@@ -11,7 +11,7 @@ import java.util.Iterator;
  *
  * @author maggot
  */
-class CodePoint {
+class CodePoint implements Cloneable {
     /**
      * Кодовая точка, используемая при итерировании по тексту программы
      * @param CPValue кодовая точка
@@ -32,9 +32,13 @@ class CodePoint {
      * @return Координаты кодовой точки
      */
     public Position position() { return position; }
-    
     public void setValue(int newValue) { value = newValue; }
     public void setPosition(Position newPosition) { position = newPosition; }
+    
+    @Override
+    public Object clone() {
+        return new CodePoint(this.value, (Position)this.position.clone());
+    } 
     
     private int value;
     private Position position;
@@ -49,15 +53,15 @@ class Program implements Iterable<CodePoint> {
      */
     public Program(String program, int terminator) {
         this.terminator = terminator;
-        this.program += this.terminator;
+        this.program = program + Character.toChars(this.terminator).toString();
     }
     /**
      * Текст программы с возможностью итерирования по кодовым точкам
      * @param program Текст программы
      */
     public Program(String program) {
-        this.terminator = 0;
-        this.program += this.terminator;
+        this.terminator = '$';
+        this.program = program + '$';
     }
     
     public class CodePointIterator implements Iterator<CodePoint> {

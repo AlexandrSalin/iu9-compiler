@@ -8,6 +8,8 @@ package ru.bmstu.iu9.compiler.lexer;
 import com.google.gson.*;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.*;
+import java.util.Iterator;
 import java.io.PrintWriter;
 import ru.bmstu.iu9.compiler.lexer.Program.CodePointIterator;
 
@@ -17,14 +19,12 @@ import ru.bmstu.iu9.compiler.lexer.Program.CodePointIterator;
  */
 public class Lexer {
     public Lexer(String program) {
-        this.program = new Program(program);
-        this.iterator = this.program.iterator();
+        this.scanner = new Scanner(program);
     }
     
     public void run() {
-        while(hasNext()) {
-            
-            
+        for (Token token : scanner) {
+            tokens.add(token);
         }
     }
     
@@ -43,31 +43,75 @@ public class Lexer {
         }
     }
     
+    public static void main(String[] args) {
+        Lexer lex = new Lexer("  .1 123e4 123E-5 ");
+        lex.run();
+    }
+    
+    private Scanner scanner;
+    private List<Token> tokens = new LinkedList<Token>();
+}
+
+
+class Scanner implements Iterable<Token> { 
+    public Scanner(String program) {
+        this.program = new Program(program);
+        this.iterator = this.program.iterator();
+    }
+    
+    @Override
+    public Iterator<Token> iterator() {
+        return new Iterator<Token>() {
+                @Override
+                public boolean hasNext() {
+                    return !skipWhitespaces();
+                }
+                @Override
+                public Token next() {
+                    return nextToken();
+                }
+                @Override
+                public void remove() {
+                    throw new UnsupportedOperationException();
+                }
+            };
+    }
+    
+    private void errorRecovery() {
+        while (iterator.hasNext() && 
+                (!Character.isWhitespace(iterator.current().value()) ||
+                  iterator.current().value() != ';')) {
+            iterator.next();
+        }
+    }
+    
     private Token nextToken() {
         if (skipWhitespaces()) {
             return null;
         }
         
-        CodePoint current = iterator.current();
+        CodePoint current = (CodePoint)iterator.current().clone();
         KeyWordToken.Type tokenType = null;
+                
         switch (iterator.current().value()) {
             case '.':
-                iterator.advance(1);
-                if (Character.isDigit(iterator.current().value())) {
-                    while (iterator.hasNext() && (
-                        Character.isDigit(iterator.current().value()) ||
-                        iterator.current().value() == 'E' ||
-                        iterator.current().value() == 'e')) {
-                        continue;
-                    }
-                    
-                    return new DoubleToken(new Fragment(
-                            current.position(), iterator.current().position()),
-                            Double.parseDouble(program.toString().substring(
+                Matcher matcher = 
+                    Pattern.compile("\\.[0-9]+([eE][-+]?[0-9]+)?\\b").
+                        matcher(program.toString()).
+                            region(
                                 current.position().index(), 
-                                iterator.current().position().index())));
+                                program.toString().length());
+
+                if (matcher.lookingAt()) {
+                    return new DoubleToken(
+                        new Fragment(
+                            iterator.current().position(), 
+                            iterator.advance(matcher.group().length()).position()),
+                        Double.parseDouble(matcher.group()));
+                } else {
+                    iterator.advance(1);
+                    tokenType = KeyWordToken.Type.MEMBER_SELECT;
                 }
-                tokenType = KeyWordToken.Type.MEMBER_SELECT;
                 break;
             case '~':
                 iterator.advance(1);
@@ -237,6 +281,21 @@ public class Lexer {
                 break;
             default:
                 if(Character.isDigit(iterator.current().value())) {
+                    Matcher matcherDouble = 
+                        Pattern.compile("(([0-9]+\\.[0-9]*([eE][-+]?[0-9]+)?)|([0-9]+[eE][-+]?[0-9]+))\\b").
+                            matcher(program.toString()).
+                                region(
+                                    current.position().index(), 
+                                    program.toString().length());
+
+                    if (matcherDouble.lookingAt()) {
+                        return new DoubleToken(
+                            new Fragment(
+                                iterator.current().position(), 
+                                iterator.advance(matcherDouble.group().length()).position()),
+                            Double.parseDouble(matcherDouble.group()));
+                    }
+                    
                     int value;
                             
                     if (iterator.current().value() == '0') {
@@ -245,7 +304,7 @@ public class Lexer {
                             iterator.current().value() == 'X') {
                             
                             iterator.advance(1);
-                            current = iterator.current();
+                            current = (CodePoint)iterator.current().clone();
                             while (iterator.hasNext() && 
                                 Character.isDigit(iterator.next().value())) {
                                 continue;
@@ -375,6 +434,7 @@ public class Lexer {
                         return new IdentifierToken(fragment, keyword);
                     
                 } else {
+                    errorRecovery();
                     return null;
                 }
         }
@@ -384,12 +444,11 @@ public class Lexer {
                 current.position(), iterator.current().position()),
                 tokenType);
         } else {
+            errorRecovery();
             return null;
         }
     }
-    public boolean hasNext() {
-        return !skipWhitespaces();
-    }
+    
     private boolean skipWhitespaces() {
         while (iterator.hasNext() && 
                 Character.isWhitespace(iterator.current().value())) {
@@ -400,5 +459,4 @@ public class Lexer {
     
     private CodePointIterator iterator;
     private Program program;
-    private List<Token> tokens = new LinkedList<Token>();
 }

@@ -9,7 +9,7 @@ package ru.bmstu.iu9.compiler.lexer;
  *
  * @author maggot
  */
-class Position {
+class Position implements Cloneable {
     /**
      * Позиция кодовой точки в тексте программы, представленная 
      * тройкой <line, pos, index>. Номер строки и позиция в строке 
@@ -40,6 +40,10 @@ class Position {
     public String toString() {
         return String.format("line: %1$d, pos: %2$d", line, position);
     }
+    @Override
+    public Object clone() {
+        return new Position(this.line, this.position, this.index);
+    } 
             
     private final int line;
     private final int position;
