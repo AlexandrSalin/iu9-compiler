@@ -1,3 +1,5 @@
+// JW9tj3vg5Uv4
+
 package ru.bmstu.iu9.compiler.lexer;
 
 import com.google.gson.*;
@@ -86,7 +88,7 @@ class Scanner implements Iterable<Token> {
         }
         
         CodePoint current = (CodePoint)iterator.current().clone();
-        KeyWordToken.Type tokenType = null;
+        Token.Type tokenType = null;
                 
         switch (iterator.current().value()) {
             case '.':
@@ -105,139 +107,143 @@ class Scanner implements Iterable<Token> {
                         Double.parseDouble(matcher.group()));
                 } else {
                     iterator.advance(1);
-                    tokenType = KeyWordToken.Type.MEMBER_SELECT;
+                    tokenType = Token.Type.MEMBER_SELECT;
                 }
                 break;
             case '~':
                 iterator.advance(1);
-                tokenType = KeyWordToken.Type.PLUS;
+                tokenType = Token.Type.PLUS;
                 break;
             case '{':
                 iterator.advance(1);
-                tokenType = KeyWordToken.Type.LEFT_BRACE;
+                tokenType = Token.Type.LEFT_BRACE;
                 break;
             case '}':
                 iterator.advance(1);
-                tokenType = KeyWordToken.Type.RIGHT_BRACE;
+                tokenType = Token.Type.RIGHT_BRACE;
                 break;
             case '[':
                 iterator.advance(1);
-                tokenType = KeyWordToken.Type.LEFT_SQUARE_BRACKET;
+                tokenType = Token.Type.LEFT_SQUARE_BRACKET;
                 break;
             case ']':
                 iterator.advance(1);
-                tokenType = KeyWordToken.Type.RIGHT_SQUARE_BRACKET;
+                tokenType = Token.Type.RIGHT_SQUARE_BRACKET;
                 break;
             case '(':
                 iterator.advance(1);
-                tokenType = KeyWordToken.Type.LEFT_BRACKET;
+                tokenType = Token.Type.LEFT_BRACKET;
                 break;
             case ')':
                 iterator.advance(1);
-                tokenType = KeyWordToken.Type.RIGHT_BRACKET;
+                tokenType = Token.Type.RIGHT_BRACKET;
                 break;
             case ':':
                 iterator.advance(1);
-                tokenType = KeyWordToken.Type.COLON;
+                tokenType = Token.Type.COLON;
+                break;
+            case ',':
+                iterator.advance(1);
+                tokenType = Token.Type.COMMA;
                 break;
             case ';':
                 iterator.advance(1);
-                tokenType = KeyWordToken.Type.SEMICOLON;
+                tokenType = Token.Type.SEMICOLON;
                 break;
             case '+':
                 iterator.advance(1); 
                 if (iterator.current().value() == '+') {   
                     iterator.advance(1); 
-                    tokenType = KeyWordToken.Type.INC;
+                    tokenType = Token.Type.INC;
                 } else if (iterator.current().value() == '=') {
                     iterator.advance(1); 
-                    tokenType = KeyWordToken.Type.PLUS_ASSIGN;
+                    tokenType = Token.Type.PLUS_ASSIGN;
                 } else {
-                    tokenType = KeyWordToken.Type.PLUS;
+                    tokenType = Token.Type.PLUS;
                 }
                 break;
             case '-':
                 iterator.advance(1);
                 if(iterator.current().value() == '-') {
                     iterator.advance(1);                    
-                    tokenType = KeyWordToken.Type.DEC;
+                    tokenType = Token.Type.DEC;
                 } else if (iterator.current().value() == '=') {
                     iterator.advance(1); 
-                    tokenType = KeyWordToken.Type.PLUS_ASSIGN;
+                    tokenType = Token.Type.PLUS_ASSIGN;
                 } else {
-                    tokenType = KeyWordToken.Type.MINUS;
+                    tokenType = Token.Type.MINUS;
                 }
                 break;
             case '!':
                 iterator.advance(1);
                 if (iterator.current().value() == '=') {
                     iterator.advance(1); 
-                    tokenType = KeyWordToken.Type.NOT_EQUAL;
+                    tokenType = Token.Type.NOT_EQUAL;
                 } else {
-                    tokenType = KeyWordToken.Type.BOOL_NOT;
+                    tokenType = Token.Type.BOOL_NOT;
                 }
                 break;
             case '&':
                 iterator.advance(1);
                 if (iterator.current().value() == '=') {
                     iterator.advance(1); 
-                    tokenType = KeyWordToken.Type.BITWISE_AND_ASSIGN;
+                    tokenType = Token.Type.BITWISE_AND_ASSIGN;
                 } else {
-                    tokenType = KeyWordToken.Type.AMPERSAND;
+                    tokenType = Token.Type.AMPERSAND;
                 }
                 break;
             case '*':
                 iterator.advance(1);
                 if (iterator.current().value() == '=') {
                     iterator.advance(1); 
-                    tokenType = KeyWordToken.Type.MUL_ASSIGN;
+                    tokenType = Token.Type.MUL_ASSIGN;
                 } else {
-                    tokenType = KeyWordToken.Type.ASTERISK;
+                    tokenType = Token.Type.ASTERISK;
                 }
                 break;
             case '/':
                 iterator.advance(1);
                 if (iterator.current().value() == '=') {
                     iterator.advance(1); 
-                    tokenType = KeyWordToken.Type.DIV_ASSIGN;
+                    tokenType = Token.Type.DIV_ASSIGN;
                 } else {
-                    tokenType = KeyWordToken.Type.DIV;
+                    tokenType = Token.Type.DIV;
                 }
                 break;
             case '%':
                 iterator.advance(1);
                 if (iterator.current().value() == '=') {
                     iterator.advance(1); 
-                    tokenType = KeyWordToken.Type.MOD_ASSIGN;
+                    tokenType = Token.Type.MOD_ASSIGN;
                 } else {
-                    tokenType = KeyWordToken.Type.MOD;
+                    tokenType = Token.Type.MOD;
                 }
                 break;
             case '^':
                 iterator.advance(1);
                 if (iterator.current().value() == '=') {
                     iterator.advance(1); 
-                    tokenType = KeyWordToken.Type.BITWISE_XOR_ASSIGN;
+                    tokenType = Token.Type.BITWISE_XOR_ASSIGN;
                 } else {
-                    tokenType = KeyWordToken.Type.BITWISE_XOR;
+                    tokenType = Token.Type.BITWISE_XOR;
                 }
                 break;
             case '|':
                 iterator.advance(1);
                 if (iterator.current().value() == '=') {
                     iterator.advance(1); 
-                    tokenType = KeyWordToken.Type.BITWISE_OR_ASSIGN;
+                    tokenType = Token.Type.BITWISE_OR_ASSIGN;
                 } else {
-                    tokenType = KeyWordToken.Type.BITWISE_OR;
+                    tokenType = Token.Type.BITWISE_OR;
                 }
                 break;
             case '=':
                 iterator.advance(1);
                 if (iterator.current().value() == '=') {
                     iterator.advance(1); 
-                    tokenType = KeyWordToken.Type.EQUAL;
+                    tokenType = Token.Type.EQUAL;
                 } else {
-                    tokenType = KeyWordToken.Type.ASSIGN;
+                    tokenType = Token.Type.ASSIGN;
                 }
                 break;
             case '>':
@@ -246,15 +252,15 @@ class Scanner implements Iterable<Token> {
                     iterator.advance(1); 
                     if (iterator.current().value() == '=') {
                         iterator.advance(1); 
-                        tokenType = KeyWordToken.Type.BITWISE_SHIFT_RIGHT_ASSIGN;
+                        tokenType = Token.Type.BITWISE_SHIFT_RIGHT_ASSIGN;
                     } else {
-                        tokenType = KeyWordToken.Type.BITWISE_SHIFT_RIGHT;
+                        tokenType = Token.Type.BITWISE_SHIFT_RIGHT;
                     }
                 } else if (iterator.current().value() == '=') {
                     iterator.advance(1); 
-                    tokenType = KeyWordToken.Type.GREATER_OR_EQUAL;
+                    tokenType = Token.Type.GREATER_OR_EQUAL;
                 } else {
-                    tokenType = KeyWordToken.Type.GREATER;
+                    tokenType = Token.Type.GREATER;
                 }
                 break;
             case '<':
@@ -263,15 +269,15 @@ class Scanner implements Iterable<Token> {
                     iterator.advance(1); 
                     if (iterator.current().value() == '=') {
                         iterator.advance(1); 
-                        tokenType = KeyWordToken.Type.BITWISE_SHIFT_RIGHT_ASSIGN;
+                        tokenType = Token.Type.BITWISE_SHIFT_RIGHT_ASSIGN;
                     } else {
-                        tokenType = KeyWordToken.Type.BITWISE_SHIFT_RIGHT;
+                        tokenType = Token.Type.BITWISE_SHIFT_RIGHT;
                     }
                 } else if (iterator.current().value() == '=') {
                     iterator.advance(1); 
-                    tokenType = KeyWordToken.Type.GREATER_OR_EQUAL;
+                    tokenType = Token.Type.GREATER_OR_EQUAL;
                 } else {
-                    tokenType = KeyWordToken.Type.GREATER;
+                    tokenType = Token.Type.GREATER;
                 }
                 break;
             default:
@@ -345,81 +351,83 @@ class Scanner implements Iterable<Token> {
                     
                     Fragment fragment = new Fragment(
                             current.position(), iterator.current().position());
-                    KeyWordToken.Type type = null; 
+                    Token.Type type = null; 
                     switch (current.value()) {
                         case 'i':
                             if (keyword.equals("int"))
-                                type = KeyWordToken.Type.INT;
+                                type = Token.Type.INT;
                             else if (keyword.equals("if"))
-                                type = KeyWordToken.Type.IF;
+                                type = Token.Type.IF;
                             break;
                         case 'f':
                             if (keyword.equals("float"))
-                                type = KeyWordToken.Type.FLOAT;
+                                type = Token.Type.FLOAT;
                             else if (keyword.equals("false"))
-                                type = KeyWordToken.Type.FALSE;
+                                type = Token.Type.FALSE;
                             else if (keyword.equals("func"))
-                                type = KeyWordToken.Type.FUNC;
+                                type = Token.Type.FUNC;
+                            else if (keyword.equals("for"))
+                                type = Token.Type.FOR;
                             break;
                         case 'd':
                             if (keyword.equals("double"))
-                                type = KeyWordToken.Type.DOUBLE;
+                                type = Token.Type.DOUBLE;
                             else if (keyword.equals("default"))
-                                type = KeyWordToken.Type.DEFAULT;
+                                type = Token.Type.DEFAULT;
                             else if (keyword.equals("do"))
-                                type = KeyWordToken.Type.DO;
+                                type = Token.Type.DO;
                             break;
                         case 'c':
                             if (keyword.equals("char"))
-                                type = KeyWordToken.Type.CHAR;
+                                type = Token.Type.CHAR;
                             else if (keyword.equals("continue"))
-                                type = KeyWordToken.Type.CONTINUE;
+                                type = Token.Type.CONTINUE;
                             else if (keyword.equals("case"))
-                                type = KeyWordToken.Type.CASE;
+                                type = Token.Type.CASE;
                             else if (keyword.equals("const"))
-                                type = KeyWordToken.Type.CONST;
+                                type = Token.Type.CONST;
                             break;
                         case 'v':
                             if (keyword.equals("void"))
-                                type = KeyWordToken.Type.VOID;
+                                type = Token.Type.VOID;
                             else if (keyword.equals("var"))
-                                type = KeyWordToken.Type.VAR;
+                                type = Token.Type.VAR;
                             break;
                         case 's':
                             if (keyword.equals("struct"))
-                                type = KeyWordToken.Type.STRUCT;
+                                type = Token.Type.STRUCT;
                             else if (keyword.equals("switch"))
-                                type = KeyWordToken.Type.SWITCH;
+                                type = Token.Type.SWITCH;
                             break;
                         case 'b':
                             if (keyword.equals("bool"))
-                                type = KeyWordToken.Type.BOOL;
+                                type = Token.Type.BOOL;
                             else if (keyword.equals("break"))
-                                type = KeyWordToken.Type.BREAK;
+                                type = Token.Type.BREAK;
                             else if (keyword.equals("berrier"))
-                                type = KeyWordToken.Type.BARRIER;
+                                type = Token.Type.BARRIER;
                             break;
                         case 'r':
                             if (keyword.equals("return"))
-                                type = KeyWordToken.Type.RETURN;
+                                type = Token.Type.RETURN;
                             else if (keyword.equals("run"))
-                                type = KeyWordToken.Type.RUN;
+                                type = Token.Type.RUN;
                             break;
                         case 'e':
                             if (keyword.equals("else"))
-                                type = KeyWordToken.Type.ELSE;
+                                type = Token.Type.ELSE;
                             break;
                         case 'w':
                             if (keyword.equals("while"))
-                                type = KeyWordToken.Type.WHILE;
+                                type = Token.Type.WHILE;
                             break;
                         case 'l':
                             if (keyword.equals("lock"))
-                                type = KeyWordToken.Type.LOCK;
+                                type = Token.Type.LOCK;
                             break;
                         case 't':
                             if (keyword.equals("true"))
-                                type = KeyWordToken.Type.TRUE;
+                                type = Token.Type.TRUE;
                             break;                            
                     }
                     

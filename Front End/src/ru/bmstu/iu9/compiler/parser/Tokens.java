@@ -1,4 +1,4 @@
-package ru.bmstu.iu9.compiler.lexer;
+package ru.bmstu.iu9.compiler.parser;
 
 /**
  *

@@ -47,16 +47,19 @@ class PrimitiveType extends Type {
 }
 
 class ArrayType extends Type {
-    public ArrayType() {
-
+    public ArrayType(Type element, int length) {
+        this.element = element;
+        this.length = length;
+        this.width = length * element.width();
     }
-    public int Length() { return this.length; }
-    public Type Type() { return element; }
+    
+    public int length() { return this.length; }
+    public Type element() { return element; }
     
     @Override
     public boolean equals(Object obj) {
-        return super.equals(obj) && ((ArrayType)obj).Length() == this.length &&
-            element.equals(((ArrayType)obj).element);
+        return super.equals(obj) && ((ArrayType)obj).length() == this.length &&
+            element.equals(((ArrayType)obj).element());
     }
     
     private int length;

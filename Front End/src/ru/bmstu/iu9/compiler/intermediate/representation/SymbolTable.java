@@ -25,6 +25,15 @@ class Nonterminal {
     public Address address() { return this.address; }
     public void setAddress(Address value) { address = value; }
     
-    private Quadruple code;
-    private Address address;
+    protected Quadruple code;
+    protected Address address;
+    protected Type type;
+}
+
+class ArrayNonterminal extends Nonterminal {
+    public ArrayNonterminal() {
+        
+    }
+    
+    protected Address array;
 }
