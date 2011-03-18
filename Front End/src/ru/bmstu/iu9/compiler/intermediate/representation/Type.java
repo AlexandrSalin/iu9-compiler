@@ -7,6 +7,8 @@ package ru.bmstu.iu9.compiler.intermediate.representation;
 
 import java.util.List;
 import java.util.LinkedList;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  *
@@ -23,7 +25,30 @@ class Type {
 }
 
 class PrimitiveType extends Type {
-    public enum type { INT, BOOL, FLOAT, DOUBLE, LONG };
+    public enum Typename { INT, BOOL, FLOAT, DOUBLE, LONG };
+    
+    public PrimitiveType(Typename type) {
+        switch(type) {
+            case INT:
+                this.width = 4;
+                break;
+            case BOOL:
+                this.width = 1;
+                break;
+            case FLOAT:
+                this.width = 4;
+                break;
+            case DOUBLE:
+                this.width = 8;
+                break;
+            case LONG:
+                this.width = 8;
+                break;
+        }
+        this.type = type;
+    }
+    
+    private Typename type;
 }
 
 class ArrayType extends Type {
@@ -44,8 +69,15 @@ class ArrayType extends Type {
 }
 
 class RecordType extends Type {
+
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj) && 
+            this.variables.equals(((RecordType)obj).variables());
+    }
+    public Map<String, Type> variables() { return this.variables; }
     
-    private SymbolTable symbolTable;
+    private Map<String, Type> variables = new HashMap<String, Type>();
 }
 
 class FunctionType extends Type {

@@ -13,9 +13,12 @@ public class Instruction {
 
 }
 class Quadruple {
-    public enum Operation { MUL, UNARY_MINUS, MINUS, UNARY_PLUS, PLUS };
+    public enum Operation { 
+        MUL, UNARY_MINUS, MINUS, UNARY_PLUS, PLUS,
+        PARAM, CALL, RETURN, GOTO, IF_GOTO,
+        INDEX };
     
-    public Quadruple(Operation op, Address arg1, Address arg2, Address result) {
+    protected Quadruple(Operation op, Address arg1, Address arg2, Address result) {
         this.operation = op;
         this.argument1 = arg1;
         this.argument2 = arg2;
@@ -25,42 +28,70 @@ class Quadruple {
     public Address argument1() { return this.argument1; }
     public Address argument2() { return this.argument2; }
     public Address result() { return this.result; }
+    public String label() { return this.label; }
     
-    private Operation operation;
-    private Address argument1;
-    private Address argument2;
-    private Address result;
+    public void setLabel() { 
+        this.label = "LABEL" + counter; 
+        ++counter;
+    }
+    
+    protected Operation operation;
+    protected Address argument1;
+    protected Address argument2;
+    protected Address result;
+    protected String label;
+    
+    private static int counter = 0;
 }
 
 
 
-class Command {
-    
+class Assignment extends Quadruple {
+    public Assignment(Address result, Operation op, Address arg1, Address arg2) {
+        super(op, arg1, arg2, result);
+    }
 }
-class BinaryAssignment extends Command {
-    
+
+class GoTo extends Quadruple {
+    public GoTo(Integer offset) {
+        super(Operation.GOTO, 
+            new Constant(new PrimitiveType(PrimitiveType.Typename.INT), offset), 
+            null, 
+            null);
+    }
 }
-class UnaryAssignment extends Command {
-    
+class If extends Quadruple {
+    public If(Address variable, Integer offset) {
+        super(Operation.IF_GOTO,
+            variable,
+            new Constant(new PrimitiveType(PrimitiveType.Typename.INT), offset),
+            null);
+    }
 }
-class Copy extends Command {
-    
+class Call extends Quadruple {
+    public Call(Address function, int argsNumber, Address result) {
+        super(Operation.CALL,
+            function,
+            new Constant(new PrimitiveType(PrimitiveType.Typename.INT), argsNumber),
+            result);
+    }
+        
+    public Call(Address function, int argsNumber) {
+        super(Operation.CALL,
+            function,
+            new Constant(new PrimitiveType(PrimitiveType.Typename.INT), argsNumber),
+            null);
+    }
 }
-class GoTo extends Command {
-    
+
+class ArrayIndex extends Quadruple {
+    public ArrayIndex(Address array, Address index, Address result) {
+        super(Operation.INDEX,
+            array,
+            index,
+            result);
+    }
 }
-class UnaryIf extends Command {
-    
-}
-class BinaryIf extends Command {
-    
-}
-class Call extends Command {
-    
-}
-class ArrayIndex extends Command {
-    
-}
-class AddressAssignment extends Command {
+class AddressAssignment extends Quadruple {
     
 }
