@@ -87,6 +87,6 @@ class ArrayIndex extends Quadruple {
             result);
     }
 }
-class AddressAssignment extends Quadruple {
-    
-}
+//class AddressAssignment extends Quadruple {
+//
+//}

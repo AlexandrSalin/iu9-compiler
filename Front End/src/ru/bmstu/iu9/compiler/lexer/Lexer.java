@@ -3,6 +3,8 @@
 package ru.bmstu.iu9.compiler.lexer;
 
 import com.google.gson.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.*;
@@ -29,7 +31,7 @@ public class Lexer {
         PrintWriter writer = null;
         
         try {
-            Gson gson = new Gson();
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
             writer = new PrintWriter(filename);
             gson.toJson(tokens, writer);
         } catch(java.io.IOException ex) {
@@ -41,8 +43,28 @@ public class Lexer {
     }
     
     public static void main(String[] args) {
-        Lexer lex = new Lexer("  .1 123e4 123E-5 ");
-        lex.run();
+        BufferedReader reader = null;
+        
+        try {
+            reader = new BufferedReader(
+                        new FileReader(
+                    "C:\\Users\\maggot\\Documents\\NetBeansProjects\\ru.bmstu.iu9.compiler\\Front End\\src\\input.src"));
+            char[] cbuf = new char[10000];
+            int count = reader.read(cbuf);
+
+            Lexer lex = new Lexer(String.copyValueOf(cbuf, 0, count));
+            lex.run();
+            lex.toJson(
+                    "C:\\Users\\maggot\\Documents\\NetBeansProjects\\ru.bmstu.iu9.compiler\\Front End\\src\\output.src");
+        } catch(java.io.IOException ex) {
+            ex.printStackTrace();
+        } finally {
+            try {
+                reader.close();
+            } catch(java.io.IOException ex) {
+                ex.printStackTrace();
+            }
+        }
     }
     
     private Scanner scanner;
@@ -100,16 +122,29 @@ class Scanner implements Iterable<Token> {
                                 program.toString().length());
 
                 if (matcher.lookingAt()) {
-                    return new DoubleToken(
-                        new Fragment(
-                            iterator.current().position(), 
-                            iterator.advance(matcher.group().length()).position()),
+                    return new Token(
+                        iterator.current().position(), 
+                        iterator.advance(matcher.group().length()).position(),
+                        Token.Type.CONST_DOUBLE, 
                         Double.parseDouble(matcher.group()));
                 } else {
                     iterator.advance(1);
                     tokenType = Token.Type.MEMBER_SELECT;
                 }
                 break;
+            case '\'':
+                iterator.advance(1);
+                int cp = iterator.current().value();
+                iterator.advance(1);
+                if (iterator.current().value() == '\'') {
+                    iterator.advance(1);
+                    return new Token(current.position(),
+                        iterator.current().position(), 
+                        Token.Type.CONST_CHAR, cp);
+                } else {
+                    errorRecovery();
+                    return null;
+                }
             case '~':
                 iterator.advance(1);
                 tokenType = Token.Type.PLUS;
@@ -275,9 +310,9 @@ class Scanner implements Iterable<Token> {
                     }
                 } else if (iterator.current().value() == '=') {
                     iterator.advance(1); 
-                    tokenType = Token.Type.GREATER_OR_EQUAL;
+                    tokenType = Token.Type.LESS_OR_EUQAL;
                 } else {
-                    tokenType = Token.Type.GREATER;
+                    tokenType = Token.Type.LESS;
                 }
                 break;
             default:
@@ -290,10 +325,10 @@ class Scanner implements Iterable<Token> {
                                     program.toString().length());
 
                     if (matcherDouble.lookingAt()) {
-                        return new DoubleToken(
-                            new Fragment(
-                                iterator.current().position(), 
-                                iterator.advance(matcherDouble.group().length()).position()),
+                        return new Token(
+                            iterator.current().position(), 
+                            iterator.advance(matcherDouble.group().length()).position(),
+                            Token.Type.CONST_DOUBLE, 
                             Double.parseDouble(matcherDouble.group()));
                     }
                     
@@ -307,8 +342,20 @@ class Scanner implements Iterable<Token> {
                             iterator.advance(1);
                             current = (CodePoint)iterator.current().clone();
                             while (iterator.hasNext() && 
-                                Character.isDigit(iterator.next().value())) {
-                                continue;
+                                (Character.isDigit(iterator.current().value()) ||
+                                 iterator.current().value() == 'A' ||
+                                 iterator.current().value() == 'B' ||
+                                 iterator.current().value() == 'C' ||
+                                 iterator.current().value() == 'D' ||
+                                 iterator.current().value() == 'E' ||
+                                 iterator.current().value() == 'F' ||
+                                 iterator.current().value() == 'a' ||
+                                 iterator.current().value() == 'b' ||
+                                 iterator.current().value() == 'c' ||
+                                 iterator.current().value() == 'd' ||
+                                 iterator.current().value() == 'e' ||
+                                 iterator.current().value() == 'f')) {
+                                iterator.next();
                             }
                             
                             value = Integer.parseInt(program.toString().substring(
@@ -335,22 +382,21 @@ class Scanner implements Iterable<Token> {
                                 iterator.current().position().index()));
                     }
                     
-                    return new IntegerToken(new Fragment(
+                    return new Token(new Fragment(
                             current.position(), iterator.current().position()),
-                            value);
+                            Token.Type.CONST_INT, value);
                     
                 } else if (Character.isLetter(iterator.current().value())) {
                     while (iterator.hasNext() &&
-                        Character.isLetterOrDigit(iterator.next().value())) {
-                        continue;
+                        (Character.isLetterOrDigit(iterator.current().value()) ||
+                         iterator.current().value() == '_')) {
+                        iterator.next();
                     }
                     
                     String keyword = program.toString().substring(
                         current.position().index(), 
                         iterator.current().position().index());
                     
-                    Fragment fragment = new Fragment(
-                            current.position(), iterator.current().position());
                     Token.Type type = null; 
                     switch (current.value()) {
                         case 'i':
@@ -404,7 +450,7 @@ class Scanner implements Iterable<Token> {
                                 type = Token.Type.BOOL;
                             else if (keyword.equals("break"))
                                 type = Token.Type.BREAK;
-                            else if (keyword.equals("berrier"))
+                            else if (keyword.equals("barrier"))
                                 type = Token.Type.BARRIER;
                             break;
                         case 'r':
@@ -432,9 +478,13 @@ class Scanner implements Iterable<Token> {
                     }
                     
                     if (type != null)
-                        return new KeyWordToken(fragment, type);
+                        return new Token(
+                            current.position(), iterator.current().position(), 
+                            type);
                     else
-                        return new IdentifierToken(fragment, keyword);
+                        return new Token(
+                            current.position(), iterator.current().position(), 
+                            Token.Type.IDENTIFIER, keyword);
                     
                 } else {
                     errorRecovery();
@@ -443,8 +493,8 @@ class Scanner implements Iterable<Token> {
         }
         
         if (tokenType != null) {
-            return new KeyWordToken(new Fragment(
-                current.position(), iterator.current().position()),
+            return new Token(
+                current.position(), iterator.current().position(),
                 tokenType);
         } else {
             errorRecovery();

@@ -1,10 +1,19 @@
-package ru.bmstu.iu9.compiler.lexer;
+package ru.bmstu.iu9.compiler.parser;
+
+import com.google.gson.InstanceCreator;
 
 /**
  *
  * @author maggot
  */
-abstract class Token {
+class Token {
+    public static class TokenInstanceCreator implements InstanceCreator<Token> {
+        @Override
+        public Token createInstance(java.lang.reflect.Type type) {
+            return new Token();
+        }
+    }
+    
     public enum Type { 
         MEMBER_SELECT, INC, DEC, BITWISE_NOT, BOOL_NOT, PLUS, 
         MINUS, AMPERSAND, ASTERISK, DIV, MOD, BITWISE_SHIFT_LEFT,
@@ -28,8 +37,15 @@ abstract class Token {
      * тексте программы
      * @param tokenCoordinates координаты лексемы
      */
-    protected Token(Fragment coordinates) {
+    public Token(Fragment coordinates, Type type) {
         this.coordinates = coordinates;
+        this.value = null;
+        this.type = type.ordinal();
+    }
+    public Token(Fragment coordinates, Type type, Object value) {
+        this.coordinates = coordinates;
+        this.value = value;
+        this.type = type.ordinal();
     }
     /**
      * Токен, представленный лексическим доменом и позицией лексемы в
@@ -37,77 +53,28 @@ abstract class Token {
      * @param starting позиция первой кодовой точки лексема
      * @param ending позиция последней кодовой точки лексема
      */
-    protected Token(Position starting, Position ending) {
-        this.coordinates = new Fragment(starting, ending);
+    public Token(Position starting, Position ending, Type type) {
+        this(new Fragment(starting, ending), type);
+    }
+    public Token(Position starting, Position ending, Type type, Object value) {
+        this(new Fragment(starting, ending), type, value);
+    }
+    
+    private Token() {
+        this.type = -1;
+        this.coordinates = null;
+        this.value = null;
     }
     
     /**
      * Метод, предоставляющий доступ к координатам лексемы
      * @return Координаты лексемы
      */
-    public Object value() { return null; }
-    public Type tag() { return type; }
+    public Object value() { return value; }
+    public Type tag() { return Type.values()[type]; }
     public Fragment coordinates() { return coordinates; }
     
-    protected Type type;
-    protected final Fragment coordinates;
-}
-
-
-class DoubleToken extends Token {
-    public DoubleToken(Fragment coordinates, double value) {
-        super(coordinates);
-        this.value = value;
-        this.type = Type.CONST_DOUBLE;
-    }
-    @Override
-    public Double value() { return value; }
-
-    private double value;
-}
-
-class IntegerToken extends Token {
-    public IntegerToken(Fragment coordinates, int value) {
-        super(coordinates);
-        this.value = value;
-        this.type = Type.CONST_INT;
-    }
-    @Override
-    public Integer value() { return value; }
-    
-    private int value;
-}
-
-class CharToken extends Token {
-    public CharToken(Fragment coordinates, char value) {
-        super(coordinates);
-        this.value = value;
-        this.type = Type.CONST_CHAR;
-    }
-    @Override
-    public Character value() { return value; }
-    
-    private char value;
-}
-
-class IdentifierToken extends Token {
-    public IdentifierToken(Fragment coordinates, String lexeme) {
-        super(coordinates);
-        
-        this.type = Type.IDENTIFIER;
-        this.value = lexeme;
-    }
-    @Override
-    public String value() { return value; }
-    
-    protected String value;
-}
-
-class KeyWordToken extends Token {
-    public KeyWordToken(Fragment coordinates, Type tokenType) {
-        super(coordinates);
-        this.type = tokenType;
-    }
-    
-    protected Type type;
+    private int type;
+    private Fragment coordinates;
+    private Object value;
 }

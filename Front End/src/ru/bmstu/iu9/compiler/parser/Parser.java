@@ -1,10 +1,9 @@
 package ru.bmstu.iu9.compiler.parser;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.util.LinkedList;
-import java.util.Iterator;
 
 /**
  *
@@ -15,10 +14,19 @@ public class Parser {
         BufferedReader reader = null;
         
         try {
-            Gson gson = new Gson();
+            Gson gson = 
+                    new GsonBuilder().
+                        registerTypeAdapter(
+                            Fragment.class, 
+                            new FragmentInstanceCreator()).
+                        registerTypeAdapter(
+                            Token.class,
+                            new Token.TokenInstanceCreator()).
+                        create();
             reader = new BufferedReader(
                         new FileReader(filename));
-            tokens = gson.fromJson(reader, tokens.getClass());
+            
+            tokens = gson.fromJson(reader, Token[].class);
         } catch(java.io.IOException ex) {
             ex.printStackTrace();
         } finally {
@@ -28,21 +36,28 @@ public class Parser {
                 ex.printStackTrace();
             }
         }
-        
-        iterator = tokens.iterator();
+    }
+    
+    public static void main(String[] args) {
+        Parser parser = new Parser(
+            "C:\\Users\\maggot\\Documents\\NetBeansProjects\\ru.bmstu.iu9.compiler\\Front End\\src\\output.src");
+        parser.process();
+    }
+    
+    public void process() {
+        Program();
     }
     
     private void nextToken() {
-        if (iterator.hasNext())
-            current = iterator.next();
+        if (++position < tokens.length)
+            current = tokens[position];
     }
     
-    private LinkedList<Token> tokens;
-    private Iterator<Token> iterator;
+    private Token[] tokens;
+    private int position = 0;
     private Token current;
     
     private void Program() {
-        nextToken();
         if(current.tag() == Token.Type.FUNC) {
             nextToken();
             Type();
@@ -68,7 +83,7 @@ public class Parser {
         }
     }
     private void Identifier() {
-        if (current instanceof IdentifierToken) {
+        if (isIdentifier()) {
             nextToken();
         } else {
             // ERROR
@@ -562,7 +577,7 @@ public class Parser {
                current.tag() == Token.Type.DEC;
     }
     private boolean isIdentifier() {
-        return current instanceof IdentifierToken;
+        return current.tag() == Token.Type.IDENTIFIER;
     }
     private boolean isModifier() {
         return current.tag() == Token.Type.CONST ||

@@ -66,7 +66,7 @@ class Program implements Iterable<CodePoint> {
         }
         @Override
         public boolean hasNext() {
-            return program.codePointAt(index + 1) != terminator;
+            return program.codePointAt(index) != terminator;
         }
         @Override
         public CodePoint next() {

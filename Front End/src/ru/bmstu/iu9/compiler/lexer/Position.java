@@ -18,16 +18,8 @@ class Position implements Cloneable {
         this.position = position;
         this.index = index;
     }
-    
-    /**
-     * Метод, предоставляющий доступ к номеру строки
-     * @return Номер строки
-     */
+
     public int line() { return line; }
-    /**
-     * Метод, предоставляющий доступ к позиции в строке
-     * @return Позиция в строке
-     */
     public int position() { return position; }
     public int index() { return index; }
     

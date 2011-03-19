@@ -1,5 +1,8 @@
 package ru.bmstu.iu9.compiler.parser;
 
+import com.google.gson.InstanceCreator;
+import java.lang.reflect.Type;
+
 /**
  *
  * @author maggot
@@ -17,6 +20,11 @@ class Position implements Cloneable {
         this.line = line;
         this.position = position;
         this.index = index;
+    }
+    public Position() {
+        this.line = 1;
+        this.position = 1;
+        this.index = 0;
     }
     
     /**
@@ -40,9 +48,9 @@ class Position implements Cloneable {
         return new Position(this.line, this.position, this.index);
     } 
             
-    private final int line;
-    private final int position;
-    private final int index;
+    private int line;
+    private int position;
+    private int index;
 }
 
 class Fragment {
@@ -59,6 +67,12 @@ class Fragment {
     public Position starting() { return starting; }
     public Position ending() { return ending; }
     
-    private final Position starting;
-    private final Position ending;
+    private Position starting;
+    private Position ending;
+}
+
+class FragmentInstanceCreator implements InstanceCreator<Fragment> {
+  public Fragment createInstance(Type type) {
+    return new Fragment(null, null);
+  }
 }
