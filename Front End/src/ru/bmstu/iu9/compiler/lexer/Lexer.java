@@ -1,5 +1,3 @@
-// JW9tj3vg5Uv4
-
 package ru.bmstu.iu9.compiler.lexer;
 
 import com.google.gson.*;
@@ -43,7 +41,7 @@ public class Lexer {
     }
     
     public static void main(String[] args) {
-        BufferedReader reader = null;
+        BufferedReader reader = null; // JW9tj3vg5Uv4
         
         try {
             reader = new BufferedReader(
@@ -55,7 +53,7 @@ public class Lexer {
             Lexer lex = new Lexer(String.copyValueOf(cbuf, 0, count));
             lex.run();
             lex.toJson(
-                    "C:\\Users\\maggot\\Documents\\NetBeansProjects\\ru.bmstu.iu9.compiler\\Front End\\src\\output.src");
+                    "C:\\Users\\maggot\\Documents\\NetBeansProjects\\ru.bmstu.iu9.compiler\\Front End\\src\\output.json");
         } catch(java.io.IOException ex) {
             ex.printStackTrace();
         } finally {

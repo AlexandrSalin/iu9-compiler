@@ -11,18 +11,19 @@ class Quadruple {
     public enum Operation { 
         MUL, UNARY_MINUS, MINUS, UNARY_PLUS, PLUS,
         PARAM, CALL, RETURN, GOTO, IF_GOTO,
-        INDEX };
+        INDEX, INDIRECT_ASSIGN, RUN, BARRIER,
+        REF, DEREF};
     
-    protected Quadruple(Operation op, Address arg1, Address arg2, Address result) {
+    protected Quadruple(Operation op, Operand arg1, Operand arg2, Operand result) {
         this.operation = op;
         this.argument1 = arg1;
         this.argument2 = arg2;
         this.result = result;
     }
     public Operation operation() { return this.operation; }
-    public Address argument1() { return this.argument1; }
-    public Address argument2() { return this.argument2; }
-    public Address result() { return this.result; }
+    public Operand argument1() { return this.argument1; }
+    public Operand argument2() { return this.argument2; }
+    public Operand result() { return this.result; }
     public String label() { return this.label; }
     
     public void setLabel() { 
@@ -31,9 +32,9 @@ class Quadruple {
     }
     
     protected Operation operation;
-    protected Address argument1;
-    protected Address argument2;
-    protected Address result;
+    protected Operand argument1;
+    protected Operand argument2;
+    protected Operand result;
     protected String label;
     
     private static int counter = 0;
@@ -42,7 +43,7 @@ class Quadruple {
 
 
 class Assignment extends Quadruple {
-    public Assignment(Address result, Operation op, Address arg1, Address arg2) {
+    public Assignment(Operand result, Operation op, Operand arg1, Operand arg2) {
         super(op, arg1, arg2, result);
     }
 }
@@ -50,41 +51,47 @@ class Assignment extends Quadruple {
 class GoTo extends Quadruple {
     public GoTo(Integer offset) {
         super(Operation.GOTO, 
-            new Constant(new PrimitiveType(PrimitiveType.Typename.INT), offset), 
-            null, 
-            null);
+                Operand.getConstantOperand(Type.getPrimitiveType(Type.Typename.INT), offset), 
+                null, 
+                null);
     }
 }
 class If extends Quadruple {
-    public If(Address variable, Integer offset) {
+    public If(Operand variable, Integer offset) {
         super(Operation.IF_GOTO,
-            variable,
-            new Constant(new PrimitiveType(PrimitiveType.Typename.INT), offset),
-            null);
+                variable,
+                Operand.getConstantOperand(Type.getPrimitiveType(Type.Typename.INT), offset),
+                null);
     }
 }
 class Call extends Quadruple {
-    public Call(Address function, int argsNumber, Address result) {
+    public Call(Operand function, int argsNumber, Operand result) {
         super(Operation.CALL,
-            function,
-            new Constant(new PrimitiveType(PrimitiveType.Typename.INT), argsNumber),
-            result);
+                function,
+                Operand.getConstantOperand(Type.getPrimitiveType(Type.Typename.INT), argsNumber),
+                result);
     }
         
-    public Call(Address function, int argsNumber) {
+    public Call(Operand function, int argsNumber) {
         super(Operation.CALL,
-            function,
-            new Constant(new PrimitiveType(PrimitiveType.Typename.INT), argsNumber),
-            null);
+                function,
+                Operand.getConstantOperand(Type.getPrimitiveType(Type.Typename.INT), argsNumber),
+                null);
     }
 }
-
+class Ref extends Quadruple {
+    public Ref(Operand variable, Operand result) {
+        super(Operation.REF, variable, null, result);
+    }
+}
+class Deref extends Quadruple {
+    public Deref(Operand variable, Operand result) {
+        super(Operation.DEREF, variable, null, result);
+    }
+}
 class ArrayIndex extends Quadruple {
-    public ArrayIndex(Address array, Address index, Address result) {
-        super(Operation.INDEX,
-            array,
-            index,
-            result);
+    public ArrayIndex(Operand array, Operand index, Operand result) {
+        super(Operation.INDEX, array, index, result);
     }
 }
 //class AddressAssignment extends Quadruple {

@@ -18,11 +18,12 @@ public class Parser {
                     new GsonBuilder().
                         registerTypeAdapter(
                             Fragment.class, 
-                            new FragmentInstanceCreator()).
+                            new Fragment.FragmentInstanceCreator()).
                         registerTypeAdapter(
                             Token.class,
                             new Token.TokenInstanceCreator()).
                         create();
+            
             reader = new BufferedReader(
                         new FileReader(filename));
             
@@ -54,22 +55,27 @@ public class Parser {
     }
     
     private Token[] tokens;
-    private int position = 0;
+    private int position = -1;
     private Token current;
     
     private void Program() {
-        if(current.tag() == Token.Type.FUNC) {
-            nextToken();
-            Type();
-            Identifier();
-            FuncArgList();
-            Code();
-        } else if (isModifier()) {
-            VariableDef();
-        } else if (current.tag() == Token.Type.STRUCT) {
-            StructDef();
-        } else {
-            // ERROR
+        nextToken();
+        while (current.tag() == Token.Type.FUNC || 
+               isModifier() || 
+               current.tag() == Token.Type.STRUCT) {
+            if(current.tag() == Token.Type.FUNC) {
+                nextToken();
+                Type();
+                Identifier();
+                FuncArgList();
+                Code();
+            } else if (isModifier()) {
+                VariableDef();
+                Semicolon();
+            } else if (current.tag() == Token.Type.STRUCT) {
+                StructDef();
+                Semicolon();
+            }
         }
     }
     private void Type() {
@@ -91,10 +97,13 @@ public class Parser {
     }
     private void FuncArgList() {
         LeftBracket();
-        if (isType()) {
+        if (isModifier()) {
             nextToken();
+            Type();
             Identifier();
             while (current.tag() == Token.Type.COMMA) {
+                nextToken();
+                Modifier();
                 Type();
                 Identifier();
             }
@@ -136,20 +145,14 @@ public class Parser {
     }
     private void Block() {
         while (isModifier() ||
-                current.tag() == Token.Type.FOR ||
-                current.tag() == Token.Type.IF ||
-                current.tag() == Token.Type.WHILE ||
-                current.tag() == Token.Type.DO ||
-                current.tag() == Token.Type.RUN ||
-                current.tag() == Token.Type.SWITCH ||
-                current.tag() == Token.Type.RETURN ||
-                current.tag() == Token.Type.CONTINUE ||
-                current.tag() == Token.Type.LOCK ||
-                current.tag() == Token.Type.BARRIER) {
+               isFirstOfControlStructure() ||
+               isFirstOfExpression()) {
             if (isModifier()) {
                 VariableDef();
+                Semicolon();
             }  else if (isFirstOfExpression()) {
                 Expression();
+                Semicolon();
             } else if (current.tag() == Token.Type.FOR) {
                 For();
             } else if (current.tag() == Token.Type.IF) {
@@ -158,18 +161,26 @@ public class Parser {
                 While();
             } else if (current.tag() == Token.Type.DO) {
                 DoWhile();
+                Semicolon();
             } else if (current.tag() == Token.Type.RUN) {
                 NewThread();
+                Semicolon();
             } else if (current.tag() == Token.Type.SWITCH) {
                 Switch();
             } else if (current.tag() == Token.Type.RETURN) {
                 Return();
+                Semicolon();
             } else if (current.tag() == Token.Type.CONTINUE) {
                 Continue();
+                Semicolon();
             } else if (current.tag() == Token.Type.LOCK) {
                 Lock();
             } else if (current.tag() == Token.Type.BARRIER) {
                 Barrier();
+                Semicolon();
+            } else if (current.tag() == Token.Type.BREAK) {
+                Break();
+                Semicolon();
             }
         }
     }
@@ -177,8 +188,8 @@ public class Parser {
         nextToken();
         LeftBracket();
 
-        if (current.tag() == Token.Type.CONST || 
-            current.tag() == Token.Type.VAR) {
+        if (isModifier()) {
+            VariableDef();
         } else if (isFirstOfExpression()) {
             Expression();
         }
@@ -247,7 +258,6 @@ public class Parser {
     private void NewThread() {
         nextToken();
         Expression();
-        Semicolon();
     }
     private void Switch() {
         nextToken();
@@ -292,11 +302,9 @@ public class Parser {
         if (isFirstOfExpression()) {
             Expression();
         }
-        Semicolon();
     }
     private void Continue() {
         nextToken();
-        Semicolon();
     }
     private void Lock() {
         nextToken();
@@ -304,7 +312,6 @@ public class Parser {
     }
     private void Barrier() {
         nextToken();
-        Semicolon();
     }    
     private void Expression() {
         BoolExpression();
@@ -312,8 +319,6 @@ public class Parser {
             nextToken();
             BoolExpression();
         }
-        
-        Semicolon();
     }
     private void BoolExpression() {
         ABoolExpression();
@@ -501,12 +506,12 @@ public class Parser {
     }
     private void Variable() {
         Identifier();
-        if (current.tag() == Token.Type.EQUAL) {
+        if (current.tag() == Token.Type.ASSIGN) {
             nextToken();
             Expression();
         } else if (current.tag() == Token.Type.LEFT_SQUARE_BRACKET) {
             ArrayDim();
-            if (current.tag() == Token.Type.EQUAL) {
+            if (current.tag() == Token.Type.ASSIGN) {
                 nextToken();
                 ArrayInit();
             }
@@ -540,6 +545,7 @@ public class Parser {
         LeftBrace();
         while (isModifier()) {
             VariableDef();
+            Semicolon();
         }
         RightBrace();
     }
@@ -558,8 +564,6 @@ public class Parser {
         } else {
             // ERROR
         }
-        
-        Semicolon();
     }
     private void FuncPointer() {
         LeftBracket();
@@ -570,6 +574,14 @@ public class Parser {
         }
         RightBracket();
         FuncArgList();
+    }
+    private void Modifier() {
+        if (current.tag() == Token.Type.VAR ||
+            current.tag() == Token.Type.CONST) {
+            nextToken();
+        } else {
+            // ERROR
+        }
     }
    
     private boolean isIncDec() {
@@ -644,5 +656,27 @@ public class Parser {
     private boolean isPlusMinus() {
         return current.tag() == Token.Type.PLUS ||
                current.tag() == Token.Type.MINUS;
+    }
+
+    private boolean isFirstOfControlStructure() {
+        return current.tag() == Token.Type.FOR ||
+                current.tag() == Token.Type.IF ||
+                current.tag() == Token.Type.WHILE ||
+                current.tag() == Token.Type.DO ||
+                current.tag() == Token.Type.RUN ||
+                current.tag() == Token.Type.SWITCH ||
+                current.tag() == Token.Type.RETURN ||
+                current.tag() == Token.Type.CONTINUE ||
+                current.tag() == Token.Type.LOCK ||
+                current.tag() == Token.Type.BARRIER ||
+                current.tag() == Token.Type.BREAK;
+    }
+
+    private void Break() {
+        if (current.tag() == Token.Type.BREAK) {
+            nextToken();
+        } else {
+            // ERROR
+        }
     }
 }

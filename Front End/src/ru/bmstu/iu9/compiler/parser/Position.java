@@ -69,10 +69,11 @@ class Fragment {
     
     private Position starting;
     private Position ending;
-}
-
-class FragmentInstanceCreator implements InstanceCreator<Fragment> {
-  public Fragment createInstance(Type type) {
-    return new Fragment(null, null);
-  }
+    
+    public static class FragmentInstanceCreator implements InstanceCreator<Fragment> {
+        @Override
+        public Fragment createInstance(Type type) {
+            return new Fragment(null, null);
+        }
+    }
 }

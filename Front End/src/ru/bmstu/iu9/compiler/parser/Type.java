@@ -1,10 +1,7 @@
-package ru.bmstu.iu9.compiler.intermediate.representation;
+package ru.bmstu.iu9.compiler.parser;
 
-import com.google.gson.InstanceCreator;
 import java.util.List;
 import java.util.LinkedList;
-import java.util.Map;
-import java.util.HashMap;
 
 /**
  *
@@ -121,11 +118,4 @@ final class Type {
     private Type returnValue = null;
     private List<Type> arguments = null;
     private SymbolTable symbolTable = null;
-    
-    public static class TypeInstanceCreator implements InstanceCreator<Type> {
-        @Override
-        public Type createInstance(java.lang.reflect.Type type) {
-            return new Type();
-        }
-    }
 }
