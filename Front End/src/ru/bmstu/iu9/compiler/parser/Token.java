@@ -7,13 +7,6 @@ import com.google.gson.InstanceCreator;
  * @author maggot
  */
 class Token {
-    public static class TokenInstanceCreator implements InstanceCreator<Token> {
-        @Override
-        public Token createInstance(java.lang.reflect.Type type) {
-            return new Token();
-        }
-    }
-    
     public enum Type { 
         MEMBER_SELECT, INC, DEC, BITWISE_NOT, BOOL_NOT, PLUS, 
         MINUS, AMPERSAND, ASTERISK, DIV, MOD, BITWISE_SHIFT_LEFT,
@@ -77,4 +70,11 @@ class Token {
     private int type;
     private Fragment coordinates;
     private Object value;
+    
+    public static class TokenInstanceCreator implements InstanceCreator<Token> {
+        @Override
+        public Token createInstance(java.lang.reflect.Type type) {
+            return new Token();
+        }
+    }
 }

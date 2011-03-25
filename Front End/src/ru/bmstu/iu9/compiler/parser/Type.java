@@ -1,15 +1,15 @@
 package ru.bmstu.iu9.compiler.parser;
 
+import com.google.gson.InstanceCreator;
 import java.util.List;
-import java.util.LinkedList;
 
 /**
  *
  * @author maggot
  */
 final class Type {
-    public enum Typename { INT, BOOL, FLOAT, DOUBLE, LONG, CHAR, 
-        ARRAY, RECORD, FUNC };
+    public enum Typename { 
+        INT, BOOL, FLOAT, DOUBLE, LONG, CHAR, ARRAY, RECORD, FUNC };
     
     private Type() { }
     public static Type getPrimitiveType(Typename type) {
@@ -52,18 +52,20 @@ final class Type {
     public static Type getRecordType(SymbolTable parentSymbolTable) {
         Type recordType = new Type();
         
-        recordType.symbolsTypes = new SymbolTable();
-        recordType.symbolsTypes.setOpenScope(parentSymbolTable);
+        recordType.nestedTable = new SymbolTable();
+        recordType.nestedTable.setOpenScope(parentSymbolTable);
         recordType.type = Typename.RECORD;
         
         return recordType;
     }
-    public static Type getFuncType(Type returnValueType, List<Type> argumentsTypes) {
+    public static Type getFuncType(Type returnValueType, 
+            List<Type> argumentsTypes, SymbolTable parentSymbolTable) {
         Type funcType = new Type();
         
         funcType.returnValue = returnValueType;
         funcType.arguments = argumentsTypes;
-        funcType.arguments = new LinkedList<Type>();
+        funcType.nestedTable = new SymbolTable();
+        funcType.nestedTable.setOpenScope(parentSymbolTable);
         funcType.type = Typename.FUNC;
         
         return funcType;
@@ -79,32 +81,32 @@ final class Type {
             case LONG:
             case CHAR:
                 return this.getClass().equals(obj.getClass()) &&
-                        this.type == ((Type)obj).type;
+                        this.type.equals(((Type)obj).type);
             case ARRAY:
                 return this.getClass().equals(obj.getClass()) && 
-                        this.type == ((Type)obj).type &&
+                        this.type.equals(((Type)obj).type) &&
                         ((Type)obj).length() == this.length &&
                         elementType.equals(((Type)obj).elementType());
             case RECORD:
                 return this.getClass().equals(obj.getClass()) && 
-                        this.type == ((Type)obj).type &&
-                        this.symbolsTypes.equals(((Type)obj).symbolsTypes());
+                        this.type.equals(((Type)obj).type) &&
+                        this.nestedTable.equals(((Type)obj).nestedTable());
             case FUNC:
                 return this.getClass().equals(obj.getClass()) && 
-                        this.type == ((Type)obj).type &&
+                        this.type.equals(((Type)obj).type) &&
                         this.returnValue.equals(((Type)obj).returnValue);
             default:
                 return false;                
         }
     }
+    
     public Typename Typename() { return type; }
     public Integer width() { return this.width; }
     public Integer length() { return this.length; }
     public Type elementType() { return this.elementType; }
-    public SymbolTable symbolsTypes() { return this.symbolsTypes; }
     public Type returnValueType() { return this.returnValue; }
     public List<Type> argumentsTypes() { return this.arguments; }
-    public SymbolTable symbolTable() { return this.symbolTable; }
+    public SymbolTable nestedTable() { return this.nestedTable; }
     
     // All types
     private Integer width = null;
@@ -112,10 +114,16 @@ final class Type {
     // Array Type
     private Integer length = null;
     private Type elementType = null;
-    // Record type
-    private SymbolTable symbolsTypes = null;
     // Func type
     private Type returnValue = null;
     private List<Type> arguments = null;
-    private SymbolTable symbolTable = null;
+    // Record && Func type
+    private SymbolTable nestedTable = null;
+    
+    public static class TypeInstanceCreator implements InstanceCreator<Type> {
+        @Override
+        public Type createInstance(java.lang.reflect.Type type) {
+            return new Type();
+        }
+    }
 }
