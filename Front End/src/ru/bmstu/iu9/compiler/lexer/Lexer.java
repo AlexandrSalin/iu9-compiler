@@ -323,14 +323,20 @@ class Scanner implements Iterable<Token> {
                                     program.toString().length());
 
                     if (matcherDouble.lookingAt()) {
+                        double value = 0.0;
+                        try {
+                            value = Double.parseDouble(matcherDouble.group());
+                        } catch(NumberFormatException ex) {
+                            Logger.log(ex.toString(), current.position());
+                        }
                         return new Token(
                             iterator.current().position(), 
                             iterator.advance(matcherDouble.group().length()).position(),
                             Token.Type.CONST_DOUBLE, 
-                            Double.parseDouble(matcherDouble.group()));
+                            value);
                     }
                     
-                    int value;
+                    int value = 0;
                             
                     if (iterator.current().value() == '0') {
                         iterator.advance(1);
@@ -356,18 +362,26 @@ class Scanner implements Iterable<Token> {
                                 iterator.next();
                             }
                             
-                            value = Integer.parseInt(program.toString().substring(
-                                current.position().index(), 
-                                iterator.current().position().index()), 16);
+                            try {
+                                value = Integer.parseInt(program.toString().substring(
+                                    current.position().index(), 
+                                    iterator.current().position().index()), 16);
+                            } catch(NumberFormatException ex) {
+                                Logger.log(ex.toString(), current.position());
+                            }
                         } else {
                             while (iterator.hasNext() && 
                                 Character.isDigit(iterator.next().value())) {
                                 continue;
                             }
                             
-                            value = Integer.parseInt(program.toString().substring(
-                                current.position().index(), 
-                                iterator.current().position().index()), 8);
+                            try {
+                                value = Integer.parseInt(program.toString().substring(
+                                    current.position().index(), 
+                                    iterator.current().position().index()), 8);
+                            } catch(NumberFormatException ex) {
+                                Logger.log(ex.toString(), current.position());
+                            }
                         }
                     } else {
                         while (iterator.hasNext() && 
@@ -375,9 +389,13 @@ class Scanner implements Iterable<Token> {
                             continue;
                         }
                         
-                        value = Integer.parseInt(program.toString().substring(
-                                current.position().index(), 
-                                iterator.current().position().index()));
+                        try {
+                            value = Integer.parseInt(program.toString().substring(
+                                    current.position().index(), 
+                                    iterator.current().position().index()));
+                        } catch(NumberFormatException ex) {
+                            Logger.log(ex.toString(), current.position());
+                        }
                     }
                     
                     return new Token(new Fragment(
@@ -485,7 +503,8 @@ class Scanner implements Iterable<Token> {
                             Token.Type.IDENTIFIER, keyword);
                     
                 } else {
-                    errorRecovery();
+                    Logger.logUnknownCharacter(current.position());
+                    iterator.advance(1);
                     return null;
                 }
         }
@@ -495,7 +514,8 @@ class Scanner implements Iterable<Token> {
                 current.position(), iterator.current().position(),
                 tokenType);
         } else {
-            errorRecovery();
+            Logger.logUnknownCharacter(current.position());
+            iterator.advance(1);
             return null;
         }
     }

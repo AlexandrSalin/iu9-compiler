@@ -1,6 +1,5 @@
 package ru.bmstu.iu9.compiler.parser;
 
-import com.google.gson.InstanceCreator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -8,52 +7,75 @@ import java.util.List;
  *
  * @author maggot
  */
-class TreeNode {
-    private TreeNode() { }
+abstract class TreeNode {  
+    protected TreeNode(Type type) {
+        this.type = type;
+    }
+    protected TreeNode() { }
     
-    public static TreeNode getCompositeNode(Type type) {
-        TreeNode compositeNode = new TreeNode();
-        compositeNode.children = new LinkedList<TreeNode>();
-        compositeNode.type = type;
-        
-        return compositeNode;
+    public Type type() { return this.type; }
+    
+    protected Type type;
+}
+
+final class InvalidNode extends TreeNode {
+    public InvalidNode() { }
+}
+
+final class CompositeNode extends TreeNode {
+    public enum Operation { ASSIGN, ARRAY_ELEMENT, FOR, MEMBER_SELECT, CALL,
+        FUNCTION_ARGUMENTS, POST_INC, POST_DEC, LOCK, BARRIER, CONTINUE, RETURN, 
+        RUN, DO_WHILE, WHILE, IF, ELSE, SEQUENCING, BREAK, MINUS, PRE_DEC, 
+        PRE_INC, UNARY_MINUS, REF, DEREF, CAST, DIV, MUL, MOD, PLUS, 
+        BITWISE_SHIFT_RIGHT, BITWISE_SHIFT_LEFT, GREATER, GREATER_OR_EQUAL, 
+        LESS, LESS_OR_EUQAL, NOT_EQUAL, EQUAL, BITWISE_AND, BITWISE_XOR,
+        BITWISE_OR, BOOL_AND, BOOL_OR, BITWISE_AND_ASSIGN, BITWISE_XOR_ASSIGN, 
+        BITWISE_SHIFT_RIGHT_ASSIGN, BITWISE_SHIFT_LEFT_ASSIGN, BITWISE_OR_ASSIGN, 
+        MOD_ASSIGN, DIV_ASSIGN, MUL_ASSIGN, MINUS_ASSIGN, PLUS_ASSIGN,
+        SWITCH, CASE};
+    public CompositeNode(Type type, Operation operation) {
+        super(type);
+        this.operation = operation;
     }
-    public static TreeNode getConstantLeaf(Type type, Object value) {
-        TreeNode constantNode = new TreeNode();
-        constantNode.type = type;
-        constantNode.value = value;
-        
-        return constantNode;
-    }
-    public static TreeNode getVariableLeaf(String name, SymbolTable symbolTable) {
-        TreeNode variableNode = new TreeNode();
-        variableNode.type = symbolTable.get(name);
-        variableNode.name = name;
-        
-        return variableNode;
+    public CompositeNode(Operation operation) {
+        this.operation = operation;
     }
     
     public void addChild(TreeNode child) {
-        if (children != null)
+        if (child != null)
             children.add(child);
-        else
-            throw new UnsupportedOperationException();
+    }
+    public int childrenNumber() { return this.children.size(); }
+    public void setType(Type type) { this.type = type; }
+    public List<TreeNode> children() { return this.children; }
+    public Operation operation() { return this.operation; }
+    
+    private List<TreeNode> children = new LinkedList<TreeNode>();
+    private Operation operation;
+}
+
+final class ConstantLeaf extends TreeNode {
+    public ConstantLeaf(Type type, Object value) {
+        super(type);
+        this.value = value;
     }
     
-    public Type type() { return this.type; }
-    public List<TreeNode> children() { return this.children; }
     public Object value() { return this.value; }
+    
+    private final Object value;
+}
+
+final class VariableLeaf extends TreeNode {
+    public VariableLeaf(String name, SymbolTable symbolTable) {
+        super(symbolTable.get(name).type());
+        this.name = name;
+    }
+    public VariableLeaf(String name, Type type) {
+        super(type);
+        this.name = name;
+    }
+    
     public String name() { return this.name; }
     
-    private List<TreeNode> children = null;
-    private Type type = null;
-    private Object value = null;
-    private String name = null;
-    
-    public static class TreeNodeInstanceCreator implements InstanceCreator<TreeNode> {
-        @Override
-        public TreeNode createInstance(java.lang.reflect.Type type) {
-            return new TreeNode();
-        }
-    }
+    private final String name;
 }

@@ -1,12 +1,20 @@
 Const         ::= Number | "'" UnicodeChar "'" | "true" | "false" 
 Number        ::= DecimalLit | OctalLit | HexLit | FloatLit 
-Modifier      ::= "const" | "var" 
-PrimitiveType ::= "int" | "float" | "double" | "char" | "void" | "struct" Identifier | "bool" 
-Type          ::= PrimitiveType [ Asterisk ["const"]] 
+
+
+Type          ::= ["const"] PrimitiveType TypeExpr0
+TypeExpr0     ::= [Poiter] Expr1
+TypeExpr1     ::= [Expr2 [FuncArgsTypes] | ArrayDim]
+TypeExpr2     ::= "(" TypeExpr0 ")"
+
+Pointer       ::= Asterisk ["const"] { Asterisk ["const"] }
+FuncArgsTypes ::= "(" [ Type, { "," Type }] ")"
+ArrayDim      ::= "[" [ IntLit ] "]" { "[" IntLit "]" }
+
 
 Identifier    ::= Letter { Letter | UnicodeDigit } 
 Letter        ::= UnicodeLetter | "_" 
-DecimalDigit  ::= "0" ... "9" 
+DecimalDigit  ::= "0" ... "9"           
 OctalDigit    ::= "0" ... "7" 
 HexDigit      ::= "0" ... "9" | "A" ... "F" | "a" ... "f" 
 
@@ -43,12 +51,11 @@ Sequencing    ::= ","
 Program       ::= { FunctionDef | VariableDef ";" | StructDef ";" }
 
 FunctionDef   ::= "func" Type Identifier FuncArgList Code 
-VariableDef   ::= Modifier Type ( Variable { "," Variable } | FuncPointer )
-Variable      ::= Identifier [ "=" Expression | ArrayDim [ "=" ArrayInit ]]
-FuncPointer   ::= "(" "*" Identifier [ ArrayDim ] ")" FuncArgList
+VariableDef   ::= Type Variable { "," Variable }
+Variable      ::= Identifier [ "=" ( Expression | ArrayInit )]
 
-FuncArgList   ::= "(" [ Modifier Type Identifier { "," Modifier Type Identifier }] ")"
-ArrayDim      ::= "[" [ Expression ] "]" { "[" [ Expression ] "]" }
+FuncArgList   ::= "(" [ Type Identifier { "," Type Identifier }] ")"
+
 ArrayInit     ::= "{" ArrayElement { "," ArrayElement } [ "," ] "}" 
 ArrayElement  ::= ArrayInit | Expression 
 
@@ -72,9 +79,10 @@ BExpression ::= CExpression { ( Div | Asterisk | Mod ) CExpression }
 CExpression ::= ( "(" ( Type ")" DExpression | Expression ")" )) | DExpression
 DExpression ::= ([ PlusMinus ] | { Ampersand | Asterisk } | [ IncDec ]) EExpression 
 EExpression ::= FExpression [ IncDec ] 
-FExpression ::= JExpression { ArrayDim | MemberSelect Identifier | FuncArgs }
+FExpression ::= JExpression { ArrayElement | MemberSelect Identifier | FuncArgs }
 JExpression ::= "(" Expression ")" | Const | Identifier 
 
+ArrayElement::= "[" Expression "]"
 FuncArgs    ::= "(" [ Expression { "," Expression }] ")" 
 
 For         ::= "for" "(" 

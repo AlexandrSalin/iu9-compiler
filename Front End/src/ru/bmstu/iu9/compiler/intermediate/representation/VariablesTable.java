@@ -8,8 +8,8 @@ import java.util.HashMap;
  * @author maggot
  */
 class VariablesTable {
-    public void add(Type type) {
-        Operand var = Operand.getVariableOperand(type);
+    public void add(String name, Type type) {
+        Variable var = new Variable(name, type);
         symbols.put(var.number(), var);
     }
     public Operand get(int number) {
@@ -19,7 +19,7 @@ class VariablesTable {
     private Map<Integer, Operand> symbols = new HashMap<Integer, Operand>();
 }
 
-
+/*
 class Nonterminal {
     public Quadruple code() { return this.code; }
     public void setCode(Quadruple value) { code = value; }
@@ -38,3 +38,4 @@ class ArrayNonterminal extends Nonterminal {
     
     protected Operand array;
 }
+*/

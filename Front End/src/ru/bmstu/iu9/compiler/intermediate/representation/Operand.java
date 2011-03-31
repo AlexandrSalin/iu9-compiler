@@ -1,45 +1,43 @@
 package ru.bmstu.iu9.compiler.intermediate.representation;
 
-final class Operand implements Cloneable {
-    private Operand(Type type) {
+abstract class Operand implements Cloneable {
+    protected Operand(Type type) {
         this.type = type;
-    }
-    private Operand(Type type, Integer number, Object value) {
-        this.type = type;
-        this.number = number;
-        this.value = value;
-    }
-    
-    public static Operand getVariableOperand(Type type) {
-        Operand varOperand = new Operand(type);
-        
-        varOperand.number = newNumber();
-        
-        return varOperand;
-    }
-    public static Operand getConstantOperand(Type type, Object value) {
-        Operand constOperand = new Operand(type);
-        
-        constOperand.value = value;
-        
-        return constOperand;
-    }
-    
-    @Override
-    public Object clone() {
-        return new Operand(this.type, this.number, this.value);
     }
     
     public Type type() { return this.type; }
-    public int number() { return this.number; }
+    
+    protected Type type;
+}
+
+class Variable extends Operand {
+    public Variable(String name, Type type) {
+        super(type);
+        this.name = name;
+    }
+    
+    public String name() { return this.name; }
+    
+    @Override
+    public Object clone() {
+        return new Variable(this.name, this.type);
+    }
+    
+    private String name;
+}
+
+class Constant extends Operand {
+    public Constant(Type type, Object value) {
+        super(type);
+        this.value = value;
+    }
+    
     public Object value() { return this.value; }
     
-    private Type type = null;
-    private Integer number = null;
-    private Object value = null;
-    
-    private static int newNumber() {
-        return counter++;
+    @Override
+    public Object clone() {
+        return new Constant(this.type, this.value);
     }
-    private static int counter = 0;
+    
+    private Object value;
 }

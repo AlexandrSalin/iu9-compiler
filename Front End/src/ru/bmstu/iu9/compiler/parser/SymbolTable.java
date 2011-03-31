@@ -1,6 +1,5 @@
 package ru.bmstu.iu9.compiler.parser;
 
-import com.google.gson.InstanceCreator;
 import java.util.Map;
 import java.util.HashMap;
 /**
@@ -13,16 +12,16 @@ class SymbolTable {
     public void setOpenScope(SymbolTable openScope) {
         this.openScope = openScope;
     }
-    public Type add(String name, Type type) {
-        return symbols.put(name, type);
+    public Symbol add(Symbol symbol) {
+        return symbols.put(symbol.name(), symbol);
     }
-    public Type get(String name) {
+    public Symbol get(String name) {
         if (symbols.containsKey(name)) {
             return symbols.get(name);
         } else {
             SymbolTable openScope = this.openScope;
             do {
-                Type tmp = openScope.get(name);
+                Symbol tmp = openScope.get(name);
                 if (tmp != null)
                     return tmp;
                 openScope = openScope.openScope();
@@ -30,23 +29,64 @@ class SymbolTable {
             return null;
         }
     }
-    public Map<String, Type> Symbols() { return this.symbols; }
+    public boolean contains(String name) {
+        return this.get(name) != null;
+    }
+    
+    public Map<String, Symbol> symbols() { return this.symbols; }
     public SymbolTable openScope() { return this.openScope; }
+    public Symbol associatedSymbol() { return this.associatedSymbol; }
+    public void setAssociatedSymbol(Symbol associatedSymbol) { this.associatedSymbol = associatedSymbol; }
+
+    private Map<String, Symbol> symbols = new HashMap<String, Symbol>();
+    private SymbolTable openScope = null;
+    private Symbol associatedSymbol = null;
+}
+
+
+abstract class Symbol {
+    protected Symbol(String name, Type type) {
+        this.type = type;
+        this.name = name;
+    }
+    
+    public String name() { return this.name; }
+    public Type type() { return this.type; }
+    
+    protected final Type type;
+    protected final String name;
+}
+
+abstract class SymbolWithScope extends Symbol {
+    protected SymbolWithScope(String name, Type type, SymbolTable ambientScope) {
+        super(name, type);
+        this.scope.setOpenScope(ambientScope);
+    }
+    
+    public SymbolTable scope() { return this.scope; }
     
     @Override
     public boolean equals(Object obj) {
-        return this.getClass().equals(obj.getClass()) &&
-                this.symbols.equals(((SymbolTable)obj).symbols) &&
-                this.openScope.equals(((SymbolTable)obj).openScope);
+        return super.equals(obj);
     }
     
-    private Map<String, Type> symbols = new HashMap<String, Type>();
-    private SymbolTable openScope = null;
-    
-    public static class SymbolTableInstanceCreator implements InstanceCreator<SymbolTable> {
-        @Override
-        public SymbolTable createInstance(java.lang.reflect.Type type) {
-            return new SymbolTable();
-        }
+    protected final SymbolTable scope = new SymbolTable();
+}
+
+final class VariableSymbol extends Symbol {
+    public VariableSymbol(String name, Type type) {
+        super(name, type);
+    }
+}
+
+final class FunctionSymbol extends SymbolWithScope {
+    public FunctionSymbol(String name, Type type, SymbolTable ambientScope) {
+        super(name, type, ambientScope);
+    }
+}
+
+final class StructSymbol extends SymbolWithScope {
+    public StructSymbol(String name, Type type, SymbolTable ambientScope) {
+        super(name, type, ambientScope);
     }
 }
