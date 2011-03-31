@@ -67,28 +67,28 @@ public class Parser {
         nextToken();
         Token.Type tag = current.tag();
         while (tag.is(new Token.Type[] { 
-                    Token.Type.CONST_KEYWORD, Token.Type.VAR, 
+                    Token.Type.CONST, Token.Type.VAR, 
                     Token.Type.FUNC, Token.Type.STRUCT
                 })) {
             currentScope = globalScope;
             
             if(tag.is(Token.Type.FUNC)) {
+                SymbolTable ambientScope = currentScope;
+                currentScope = new SymbolTable();
+                
                 nextToken();
                 Type returnValueType = Type();
-                String funcName = Identifier();
+                String funcName = Identifier();                
                 Type[] argsTypes = FuncArgList();
-                FunctionSymbol function = 
-                        new FunctionSymbol(
-                            funcName, 
-                            new FunctionType(returnValueType, argsTypes), 
-                            currentScope);
-                currentScope.add(function);
-                SymbolTable backup = currentScope;
-                currentScope = function.scope();
+                FunctionSymbol function = new FunctionSymbol(
+                        funcName, new FunctionType(returnValueType, argsTypes), 
+                        ambientScope, currentScope);
+                
+                ambientScope.add(function);
                 currentScope.setAssociatedSymbol(function);
                 
                 Code();
-                currentScope = backup;
+                currentScope = ambientScope;
             } else if (tag.is(Token.Type.STRUCT)) {
                 StructDef();
                 Semicolon();
@@ -96,6 +96,8 @@ public class Parser {
                 VariableDef();
                 Semicolon();
             }
+            
+            tag = current.tag();
         }
     }
     
@@ -186,7 +188,7 @@ public class Parser {
         Type pointer = null;
         
         nextToken();
-        if (current.tag().is(Token.Type.CONST_KEYWORD)) {
+        if (current.tag().is(Token.Type.CONST)) {
             pointer = new PointerType(pointer, true);
         } else {
             pointer = new PointerType(pointer, false);
@@ -195,7 +197,7 @@ public class Parser {
         Type innerPointer = pointer;
         while (current.tag().is(Token.Type.ASTERISK)) {
             nextToken();
-            if (current.tag().is(Token.Type.CONST_KEYWORD)) {
+            if (current.tag().is(Token.Type.CONST)) {
                 pointer = new PointerType(pointer, true);
             } else {
                 pointer = new PointerType(pointer, false);
@@ -255,9 +257,11 @@ public class Parser {
         Type type = null;
         
         boolean isConst = false;
-        if (isConst = (current.tag().is(Token.Type.CONST_KEYWORD))) {
+        if (current.tag().is(Token.Type.CONST)) {
+            isConst = true;
             nextToken();
-        } else if (isConst = !(current.tag().is(Token.Type.VAR))) {
+        } else if (current.tag().is(Token.Type.VAR)) {
+            isConst = false;
             nextToken();
         } else {
             Logger.logUnexpectedToken(current.tag(), Token.Type.Modifier, 
@@ -334,7 +338,7 @@ public class Parser {
         }
         RightBracket();
         
-        return (Type[])args.toArray();
+        return args.toArray(new Type[0]);
     }
     private CompositeNode Code() {
         LeftBrace();
@@ -652,9 +656,9 @@ public class Parser {
                     (((FunctionType)((FunctionSymbol)currentScope.associatedSymbol()).type()).returnValueType()),
                     Type.Typename.VOID, 
                     current.coordinates().starting());
+            
+            returnNode = new CompositeNode(CompositeNode.Operation.RETURN);
         }
-        
-        returnNode = new CompositeNode(CompositeNode.Operation.RETURN);
         
         return returnNode;
     }
@@ -941,6 +945,7 @@ public class Parser {
             }
             node.addChild(result);
             node.addChild(right);
+            node.setType(new PrimitiveType(Type.Typename.BOOL, true));
             result = node;
         }
         
@@ -1066,7 +1071,31 @@ public class Parser {
         if (current.tag().is(Token.Type.PlusMinus)) {
             return PlusMinus(EExpression());
         } else if (current.tag().is(Token.Type.IncDec)) {
-            return PreIncDec(EExpression());
+            Token.Type type = current.tag();
+            nextToken();
+            TreeNode node = EExpression();
+            
+            checkTypes(node.type(), 
+                    new Type.Typename[] { 
+                        Type.Typename.CHAR, Type.Typename.INT
+                    }, 
+                    current.coordinates().starting());
+
+            CompositeNode opNode = null;
+
+            switch (type) {
+                case INC:
+                    opNode = new CompositeNode(node.type(), CompositeNode.Operation.PRE_INC);
+                    break;
+                case DEC:
+                    opNode = new CompositeNode(node.type(), CompositeNode.Operation.PRE_DEC);
+                    break;
+                default:
+                    Logger.logUnknownError(current.coordinates().starting());
+            }
+            opNode.addChild(node);
+
+            return opNode;
         } else {
             TreeNode node = EExpression();
             while (current.tag() == Token.Type.AMPERSAND ||
@@ -1112,30 +1141,6 @@ public class Parser {
         nextToken();
         
         return compositeNode;
-    }
-    private TreeNode PreIncDec(TreeNode node) {
-        checkTypes(node.type(), 
-                new Type.Typename[] { 
-                    Type.Typename.CHAR, Type.Typename.INT
-                }, 
-                current.coordinates().starting());
-        
-        CompositeNode opNode = null;
-        
-        switch (current.tag()) {
-            case INC:
-                opNode = new CompositeNode(node.type(), CompositeNode.Operation.PRE_INC);
-                break;
-            case DEC:
-                opNode = new CompositeNode(node.type(), CompositeNode.Operation.PRE_DEC);
-                break;
-            default:
-                Logger.logUnknownError(current.coordinates().starting());
-        }
-        nextToken();
-        opNode.addChild(node);
-        
-        return opNode;
     }
     private TreeNode EExpression() {
         TreeNode node = FExpression();
@@ -1367,7 +1372,7 @@ public class Parser {
         currentScope = backup;
     }
     private TreeNode VariableDef() {
-        CompositeNode var = new CompositeNode(null);
+        CompositeNode var = new CompositeNode(CompositeNode.Operation.SEQUENCING);
         Type type = Type();
         
         var.addChild(Variable(type));
@@ -1388,7 +1393,8 @@ public class Parser {
             nextToken();
              
             CompositeNode node = new CompositeNode(CompositeNode.Operation.ASSIGN);
-            node.addChild(new VariableLeaf(name, currentScope));
+            TreeNode var = new VariableLeaf(name, currentScope);
+            node.addChild(var);
             
             Position pos = current.coordinates().starting();
             TreeNode value;
@@ -1400,7 +1406,7 @@ public class Parser {
             checkTypes(type, value.type(), pos);
             
             node.addChild(value);
-            node.setType(value.type());
+            node.setType(var.type());
             
             return node;
         } else if (name != null) {

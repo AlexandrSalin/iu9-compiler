@@ -1,8 +1,7 @@
 package ru.bmstu.iu9.compiler.parser;
 
 import com.google.gson.InstanceCreator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.BitSet;
 
 /**
  *
@@ -24,89 +23,80 @@ class Token {
         
         INT, FLOAT, DOUBLE, CHAR, VOID, STRUCT, BOOL, 
         CONTINUE, RETURN, BREAK, ELSE, DEFAULT, CASE, SWITCH, IF, DO, WHILE, 
-        RUN, BARRIER, LOCK, TRUE, FALSE, FUNC, VAR, CONST_KEYWORD, FOR,
+        RUN, BARRIER, LOCK, TRUE, FALSE, FUNC, VAR, CONST, FOR,
         
         CONST_DOUBLE, CONST_INT, CONST_CHAR, IDENTIFIER,
         
         
-        PrimitiveType(INT.value | FLOAT.value | DOUBLE.value | CHAR.value | 
-                VOID.value | STRUCT.value | BOOL.value),
-//        Keyword(),
-        Constant(CONST_DOUBLE.value | CONST_INT.value | CONST_CHAR.value |
-                TRUE.value | FALSE.value),
-        Assignment(ASSIGN.value | PLUS_ASSIGN.value | MINUS_ASSIGN.value | 
-                MUL_ASSIGN.value | DIV_ASSIGN.value | MOD_ASSIGN.value |
-                COMMA.value | BITWISE_SHIFT_LEFT_ASSIGN.value | 
-                BITWISE_SHIFT_RIGHT_ASSIGN.value | BITWISE_AND_ASSIGN.value | 
-                BITWISE_OR_ASSIGN.value | BITWISE_XOR_ASSIGN.value),
-        Modifier(CONST_KEYWORD.value | VAR.value),
-        FirstOfExpression(LEFT_BRACKET.value | PLUS.value | MINUS.value | 
-                AMPERSAND.value | ASTERISK.value | INC.value | DEC.value | 
-                Constant.value | IDENTIFIER.value),
-        FirstOfControlStructure(IF.value | WHILE.value | DO.value | RUN.value |
-                SWITCH.value | RETURN.value | CONTINUE.value | LOCK.value |
-                BARRIER.value | BREAK.value),
-        Equality(EQUAL.value | NOT_EQUAL.value),
-        OrderRelation(GREATER.value | LESS.value | GREATER_OR_EQUAL.value |
-                LESS_OR_EQUAL.value),
-        IncDec(INC.value | DEC.value),
-        BitwiseShift(BITWISE_SHIFT_LEFT.value | BITWISE_SHIFT_RIGHT.value),
-        MulDivMod(ASTERISK.value | DIV.value | MOD.value),
-        PlusMinus(PLUS.value | MINUS.value);
+        PrimitiveType(new Type[] {
+            INT, FLOAT, DOUBLE, CHAR, VOID, STRUCT, BOOL
+        }),
+        Constant(new Type[] {
+            CONST_DOUBLE, CONST_INT, CONST_CHAR, TRUE, FALSE
+        }),
+        Assignment(new Type[] {
+            ASSIGN, PLUS_ASSIGN, MINUS_ASSIGN, MUL_ASSIGN, DIV_ASSIGN, 
+            MOD_ASSIGN, BITWISE_SHIFT_LEFT_ASSIGN, 
+            BITWISE_SHIFT_RIGHT_ASSIGN, BITWISE_AND_ASSIGN, BITWISE_OR_ASSIGN, 
+            BITWISE_XOR_ASSIGN
+        }),
+        Modifier(new Type[] { 
+            CONST, VAR 
+        }),
+        FirstOfExpression(new Type[] {
+            LEFT_BRACKET, PLUS, MINUS, AMPERSAND, ASTERISK, INC, DEC, Constant, 
+            IDENTIFIER
+        }),
+        FirstOfControlStructure(new Type[] {
+            IF, WHILE, DO, RUN, SWITCH, RETURN, CONTINUE, LOCK, BARRIER, BREAK, 
+            FOR
+        }),
+        Equality(new Type[] { 
+            EQUAL, NOT_EQUAL 
+        }),
+        OrderRelation(new Type[] { 
+            GREATER, LESS, GREATER_OR_EQUAL, LESS_OR_EQUAL 
+        }),
+        IncDec(new Type[] { 
+            INC, DEC 
+        }),
+        BitwiseShift(new Type[] { 
+            BITWISE_SHIFT_LEFT, BITWISE_SHIFT_RIGHT 
+        }),
+        MulDivMod(new Type[] { 
+            ASTERISK, DIV, MOD 
+        }),
+        PlusMinus(new Type[] { 
+            PLUS, MINUS 
+        });
         
-        private Type(long value) { this.value = value; }
-        private Type() { init(); }
-        private void init() {
-            this.value = 1 << counter;
-            counter++;
+        private Type(Type[] types) { 
+            for(int i = 0; i < types.length; ++i) {
+                this.value.or(types[i].value); 
+            }
+        }
+        private Type() {
+            this.value.set(this.ordinal());
         }
 
         public boolean is(Type[] types) {
             for (int i = 0; i < types.length; ++i) {
-                if ((this.value & types[i].value) != 0)
+                if (this.value.intersects(types[i].value))
                     return true;
             }
             return false;
         }
         public boolean is(Type type) {
-            return (this.value & type.value) != 0;
+            return this.value.intersects(type.value);
         }     
         
         public static void main(String[] args) {
+            Type type = Type.AMPERSAND;
+            return;
         }
         
-        private long value;
-        private static byte counter = 0;
+        private BitSet value = new BitSet(80);
     };
-
-    
-    /**
-     * Токен, представленный лексическим доменом и позицией лексемы в
-     * тексте программы
-     * @param tokenCoordinates координаты лексемы
-     */
-    public Token(Fragment coordinates, Type type) {
-        this.coordinates = coordinates;
-        this.value = null;
-        this.type = type.ordinal();
-    }
-    public Token(Fragment coordinates, Type type, Object value) {
-        this.coordinates = coordinates;
-        this.value = value;
-        this.type = type.ordinal();
-    }
-    /**
-     * Токен, представленный лексическим доменом и позицией лексемы в
-     * тексте программы
-     * @param starting позиция первой кодовой точки лексема
-     * @param ending позиция последней кодовой точки лексема
-     */
-    public Token(Position starting, Position ending, Type type) {
-        this(new Fragment(starting, ending), type);
-    }
-    public Token(Position starting, Position ending, Type type, Object value) {
-        this(new Fragment(starting, ending), type, value);
-    }
     
     private Token() {
         this.type = -1;
@@ -114,10 +104,6 @@ class Token {
         this.value = null;
     }
     
-    /**
-     * Метод, предоставляющий доступ к координатам лексемы
-     * @return Координаты лексемы
-     */
     public Object value() { return value; }
     public Type tag() { return Type.values()[type]; }
     public Fragment coordinates() { return coordinates; }

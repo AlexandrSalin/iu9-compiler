@@ -58,8 +58,10 @@ abstract class Symbol {
 }
 
 abstract class SymbolWithScope extends Symbol {
-    protected SymbolWithScope(String name, Type type, SymbolTable ambientScope) {
+    protected SymbolWithScope(String name, Type type, SymbolTable ambientScope,
+            SymbolTable scope) {
         super(name, type);
+        this.scope = scope;
         this.scope.setOpenScope(ambientScope);
     }
     
@@ -70,7 +72,7 @@ abstract class SymbolWithScope extends Symbol {
         return super.equals(obj);
     }
     
-    protected final SymbolTable scope = new SymbolTable();
+    protected final SymbolTable scope;
 }
 
 final class VariableSymbol extends Symbol {
@@ -81,12 +83,20 @@ final class VariableSymbol extends Symbol {
 
 final class FunctionSymbol extends SymbolWithScope {
     public FunctionSymbol(String name, Type type, SymbolTable ambientScope) {
-        super(name, type, ambientScope);
+        super(name, type, ambientScope, new SymbolTable());
+    }
+    public FunctionSymbol(String name, Type type, SymbolTable ambientScope,
+            SymbolTable scope) {
+        super(name, type, ambientScope, scope);
     }
 }
 
 final class StructSymbol extends SymbolWithScope {
     public StructSymbol(String name, Type type, SymbolTable ambientScope) {
-        super(name, type, ambientScope);
+        super(name, type, ambientScope, new SymbolTable());
+    }
+    public StructSymbol(String name, Type type, SymbolTable ambientScope,
+            SymbolTable scope) {
+        super(name, type, ambientScope, scope);
     }
 }

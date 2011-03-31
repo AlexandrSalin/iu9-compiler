@@ -4,12 +4,13 @@ package ru.bmstu.iu9.compiler.lexer;
  *
  * @author maggot
  */
-class Token {
+abstract class Token {
     public enum Type { 
         MEMBER_SELECT, INC, DEC, BITWISE_NOT, BOOL_NOT, PLUS, 
         MINUS, AMPERSAND, ASTERISK, DIV, MOD, BITWISE_SHIFT_LEFT,
-        BITWISE_SHIFT_RIGHT, GREATER_OR_EQUAL, LESS_OR_EUQAL, GREATER, LESS, 
+        BITWISE_SHIFT_RIGHT, GREATER_OR_EQUAL, LESS_OR_EQUAL, GREATER, LESS, 
         EQUAL, NOT_EQUAL, BITWISE_XOR, BITWISE_OR, BOOL_AND, BOOL_OR, 
+        
         ASSIGN, PLUS_ASSIGN, MINUS_ASSIGN, MUL_ASSIGN, DIV_ASSIGN, MOD_ASSIGN,
         COMMA, BITWISE_SHIFT_LEFT_ASSIGN, BITWISE_SHIFT_RIGHT_ASSIGN,
         BITWISE_AND_ASSIGN, BITWISE_OR_ASSIGN, BITWISE_XOR_ASSIGN,
@@ -17,58 +18,98 @@ class Token {
         LEFT_BRACE, RIGHT_BRACE, LEFT_SQUARE_BRACKET,
         RIGHT_SQUARE_BRACKET, LEFT_BRACKET, RIGHT_BRACKET, COLON, SEMICOLON,
         
-        INT, FLOAT, DOUBLE, CHAR, VOID, STRUCT, BOOL, CONTINUE, RETURN, BREAK, 
-        ELSE, DEFAULT, CASE, SWITCH, IF, DO, WHILE, RUN, BARRIER, LOCK, TRUE,
-        FALSE, FUNC, VAR, CONST, FOR,
+        INT, FLOAT, DOUBLE, CHAR, VOID, STRUCT, BOOL, 
+        CONTINUE, RETURN, BREAK, ELSE, DEFAULT, CASE, SWITCH, IF, DO, WHILE, 
+        RUN, BARRIER, LOCK, TRUE, FALSE, FUNC, VAR, CONST, FOR,
         
-        CONST_DOUBLE, CONST_INT, CONST_CHAR, IDENTIFIER };
+        CONST_DOUBLE, CONST_INT, CONST_CHAR, IDENTIFIER;
+    };
     
-    public Token() {
-        this.type = -1;
-        this.coordinates = null;
-        this.value = null;
-    }
-    /**
-     * Токен, представленный лексическим доменом и позицией лексемы в
-     * тексте программы
-     * @param tokenCoordinates координаты лексемы
-     */
-    public Token(Fragment coordinates, Type type) {
+    protected Token(Fragment coordinates, Type type) {
         this.coordinates = coordinates;
-        this.value = null;
         this.type = type.ordinal();
     }
-    public Token(Fragment coordinates, Type type, Object value) {
-        this.coordinates = coordinates;
-        this.value = value;
-        this.type = type.ordinal();
-    }
-    /**
-     * Токен, представленный лексическим доменом и позицией лексемы в
-     * тексте программы
-     * @param starting позиция первой кодовой точки лексема
-     * @param ending позиция последней кодовой точки лексема
-     */
-    public Token(Position starting, Position ending, Type type) {
+    protected Token(Position starting, Position ending, Type type) {
         this.coordinates = new Fragment(starting, ending);
-        this.value = null;
-        this.type = type.ordinal();
-    }
-    public Token(Position starting, Position ending, Type type, Object value) {
-        this.coordinates = new Fragment(starting, ending);
-        this.value = value;
         this.type = type.ordinal();
     }
     
-    /**
-     * Метод, предоставляющий доступ к координатам лексемы
-     * @return Координаты лексемы
-     */
-    public Object value() { return value; }
-    public Type tag() { return Type.values()[type]; }
-    public Fragment coordinates() { return coordinates; }
-    
-    private int type;
+    private final int type;
     private final Fragment coordinates;
-    private Object value;
+}
+
+
+abstract class ConstantToken extends Token {
+    protected ConstantToken(Fragment coordinates, Type type) {
+        super(coordinates, type);
+    }
+}
+
+final class IntegerConstantToken extends ConstantToken {
+    public IntegerConstantToken(Fragment coordinates, int value) {
+        super(coordinates, Type.CONST_INT);
+        this.value = value;
+    }
+    public IntegerConstantToken(Position starting, Position ending, int value) {
+        super(new Fragment(starting, ending), Type.CONST_INT);
+        this.value = value;
+    }
+    
+    public int value() { return this.value; }
+    
+    private int value;
+}
+final class DoubleConstantToken extends ConstantToken {
+    public DoubleConstantToken(Fragment coordinates, double value) {
+        super(coordinates, Type.CONST_INT);
+        this.value = value;
+    }
+    public DoubleConstantToken(Position starting, Position ending, double value) {
+        super(new Fragment(starting, ending), Type.CONST_DOUBLE);
+        this.value = value;
+    }
+    
+    public double value() { return this.value; }
+    
+    private double value;
+}
+final class CharConstantToken extends ConstantToken {
+    public CharConstantToken(Fragment coordinates, int value) {
+        super(coordinates, Type.CONST_INT);
+        this.value = value;
+    }
+    public CharConstantToken(Position starting, Position ending, int value) {
+        super(new Fragment(starting, ending), Type.CONST_CHAR);
+        this.value = value;
+    }
+    
+    public int value() { return this.value; }
+    
+    private int value;
+}
+
+
+final class IdentifierToken extends Token {
+    public IdentifierToken(Fragment coordinates, String name) {
+        super(coordinates, Type.IDENTIFIER);
+        this.value = name;
+    }
+    public IdentifierToken(Position starting, Position ending, String name) {
+        super(new Fragment(starting, ending), Type.IDENTIFIER);
+        this.value = name;
+    }
+    
+    public String name() { return this.value; }
+    
+    private String value;
+}
+
+
+final class SpecialToken extends Token {
+    public SpecialToken(Fragment coordinates, Type type) {
+        super(coordinates, type);
+    }
+    public SpecialToken(Position starting, Position ending, Type type) {
+        super(new Fragment(starting, ending), type);
+    }
 }

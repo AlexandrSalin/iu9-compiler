@@ -120,10 +120,9 @@ class Scanner implements Iterable<Token> {
                                 program.toString().length());
 
                 if (matcher.lookingAt()) {
-                    return new Token(
+                    return new DoubleConstantToken(
                         iterator.current().position(), 
                         iterator.advance(matcher.group().length()).position(),
-                        Token.Type.CONST_DOUBLE, 
                         Double.parseDouble(matcher.group()));
                 } else {
                     iterator.advance(1);
@@ -136,9 +135,8 @@ class Scanner implements Iterable<Token> {
                 iterator.advance(1);
                 if (iterator.current().value() == '\'') {
                     iterator.advance(1);
-                    return new Token(current.position(),
-                        iterator.current().position(), 
-                        Token.Type.CONST_CHAR, cp);
+                    return new CharConstantToken(current.position(),
+                        iterator.current().position(), cp);
                 } else {
                     errorRecovery();
                     return null;
@@ -308,7 +306,7 @@ class Scanner implements Iterable<Token> {
                     }
                 } else if (iterator.current().value() == '=') {
                     iterator.advance(1); 
-                    tokenType = Token.Type.LESS_OR_EUQAL;
+                    tokenType = Token.Type.LESS_OR_EQUAL;
                 } else {
                     tokenType = Token.Type.LESS;
                 }
@@ -329,10 +327,9 @@ class Scanner implements Iterable<Token> {
                         } catch(NumberFormatException ex) {
                             Logger.log(ex.toString(), current.position());
                         }
-                        return new Token(
+                        return new DoubleConstantToken(
                             iterator.current().position(), 
                             iterator.advance(matcherDouble.group().length()).position(),
-                            Token.Type.CONST_DOUBLE, 
                             value);
                     }
                     
@@ -371,7 +368,8 @@ class Scanner implements Iterable<Token> {
                             }
                         } else {
                             while (iterator.hasNext() && 
-                                Character.isDigit(iterator.next().value())) {
+                                Character.isDigit(iterator.current().value())) {
+                                iterator.next();
                                 continue;
                             }
                             
@@ -398,9 +396,9 @@ class Scanner implements Iterable<Token> {
                         }
                     }
                     
-                    return new Token(new Fragment(
-                            current.position(), iterator.current().position()),
-                            Token.Type.CONST_INT, value);
+                    return new IntegerConstantToken(new Fragment(
+                            current.position(), iterator.current().position()), 
+                            value);
                     
                 } else if (Character.isLetter(iterator.current().value())) {
                     while (iterator.hasNext() &&
@@ -494,13 +492,13 @@ class Scanner implements Iterable<Token> {
                     }
                     
                     if (type != null)
-                        return new Token(
+                        return new SpecialToken(
                             current.position(), iterator.current().position(), 
                             type);
                     else
-                        return new Token(
+                        return new IdentifierToken(
                             current.position(), iterator.current().position(), 
-                            Token.Type.IDENTIFIER, keyword);
+                            keyword);
                     
                 } else {
                     Logger.logUnknownCharacter(current.position());
@@ -510,7 +508,7 @@ class Scanner implements Iterable<Token> {
         }
         
         if (tokenType != null) {
-            return new Token(
+            return new SpecialToken(
                 current.position(), iterator.current().position(),
                 tokenType);
         } else {

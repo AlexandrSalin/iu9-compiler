@@ -39,8 +39,8 @@ class PrimitiveType extends Type {
     
     @Override
     public boolean equals(Object obj) {
-        return super.equals(obj) &&
-                (this.isConstant == ((PrimitiveType)obj).isConstant);
+        return super.equals(obj)/* &&
+                (this.isConstant == ((PrimitiveType)obj).isConstant)*/;
     }
     @Override
     public String toString() {
@@ -138,6 +138,7 @@ final class FunctionType extends Type {
     }
     
     public void setReturnValueType(Type type) { this.returnValue = type; }
+    public void setArgumentsTypes(Type[] types) { this.arguments = types; }
     public Type returnValueType() { return this.returnValue; }
     public Type[] argumentsTypes() { return this.arguments; }
     
@@ -170,5 +171,5 @@ final class FunctionType extends Type {
     }
     
     private Type returnValue;
-    private final Type[] arguments;
+    private Type[] arguments;
 }
