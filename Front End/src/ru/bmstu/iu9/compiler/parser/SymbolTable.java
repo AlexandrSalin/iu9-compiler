@@ -1,5 +1,6 @@
 package ru.bmstu.iu9.compiler.parser;
 
+import ru.bmstu.iu9.compiler.Type;
 import java.util.Map;
 import java.util.HashMap;
 /**

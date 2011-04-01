@@ -1,5 +1,7 @@
 package ru.bmstu.iu9.compiler.lexer;
 
+import ru.bmstu.iu9.compiler.*;
+import ru.bmstu.iu9.compiler.Fragment;
 import com.google.gson.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -33,7 +35,7 @@ public class Lexer {
             writer = new PrintWriter(filename);
             gson.toJson(tokens, writer);
         } catch(java.io.IOException ex) {
-            ex.printStackTrace();
+//            ex.printStackTrace();
         } finally {
             writer.flush();
             writer.close();

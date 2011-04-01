@@ -1,5 +1,7 @@
 package ru.bmstu.iu9.compiler.intermediate.representation;
 
+import ru.bmstu.iu9.compiler.*;
+
 abstract class Operand implements Cloneable {
     protected Operand(Type type) {
         this.type = type;

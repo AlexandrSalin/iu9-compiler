@@ -1,71 +1,77 @@
 package ru.bmstu.iu9.compiler.parser;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import java.io.BufferedReader;
-import java.io.FileReader;
+import ru.bmstu.iu9.compiler.*;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import javax.swing.JFrame;
 
 /**
  *
  * @author maggot
  */
 public class Parser {
-    public Parser(String filename) {
-        BufferedReader reader = null;
-        
-        try {
-            Gson gson = 
-                    new GsonBuilder().
-                        registerTypeAdapter(
-                            Fragment.class, 
-                            new Fragment.FragmentInstanceCreator()).
-                        registerTypeAdapter(
-                            Token.class,
-                            new Token.TokenInstanceCreator()).
-                        create();
-            
-            reader = new BufferedReader(
-                        new FileReader(filename));
-            
-            tokens = gson.fromJson(reader, Token[].class);
-        } catch(java.io.IOException ex) {
-            ex.printStackTrace();
-        } finally {
-            try {
-                reader.close();
-            } catch(java.io.IOException ex) {
-                ex.printStackTrace();
+    public Parser(final Token[] tokens) {
+        token = new Iterator<Token>() {
+            @Override
+            public boolean hasNext() {
+                return counter < container.length;
             }
-        }
+
+            @Override
+            public Token next() {
+                ++counter;
+                return container[counter];
+            }
+
+            @Override
+            public void remove() {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+            
+            {
+                container = tokens;
+            }
+            
+            private int counter = -1;
+            private Token[] container;
+        };
+    }
+    public Parser(String filename) {
+        tokener = new TokenFactory(filename);
+        token = tokener.iterator();
     }
     
     public static void main(String[] args) {
         Parser parser = new Parser(
             "C:\\Users\\maggot\\Documents\\NetBeansProjects\\ru.bmstu.iu9.compiler\\Front End\\src\\output.json");
-        parser.process();
+        
+        TreeVisualizer frame = new TreeVisualizer(parser.process());
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(800, 600);
+        frame.setVisible(true);
     }
     
-    public void process() {
+    public TreeNode process() {
         Program();
+        return parseTree;
     }
     
     private void nextToken() {
-        if (++position < tokens.length)
-            current = tokens[position];
+        if (token.hasNext())
+            current = token.next();
     }
     
-    private Token[] tokens;
-    private int position = -1;
+    private TokenFactory tokener;
+    private Iterator<Token> token;
     private Token current;
-    private TreeNode parseTree = new CompositeNode(null);
+    private CompositeNode parseTree = new CompositeNode(null);
     private SymbolTable globalScope = new SymbolTable();
     private SymbolTable currentScope;
     
     private void Program() {
         nextToken();
-        Token.Type tag = current.tag();
+        Token.Type tag = current.type();
         while (tag.is(new Token.Type[] { 
                     Token.Type.CONST, Token.Type.VAR, 
                     Token.Type.FUNC, Token.Type.STRUCT
@@ -73,6 +79,8 @@ public class Parser {
             currentScope = globalScope;
             
             if(tag.is(Token.Type.FUNC)) {
+                CompositeNode func = new CompositeNode(null);
+                
                 SymbolTable ambientScope = currentScope;
                 currentScope = new SymbolTable();
                 
@@ -84,20 +92,24 @@ public class Parser {
                         funcName, new FunctionType(returnValueType, argsTypes), 
                         ambientScope, currentScope);
                 
+                func.addChild(new VariableLeaf(funcName, function.type()));
+                
                 ambientScope.add(function);
                 currentScope.setAssociatedSymbol(function);
                 
-                Code();
+                func.addChild(Code());
                 currentScope = ambientScope;
+                
+                parseTree.addChild(func);
             } else if (tag.is(Token.Type.STRUCT)) {
                 StructDef();
                 Semicolon();
             } else {
-                VariableDef();
+                parseTree.addChild(VariableDef());
                 Semicolon();
             }
             
-            tag = current.tag();
+            tag = current.type();
         }
     }
     
@@ -123,13 +135,13 @@ public class Parser {
         return type;
     }
     private Type AmbientType(Type type) {
-        if (current.tag().is(Token.Type.ASTERISK)) {
+        if (current.type().is(Token.Type.ASTERISK)) {
             Pair result = Pointer();
             ((PointerType)result.type2()).setType(type);
             type = result.type1();
         }
         Pair innerType = TypeExpr1(new Pair(null, null));
-        if (current.tag() == Token.Type.LEFT_SQUARE_BRACKET) {
+        if (current.type() == Token.Type.LEFT_SQUARE_BRACKET) {
             type = ArrayDim(type);
         }
         
@@ -151,7 +163,7 @@ public class Parser {
         }
     }
     private Pair TypeExpr0(Type type) {
-        if (current.tag().is(Token.Type.ASTERISK)) {
+        if (current.type().is(Token.Type.ASTERISK)) {
             Pair pointers = Pointer();
             return TypeExpr1(pointers);
         } else {
@@ -159,10 +171,10 @@ public class Parser {
         }
     }
     private Pair TypeExpr1(Pair typesPair) {
-        if (current.tag().is(Token.Type.LEFT_BRACKET)) {
+        if (current.type().is(Token.Type.LEFT_BRACKET)) {
             Pair result = TypeExpr2(typesPair.type1());
             
-            if (current.tag().is(Token.Type.LEFT_BRACKET)) {
+            if (current.type().is(Token.Type.LEFT_BRACKET)) {
                 Type[] argsTypes = FuncArgsTypes();
 
                 ((PointerType)result.type2()).setType(new FunctionType(typesPair.type1(), argsTypes));
@@ -170,7 +182,7 @@ public class Parser {
             }
 
             return result;
-        } else if (current.tag().is(Token.Type.LEFT_SQUARE_BRACKET)) {
+        } else if (current.type().is(Token.Type.LEFT_SQUARE_BRACKET)) {
             return new Pair(ArrayDim(typesPair.type1()), typesPair.type2());
         }
         
@@ -188,16 +200,16 @@ public class Parser {
         Type pointer = null;
         
         nextToken();
-        if (current.tag().is(Token.Type.CONST)) {
+        if (current.type().is(Token.Type.CONST)) {
             pointer = new PointerType(pointer, true);
         } else {
             pointer = new PointerType(pointer, false);
         }
         
         Type innerPointer = pointer;
-        while (current.tag().is(Token.Type.ASTERISK)) {
+        while (current.type().is(Token.Type.ASTERISK)) {
             nextToken();
-            if (current.tag().is(Token.Type.CONST)) {
+            if (current.type().is(Token.Type.CONST)) {
                 pointer = new PointerType(pointer, true);
             } else {
                 pointer = new PointerType(pointer, false);
@@ -208,11 +220,11 @@ public class Parser {
     private Type[] FuncArgsTypes() {
         List<Type> args = new LinkedList<Type>();
         LeftBracket();
-        if (current.tag().is(Token.Type.Modifier)) {                   
+        if (current.type().is(Token.Type.Modifier)) {                   
             Type argType = Type();
             args.add(argType);
             
-            while (current.tag().is(Token.Type.COMMA)) {
+            while (current.type().is(Token.Type.COMMA)) {
                 nextToken();
                 argType = Type();
                 args.add(argType);
@@ -227,25 +239,25 @@ public class Parser {
         
         LeftSquareBracket();
         Position pos = current.coordinates().starting();
-        if (current.tag().is(Token.Type.CONST_INT)) {
+        if (current.type().is(Token.Type.CONST_INT)) {
             array = new ArrayType(elementType, (int)current.value());
-        } else  if (current.tag().is(Token.Type.RIGHT_SQUARE_BRACKET)) {
+        } else  if (current.type().is(Token.Type.RIGHT_SQUARE_BRACKET)) {
             array = new ArrayType(elementType);
         } else {
             array = new ArrayType(elementType);
-            Logger.logUnexpectedToken(current.tag(), Token.Type.CONST_INT, pos);
+            Logger.logUnexpectedToken(current.type(), Token.Type.CONST_INT, pos);
         }
         RightSquareBracket();
         
-        while (current.tag().is(Token.Type.LEFT_SQUARE_BRACKET)) {
+        while (current.type().is(Token.Type.LEFT_SQUARE_BRACKET)) {
             LeftSquareBracket();
             pos = current.coordinates().starting();
-            if (current.tag().is(Token.Type.CONST_INT)) {
+            if (current.type().is(Token.Type.CONST_INT)) {
                 array = new ArrayType(array, (int)current.value());
                 nextToken();
             } else {
                 array = new ArrayType(elementType);
-                Logger.logUnexpectedToken(current.tag(), Token.Type.CONST_INT, pos);
+                Logger.logUnexpectedToken(current.type(), Token.Type.CONST_INT, pos);
             }
             RightSquareBracket();
         }
@@ -257,18 +269,18 @@ public class Parser {
         Type type = null;
         
         boolean isConst = false;
-        if (current.tag().is(Token.Type.CONST)) {
+        if (current.type().is(Token.Type.CONST)) {
             isConst = true;
             nextToken();
-        } else if (current.tag().is(Token.Type.VAR)) {
+        } else if (current.type().is(Token.Type.VAR)) {
             isConst = false;
             nextToken();
         } else {
-            Logger.logUnexpectedToken(current.tag(), Token.Type.Modifier, 
+            Logger.logUnexpectedToken(current.type(), Token.Type.Modifier, 
                     current.coordinates().starting());
         }
         
-        switch (current.tag()) {
+        switch (current.type()) {
             case INT:
                 type = new PrimitiveType(Type.Typename.INT, isConst);
                 break;
@@ -298,7 +310,7 @@ public class Parser {
                 type = struct.type();
                 break;
             default:
-                Logger.logUnexpectedToken(current.tag(), Token.Type.PrimitiveType, 
+                Logger.logUnexpectedToken(current.type(), Token.Type.PrimitiveType, 
                         current.coordinates().starting());
         }
         nextToken();
@@ -320,7 +332,7 @@ public class Parser {
         List<Type> args = null;
         
         LeftBracket();
-        if (current.tag().is(Token.Type.Modifier)) {
+        if (current.type().is(Token.Type.Modifier)) {
             args = new LinkedList<Type>();
                     
             Type argType = Type();
@@ -328,7 +340,7 @@ public class Parser {
             currentScope.add(new VariableSymbol(argName, argType));
             args.add(argType);
             
-            while (current.tag().is(Token.Type.COMMA)) {
+            while (current.type().is(Token.Type.COMMA)) {
                 nextToken();
                 argType = Type();
                 argName = Identifier();
@@ -352,13 +364,13 @@ public class Parser {
         CompositeNode block = new CompositeNode(null);
         
       
-        while (current.tag().is(new Token.Type[] {
+        while (current.type().is(new Token.Type[] {
             Token.Type.FirstOfControlStructure, Token.Type.FirstOfExpression,
             Token.Type.Modifier
         })) {
             
-            if (current.tag().is(Token.Type.FirstOfControlStructure)) {
-                switch (current.tag()) {
+            if (current.type().is(Token.Type.FirstOfControlStructure)) {
+                switch (current.type()) {
                     case FOR:
                         block.addChild(For());
                         break;
@@ -399,10 +411,10 @@ public class Parser {
                         Semicolon();
                         break;
                 }
-            } else if(current.tag().is(Token.Type.Modifier)) {
+            } else if(current.type().is(Token.Type.Modifier)) {
                 block.addChild(VariableDef());
                 Semicolon();
-            } else if(current.tag().is(Token.Type.FirstOfExpression)) {
+            } else if(current.type().is(Token.Type.FirstOfExpression)) {
                 block.addChild(Expression());
                 Semicolon();
             }
@@ -416,13 +428,13 @@ public class Parser {
         nextToken();
         LeftBracket();
 
-        if (current.tag().is(Token.Type.Modifier)) {
+        if (current.type().is(Token.Type.Modifier)) {
             forNode.addChild(VariableDef());
-        } else if (current.tag().is(Token.Type.FirstOfExpression)) {
+        } else if (current.type().is(Token.Type.FirstOfExpression)) {
             forNode.addChild(Expression());
         }
         Semicolon();
-        if (current.tag().is(Token.Type.FirstOfExpression)) {
+        if (current.type().is(Token.Type.FirstOfExpression)) {
             Position pos = current.coordinates().starting();
             TreeNode condition = Expression();
             checkTypes(condition.type(), Type.Typename.BOOL, pos);
@@ -430,10 +442,10 @@ public class Parser {
             forNode.addChild(condition);
         }
         Semicolon();
-        if (current.tag().is(Token.Type.FirstOfExpression)) {
+        if (current.type().is(Token.Type.FirstOfExpression)) {
             CompositeNode node = new CompositeNode(CompositeNode.Operation.SEQUENCING);
             node.addChild(Expression());
-            while (current.tag().is(Token.Type.COMMA)) {
+            while (current.type().is(Token.Type.COMMA)) {
                 nextToken();
                 node.addChild(Expression());
             }
@@ -464,14 +476,14 @@ public class Parser {
     
     private boolean checkTokens(Token found, Token.Type required) {
         boolean result;
-        if (result = !found.tag().is(required))
-            Logger.logUnexpectedToken(found.tag(), required, current.coordinates().starting());
+        if (result = !found.type().is(required))
+            Logger.logUnexpectedToken(found.type(), required, current.coordinates().starting());
         return !result;
     }
     private boolean checkTokens(Token found, Token.Type required, Position pos) {
         boolean result;
-        if (result = !found.tag().is(required))
-            Logger.logUnexpectedToken(found.tag(), required, pos);
+        if (result = !found.type().is(required))
+            Logger.logUnexpectedToken(found.type(), required, pos);
         return !result;
     }
     private boolean checkTypes(Type found, Type required, Position pos) {
@@ -529,11 +541,11 @@ public class Parser {
         
         ifNode.addChild(Code());
         
-        if (current.tag().is(Token.Type.ELSE)) {
+        if (current.type().is(Token.Type.ELSE)) {
             nextToken();
             CompositeNode elseNode = new CompositeNode(CompositeNode.Operation.ELSE);
             
-            if (current.tag().is(Token.Type.IF)) {
+            if (current.type().is(Token.Type.IF)) {
                 elseNode.addChild(If());
             } else {
                 elseNode.addChild(Code());
@@ -600,10 +612,10 @@ public class Parser {
         LeftBrace();
         node.addChild(Case(switchNode));
         
-        while (current.tag().is(Token.Type.CASE)) {
+        while (current.type().is(Token.Type.CASE)) {
             node.addChild(Case(switchNode));
         }
-        if (current.tag().is(Token.Type.DEFAULT)) {
+        if (current.type().is(Token.Type.DEFAULT)) {
             node.addChild(Default());
         }
         RightBrace();
@@ -641,7 +653,7 @@ public class Parser {
         nextToken();
         CompositeNode returnNode;
         
-        if (current.tag().is(Token.Type.FirstOfExpression)) {
+        if (current.type().is(Token.Type.FirstOfExpression)) {
             Position pos = current.coordinates().starting();
             TreeNode value = Expression();
             checkTypes(value.type(),
@@ -702,8 +714,8 @@ public class Parser {
         Position pos = current.coordinates().starting();
         TreeNode result = BoolExpression();
         
-        while (current.tag().is(Token.Type.Assignment)) {
-            Token.Type type = current.tag();
+        while (current.type().is(Token.Type.Assignment)) {
+            Token.Type type = current.type();
             nextToken();
             TreeNode right = BoolExpression();
             
@@ -763,7 +775,7 @@ public class Parser {
         Position pos = current.coordinates().starting();
         TreeNode result = ABoolExpression();
         
-        while (current.tag().is(Token.Type.BOOL_OR)) {
+        while (current.type().is(Token.Type.BOOL_OR)) {
             checkTypes(result.type(), Type.Typename.BOOL, pos);
             
             nextToken();
@@ -787,7 +799,7 @@ public class Parser {
         Position pos = current.coordinates().starting();
         TreeNode result = BBoolExpression();
         
-        while (current.tag().is(Token.Type.BOOL_AND)) {
+        while (current.type().is(Token.Type.BOOL_AND)) {
             checkTypes(result.type(), Type.Typename.BOOL, pos);
             
             nextToken();
@@ -810,7 +822,7 @@ public class Parser {
         Position pos = current.coordinates().starting();
         TreeNode result = GExpression();
         
-        while (current.tag().is(Token.Type.BITWISE_OR)) {
+        while (current.type().is(Token.Type.BITWISE_OR)) {
             checkTypes(result.type(), Type.Typename.BOOL, pos);
             
             nextToken();
@@ -833,7 +845,7 @@ public class Parser {
         Position pos = current.coordinates().starting();
         TreeNode result = HExpression();
 
-        while (current.tag().is(Token.Type.BITWISE_XOR)) {
+        while (current.type().is(Token.Type.BITWISE_XOR)) {
             checkTypes(result.type(), Type.Typename.BOOL, pos);
             
             nextToken();
@@ -856,7 +868,7 @@ public class Parser {
         Position pos = current.coordinates().starting();
         TreeNode result = IExpression();
         
-        while (current.tag().is(Token.Type.AMPERSAND)) {
+        while (current.type().is(Token.Type.AMPERSAND)) {
             checkTypes(result.type(), Type.Typename.INT, pos);
             nextToken();
             pos = current.coordinates().starting();
@@ -877,9 +889,9 @@ public class Parser {
     private TreeNode IExpression() {
         TreeNode result = CBoolExpression();
         
-        while (current.tag().is(Token.Type.Equality)) {
+        while (current.type().is(Token.Type.Equality)) {
             Position pos = current.coordinates().starting();
-            Token.Type type = current.tag();
+            Token.Type type = current.type();
             nextToken();
             TreeNode right = CBoolExpression();
             
@@ -910,9 +922,9 @@ public class Parser {
     private TreeNode CBoolExpression() {
         TreeNode result = DboolExpression();
         
-        while (current.tag().is(Token.Type.OrderRelation)) {
+        while (current.type().is(Token.Type.OrderRelation)) {
             Position pos = current.coordinates().starting();
-            Token.Type type = current.tag();
+            Token.Type type = current.type();
             nextToken();
             TreeNode right = DboolExpression();
             
@@ -954,12 +966,12 @@ public class Parser {
     private TreeNode DboolExpression() {
         TreeNode result = AExpression();
         
-        while (current.tag().is(Token.Type.BitwiseShift)) {
+        while (current.type().is(Token.Type.BitwiseShift)) {
             Position pos = current.coordinates().starting();
             checkTypes(result.type(), Type.Typename.INT, pos);
             
             pos = current.coordinates().starting();
-            Token.Type type = current.tag();
+            Token.Type type = current.type();
             nextToken();
             TreeNode right = AExpression();
             
@@ -986,9 +998,9 @@ public class Parser {
     private TreeNode AExpression() {
         TreeNode result = BExpression();
         
-        while (current.tag().is(Token.Type.PlusMinus)) {
+        while (current.type().is(Token.Type.PlusMinus)) {
             Position pos = current.coordinates().starting();
-            Token.Type type = current.tag();
+            Token.Type type = current.type();
             nextToken();
             TreeNode right = BExpression();
             
@@ -1015,9 +1027,9 @@ public class Parser {
     private TreeNode BExpression() {
         TreeNode result = CExpression();
         
-        while (current.tag().is(Token.Type.MulDivMod)) {
+        while (current.type().is(Token.Type.MulDivMod)) {
             Position pos = current.coordinates().starting();
-            Token.Type type = current.tag();
+            Token.Type type = current.type();
             nextToken();
             TreeNode right = CExpression();
             
@@ -1045,9 +1057,9 @@ public class Parser {
         return result;
     }
     private TreeNode CExpression() {
-        if (current.tag() == Token.Type.LEFT_BRACKET) {
+        if (current.type() == Token.Type.LEFT_BRACKET) {
             nextToken();
-            if (current.tag().is(Token.Type.Modifier)) {
+            if (current.type().is(Token.Type.Modifier)) {
                 CompositeNode node = new CompositeNode(CompositeNode.Operation.CAST);
                 Type type = Type();
                 RightBracket();
@@ -1068,10 +1080,10 @@ public class Parser {
         }
     }
     private TreeNode DExpression() {
-        if (current.tag().is(Token.Type.PlusMinus)) {
+        if (current.type().is(Token.Type.PlusMinus)) {
             return PlusMinus(EExpression());
-        } else if (current.tag().is(Token.Type.IncDec)) {
-            Token.Type type = current.tag();
+        } else if (current.type().is(Token.Type.IncDec)) {
+            Token.Type type = current.type();
             nextToken();
             TreeNode node = EExpression();
             
@@ -1098,8 +1110,8 @@ public class Parser {
             return opNode;
         } else {
             TreeNode node = EExpression();
-            while (current.tag() == Token.Type.AMPERSAND ||
-                   current.tag() == Token.Type.ASTERISK) {
+            while (current.type() == Token.Type.AMPERSAND ||
+                   current.type() == Token.Type.ASTERISK) {
                 node = AmpersandAsterisk(node);
             }
             return node;
@@ -1107,7 +1119,7 @@ public class Parser {
     }
     private TreeNode AmpersandAsterisk(TreeNode node) {
         CompositeNode compositeNode = null;
-        switch (current.tag()) {
+        switch (current.type()) {
             case AMPERSAND:
                 compositeNode = new CompositeNode(CompositeNode.Operation.REF);
                 compositeNode.setType(new PointerType(node.type(), false));
@@ -1129,7 +1141,7 @@ public class Parser {
     }
     private TreeNode PlusMinus(TreeNode node) {        
         CompositeNode compositeNode = null;
-        switch (current.tag()) {
+        switch (current.type()) {
             case PLUS:
                 break;
             case MINUS:
@@ -1145,7 +1157,7 @@ public class Parser {
     private TreeNode EExpression() {
         TreeNode node = FExpression();
         
-        if (current.tag().is(Token.Type.IncDec)) {
+        if (current.type().is(Token.Type.IncDec)) {
             node = PostIncDec(node);
         }
         
@@ -1160,7 +1172,7 @@ public class Parser {
         
         CompositeNode opNode = null;
         
-        switch (current.tag()) {
+        switch (current.type()) {
             case INC:
                 opNode = new CompositeNode(node.type(), CompositeNode.Operation.POST_INC);
                 break;
@@ -1178,12 +1190,12 @@ public class Parser {
     private TreeNode FExpression() {
         TreeNode node = JExpression();
         
-        while (current.tag() == Token.Type.MEMBER_SELECT ||
-               current.tag() == Token.Type.LEFT_BRACKET ||
-               current.tag() == Token.Type.LEFT_SQUARE_BRACKET) {
-            if (current.tag() == Token.Type.MEMBER_SELECT) {
+        while (current.type() == Token.Type.MEMBER_SELECT ||
+               current.type() == Token.Type.LEFT_BRACKET ||
+               current.type() == Token.Type.LEFT_SQUARE_BRACKET) {
+            if (current.type() == Token.Type.MEMBER_SELECT) {
                 node = StructMember(node);
-            } else if (current.tag() == Token.Type.LEFT_BRACKET) {
+            } else if (current.type() == Token.Type.LEFT_BRACKET) {
                 node = FuncArgs(node);
             } else {
                 node = ArrayElement(node);
@@ -1193,7 +1205,7 @@ public class Parser {
         return node;
     }    
     private TreeNode JExpression() {
-        if (current.tag().is(Token.Type.Constant)) {
+        if (current.type().is(Token.Type.Constant)) {
             return Const();
         } else {
             Position pos = current.coordinates().starting();
@@ -1244,9 +1256,9 @@ public class Parser {
 
         CompositeNode args = new CompositeNode(CompositeNode.Operation.FUNCTION_ARGUMENTS);
         LeftBracket();
-        if (current.tag().is(Token.Type.FirstOfExpression)) {           
+        if (current.type().is(Token.Type.FirstOfExpression)) {           
             args.addChild(Expression());
-            while (current.tag() == Token.Type.COMMA) {
+            while (current.type() == Token.Type.COMMA) {
                 nextToken();
                 args.addChild(Expression());
             }
@@ -1276,7 +1288,7 @@ public class Parser {
         arrayElementNode.addChild(node);
 
         LeftSquareBracket();
-        if (current.tag().is(Token.Type.FirstOfExpression)) {
+        if (current.type().is(Token.Type.FirstOfExpression)) {
             pos = current.coordinates().starting();
             TreeNode index = Expression();
             if (checkTypes(index.type(), Type.Typename.INT, pos)) {
@@ -1291,7 +1303,7 @@ public class Parser {
     
     private TreeNode Const() {
         ConstantLeaf leaf = null;
-        switch (current.tag()) {
+        switch (current.type()) {
             case CONST_CHAR:
                 leaf = new ConstantLeaf(new PrimitiveType(Type.Typename.CHAR, true), current.value());
                 break;
@@ -1322,7 +1334,7 @@ public class Parser {
         
         TreeNode element = ArrayElement();
         value.addChild(element);
-        while (current.tag() == Token.Type.COMMA) {
+        while (current.type() == Token.Type.COMMA) {
             nextToken();
             Position pos = current.coordinates().starting();
             
@@ -1331,7 +1343,7 @@ public class Parser {
             
             checkTypes(element.type(), nextElement.type(), pos);
         }
-        if (current.tag() == Token.Type.COMMA) {
+        if (current.type() == Token.Type.COMMA) {
             nextToken();
         }
         
@@ -1340,7 +1352,7 @@ public class Parser {
         return value;
     }
     private TreeNode ArrayElement() {
-        if (current.tag() == Token.Type.LEFT_SQUARE_BRACKET) {
+        if (current.type() == Token.Type.LEFT_SQUARE_BRACKET) {
             return ArrayInit();
         } else {
             return Expression();
@@ -1362,7 +1374,7 @@ public class Parser {
         currentScope = struct.scope();
         
         LeftBrace();
-        while (current.tag().is(Token.Type.Modifier)) {
+        while (current.type().is(Token.Type.Modifier)) {
             VariableDef();
             Semicolon();
         }
@@ -1376,7 +1388,7 @@ public class Parser {
         Type type = Type();
         
         var.addChild(Variable(type));
-        while (current.tag() == Token.Type.COMMA) {
+        while (current.type() == Token.Type.COMMA) {
             nextToken();
             var.addChild(Variable(type));
         }
@@ -1389,7 +1401,7 @@ public class Parser {
         if (name != null) 
             currentScope.add(new VariableSymbol(name, type));
         
-        if (current.tag() == Token.Type.ASSIGN) {
+        if (current.type() == Token.Type.ASSIGN) {
             nextToken();
              
             CompositeNode node = new CompositeNode(CompositeNode.Operation.ASSIGN);
@@ -1398,7 +1410,7 @@ public class Parser {
             
             Position pos = current.coordinates().starting();
             TreeNode value;
-            if (current.tag().is(Token.Type.FirstOfExpression))
+            if (current.type().is(Token.Type.FirstOfExpression))
                 value = Expression();
             else
                 value = ArrayInit();

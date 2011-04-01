@@ -1,5 +1,6 @@
 package ru.bmstu.iu9.compiler.lexer;
 
+import ru.bmstu.iu9.compiler.Position;
 import java.util.Iterator;
 
 /**

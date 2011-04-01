@@ -1,10 +1,12 @@
-package ru.bmstu.iu9.compiler.lexer;
+package ru.bmstu.iu9.compiler;
+
+import com.google.gson.InstanceCreator;
 
 /**
  *
  * @author maggot
  */
-class Position implements Cloneable {
+public final class Position implements Cloneable {
     /**
      * Позиция кодовой точки в тексте программы, представленная 
      * тройкой <line, pos, index>. Номер строки и позиция в строке 
@@ -13,6 +15,7 @@ class Position implements Cloneable {
      * @param positionInLine позиция в строке программы
      * @param indexInText индекс в тексте программы
      */
+    private Position() { }
     public Position(int line, int position, int index) {
         this.line = line;
         this.position = position;
@@ -32,25 +35,14 @@ class Position implements Cloneable {
         return new Position(this.line, this.position, this.index);
     } 
             
-    private final int line;
-    private final int position;
-    private final int index;
-}
-
-class Fragment {
-    /**
-     * Координаты фрагмента текста программы
-     * @param startingPosition позиция первого символа фрагмента
-     * @param endingPosition позиция последнего символа фрагмента
-     */
-    public Fragment(Position starting, Position ending) {
-        this.starting = starting;
-        this.ending = ending;
+    private int line;
+    private int position;
+    private int index;
+    
+    public static class PositionInstanceCreator implements InstanceCreator<Position> {
+        @Override
+        public Position createInstance(java.lang.reflect.Type type) {
+            return new Position();
+        }
     }
-    
-    public Position starting() { return starting; }
-    public Position ending() { return ending; }
-    
-    private final Position starting;
-    private final Position ending;
 }

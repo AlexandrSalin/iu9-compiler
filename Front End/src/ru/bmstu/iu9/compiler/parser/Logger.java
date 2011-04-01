@@ -5,6 +5,9 @@
 
 package ru.bmstu.iu9.compiler.parser;
 
+import ru.bmstu.iu9.compiler.Position;
+import ru.bmstu.iu9.compiler.Type;
+import ru.bmstu.iu9.compiler.Token;
 import java.util.logging.Level;
 
 /**

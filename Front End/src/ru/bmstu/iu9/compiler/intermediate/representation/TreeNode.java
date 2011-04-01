@@ -1,6 +1,6 @@
 package ru.bmstu.iu9.compiler.intermediate.representation;
 
-import ru.bmstu.iu9.compiler.parser.*;
+import ru.bmstu.iu9.compiler.*;
 import com.google.gson.InstanceCreator;
 import java.util.LinkedList;
 import java.util.List;

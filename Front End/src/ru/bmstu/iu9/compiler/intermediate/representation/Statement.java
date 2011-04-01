@@ -1,5 +1,7 @@
 package ru.bmstu.iu9.compiler.intermediate.representation;
 
+import ru.bmstu.iu9.compiler.*;
+
 /**
  *
  * @author maggot
@@ -72,7 +74,7 @@ final class BinaryOperation extends Statement {
 final class GoTo extends Statement {
     public GoTo(int offset) {
         this.operation = Operation.GOTO;
-        this.offset = new Constant(Type.getPrimitiveType(Type.Typename.INT), offset);
+        this.offset = new Constant(new PrimitiveType(Type.Typename.INT, true), offset);
     }
     
     @Override
@@ -84,7 +86,7 @@ final class If extends Statement {
     public If(Variable variable, int offset) {
         this.operation = Operation.IF_GOTO;
         this.condition = variable;
-        this.offset = new Constant(Type.getPrimitiveType(Type.Typename.INT), offset);
+        this.offset = new Constant(new PrimitiveType(Type.Typename.INT, true), offset);
     }
     
     @Override
@@ -100,7 +102,7 @@ final class Call extends Statement {
         this.operation = Operation.CALL;
         this.function = function;
         this.argsNumber = 
-                new Constant(Type.getPrimitiveType(Type.Typename.INT), argsNumber);
+                new Constant(new PrimitiveType(Type.Typename.INT, true), argsNumber);
         this.result = result;
     }
         
@@ -108,7 +110,7 @@ final class Call extends Statement {
         this.operation = Operation.CALL;
         this.function = function;
         this.argsNumber = 
-                new Constant(Type.getPrimitiveType(Type.Typename.INT), argsNumber);
+                new Constant(new PrimitiveType(Type.Typename.INT, true), argsNumber);
         this.result = null;
     }
     
