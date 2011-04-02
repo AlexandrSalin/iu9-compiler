@@ -1,5 +1,7 @@
 package ru.bmstu.iu9.compiler;
 
+import ru.bmstu.iu9.compiler.lexis.token.ConstantToken;
+
 /**
  *
  * @author maggot

@@ -4,8 +4,27 @@ package ru.bmstu.iu9.compiler;
  * @author maggot
  */
 public abstract class Type {
-    public enum Typename { INT, BOOL, FLOAT, DOUBLE, CHAR, VOID, 
-        ARRAY, STRUCT, FUNCTION, POINTER };
+    public enum Typename { 
+        INT, BOOL, FLOAT, DOUBLE, CHAR, VOID, 
+        ARRAY, STRUCT, FUNCTION, POINTER,
+        PrimitiveType(new Typename[] {
+            INT, VOID, DOUBLE, FLOAT, CHAR
+        });
+        
+        private Typename() {
+            this.value = 1 << this.ordinal();
+        }
+        private Typename(Typename[] typenames) {
+            for (int i = 0; i < typenames.length; ++i)
+                this.value = this.value | typenames[i].value;
+        }
+        
+        public boolean is(Typename typename) {
+            return (this.value & typename.value) != 0;
+        }
+        
+        private int value = 0;
+    };
     
     protected Type(Typename typename) {
         

@@ -1,4 +1,4 @@
-package ru.bmstu.iu9.compiler;
+package ru.bmstu.iu9.compiler.lexis.token;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -6,6 +6,8 @@ import com.google.gson.InstanceCreator;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.Iterator;
+import ru.bmstu.iu9.compiler.Fragment;
+import ru.bmstu.iu9.compiler.IntegerConstantToken;
 
 /**
  *
@@ -80,7 +82,6 @@ public final class TokenFactory implements Iterable<Token> {
     }
     
     private static class GeneralizedToken {
-
         private GeneralizedToken() { }
 
         private int type;

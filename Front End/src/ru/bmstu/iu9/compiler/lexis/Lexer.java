@@ -1,5 +1,10 @@
-package ru.bmstu.iu9.compiler.lexer;
+package ru.bmstu.iu9.compiler.lexis;
 
+import ru.bmstu.iu9.compiler.lexis.token.DoubleConstantToken;
+import ru.bmstu.iu9.compiler.lexis.token.CharConstantToken;
+import ru.bmstu.iu9.compiler.lexis.token.Token;
+import ru.bmstu.iu9.compiler.lexis.token.IdentifierToken;
+import ru.bmstu.iu9.compiler.lexis.token.SpecialToken;
 import ru.bmstu.iu9.compiler.*;
 import ru.bmstu.iu9.compiler.Fragment;
 import com.google.gson.*;
@@ -10,7 +15,7 @@ import java.util.List;
 import java.util.regex.*;
 import java.util.Iterator;
 import java.io.PrintWriter;
-import ru.bmstu.iu9.compiler.lexer.Program.CodePointIterator;
+import ru.bmstu.iu9.compiler.lexis.Program.CodePointIterator;
 
 /**
  *

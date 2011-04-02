@@ -3,11 +3,11 @@
  * and open the template in the editor.
  */
 
-package ru.bmstu.iu9.compiler.parser;
+package ru.bmstu.iu9.compiler.syntax;
 
 import ru.bmstu.iu9.compiler.Position;
 import ru.bmstu.iu9.compiler.Type;
-import ru.bmstu.iu9.compiler.Token;
+import ru.bmstu.iu9.compiler.lexis.token.Token;
 import java.util.logging.Level;
 
 /**

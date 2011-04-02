@@ -52,12 +52,9 @@ Program       ::= { FunctionDef | VariableDef ";" | StructDef ";" }
 
 FunctionDef   ::= "func" Type Identifier FuncArgList Code 
 VariableDef   ::= Type Variable { "," Variable }
-Variable      ::= Identifier [ "=" ( Expression | ArrayInit )]
+Variable      ::= Identifier [ "=" Expression ]
 
 FuncArgList   ::= "(" [ Type Identifier { "," Type Identifier }] ")"
-
-ArrayInit     ::= "{" ArrayElement { "," ArrayElement } [ "," ] "}" 
-ArrayElement  ::= ArrayInit | Expression 
 
 StructDef ::= "struct" Identifier "{" { VariableDef ";" } "}"
 

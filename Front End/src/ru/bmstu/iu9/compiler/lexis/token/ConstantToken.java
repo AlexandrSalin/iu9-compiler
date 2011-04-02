@@ -1,4 +1,6 @@
-package ru.bmstu.iu9.compiler;
+package ru.bmstu.iu9.compiler.lexis.token;
+
+import ru.bmstu.iu9.compiler.Fragment;
 
 /**
  *

@@ -1,4 +1,4 @@
-package ru.bmstu.iu9.compiler.parser;
+package ru.bmstu.iu9.compiler.syntax;
 
 import com.mxgraph.layout.mxCompactTreeLayout;
 import javax.swing.JFrame;

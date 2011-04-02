@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package ru.bmstu.iu9.compiler.lexer;
+package ru.bmstu.iu9.compiler.lexis;
 
 import ru.bmstu.iu9.compiler.Position;
 import java.util.logging.Level;
