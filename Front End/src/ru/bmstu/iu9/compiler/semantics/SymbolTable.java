@@ -1,4 +1,4 @@
-package ru.bmstu.iu9.compiler.syntax;
+package ru.bmstu.iu9.compiler.semantics;
 
 import ru.bmstu.iu9.compiler.Type;
 import java.util.Map;

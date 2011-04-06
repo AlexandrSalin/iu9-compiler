@@ -1,5 +1,6 @@
 package ru.bmstu.iu9.compiler.lexis;
 
+import ru.bmstu.iu9.compiler.lexis.token.IntegerConstantToken;
 import ru.bmstu.iu9.compiler.lexis.token.DoubleConstantToken;
 import ru.bmstu.iu9.compiler.lexis.token.CharConstantToken;
 import ru.bmstu.iu9.compiler.lexis.token.Token;

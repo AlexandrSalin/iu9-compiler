@@ -18,7 +18,7 @@ public class PrimitiveType extends Type {
     }
     @Override
     public String toString() {
-        return (isConstant) ? "CONST " : "" + super.toString();
+        return ((isConstant) ? "CONST " : "") + super.toString();
     }
     
     protected final boolean isConstant;

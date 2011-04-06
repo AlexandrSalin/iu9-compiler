@@ -1,5 +1,7 @@
-package ru.bmstu.iu9.compiler;
+package ru.bmstu.iu9.compiler.lexis.token;
 
+import ru.bmstu.iu9.compiler.Fragment;
+import ru.bmstu.iu9.compiler.Position;
 import ru.bmstu.iu9.compiler.lexis.token.ConstantToken;
 
 /**

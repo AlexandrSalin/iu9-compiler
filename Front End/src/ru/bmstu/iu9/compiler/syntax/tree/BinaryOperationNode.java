@@ -3,7 +3,10 @@
  * and open the template in the editor.
  */
 
-package ru.bmstu.iu9.compiler.semantics.tree;
+package ru.bmstu.iu9.compiler.syntax.tree;
+
+import com.google.gson.annotations.SerializedName;
+import ru.bmstu.iu9.compiler.Position;
 
 /**
  *
@@ -23,6 +26,9 @@ final public class BinaryOperationNode extends ExpressionNode {
             BITWISE_SHIFT_RIGHT, BITWISE_SHIFT_LEFT, BITWISE_AND, BITWISE_XOR,
             BITWISE_OR, BITWISE_XOR_ASSIGN, BITWISE_SHIFT_RIGHT_ASSIGN, 
             BITWISE_SHIFT_LEFT_ASSIGN, BITWISE_OR_ASSIGN
+        }),
+        Comparison(new Operation[] {
+            GREATER, GREATER_OR_EQUAL, LESS, LESS_OR_EUQAL, NOT_EQUAL, EQUAL
         });
     
         private Operation() {
@@ -40,23 +46,27 @@ final public class BinaryOperationNode extends ExpressionNode {
         private long value = 0;
     };
     
-    public BinaryOperationNode(Operation operation) {
-        super(Node.NodeType.BINARY_OPERATION);
-        this.operation = operation;
+    public BinaryOperationNode(Operation operation, Position position) {
+        super(Node.NodeType.BINARY_OPERATION, position);
+        this.operation = operation.ordinal();
     }
-    public BinaryOperationNode(Operation operation, Node left, Node right) {
-        super(Node.NodeType.BINARY_OPERATION);
-        this.operation = operation;
+    public BinaryOperationNode(Operation operation, Node left, Node right,
+            Position position) {
+        this(operation, position);
         this.left = left;
         this.right = right;
     }
     
+    public Operation operation() { return Operation.values()[this.operation]; }
     public void setLeftChild(Node child) { this.left = child; }
     public void setRightChild(Node child) { this.right = child; }
     public Node leftChild() { return this.left; }
     public Node rightChild() { return this.right; }
     
+    @SerializedName("node1")
     private Node left;
+    @SerializedName("node2")
     private Node right;
-    private Operation operation;
+    @SerializedName("operation")
+    private int operation;
 }

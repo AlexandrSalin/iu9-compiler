@@ -32,6 +32,7 @@ public final class FunctionType extends Type {
     public String toString() {
         StringBuilder result = new StringBuilder();
         result.append(super.toString());
+        result.append(" ");
         result.append(type.toString());
         result.append("(");
         

@@ -3,10 +3,10 @@
  * and open the template in the editor.
  */
 
-package ru.bmstu.iu9.compiler.semantics.tree;
+package ru.bmstu.iu9.compiler.syntax.tree;
 
-import java.util.LinkedList;
-import java.util.List;
+import com.google.gson.annotations.SerializedName;
+
 
 /**
  *
@@ -16,15 +16,24 @@ final public class SwitchNode extends Node {
     public SwitchNode() {
         super(Node.NodeType.SWITCH);
     }
+    public SwitchNode(Node expression, BlockNode cases, BlockNode defaultNode) {
+        super(Node.NodeType.SWITCH);
+        this.expression = expression;
+        this.cases = cases;
+        this.defaultNode = defaultNode;
+    }
     
     public Node expression() { return this.expression; }
     public void setExpression(Node expression) { this.expression = expression; }
-    public List<CaseNode> cases() { return this.cases; }
-    public void addCase(CaseNode caseNode) { this.cases.add(caseNode); }
+    public BlockNode cases() { return this.cases; }
+    public void addCase(CaseNode caseNode) { this.cases.addChild(caseNode); }
     public BlockNode defaultNode() { return this.defaultNode; }
     public void setDefaultNode(BlockNode defaultNode) { this.defaultNode = defaultNode; }
     
+    @SerializedName("node1")
     private Node expression;
-    private List<CaseNode> cases = new LinkedList<CaseNode>();
+    @SerializedName("node2")
+    private BlockNode cases = new BlockNode();
+    @SerializedName("node3")
     private BlockNode defaultNode;
 }

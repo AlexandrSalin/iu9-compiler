@@ -8,7 +8,7 @@ public abstract class Type {
         INT, BOOL, FLOAT, DOUBLE, CHAR, VOID, 
         ARRAY, STRUCT, FUNCTION, POINTER,
         PrimitiveType(new Typename[] {
-            INT, VOID, DOUBLE, FLOAT, CHAR
+            INT, VOID, DOUBLE, FLOAT, CHAR, BOOL
         });
         
         private Typename() {
@@ -22,26 +22,33 @@ public abstract class Type {
         public boolean is(Typename typename) {
             return (this.value & typename.value) != 0;
         }
+        public boolean is(Typename[] typenames) {
+            for (int i = 0; i < typenames.length; ++i) {
+                if ((this.value & typenames[i].value) != 0)
+                    return true;
+            }
+            return false;
+        }
         
         private int value = 0;
     };
     
     protected Type(Typename typename) {
         
-        this.typename = typename;
+        this.typename = typename.ordinal();
     }
     
-    public Typename Typename() { return this.typename; }
+    public Typename Typename() { return Typename.values()[this.typename]; }
     
     @Override
     public boolean equals(Object obj) {
         return this.getClass().equals(obj.getClass()) && 
-                this.typename.equals(((Type)obj).typename);
+                (this.typename == (((Type)obj).typename));
     }
     @Override
     public String toString() {
-        return typename.name();
+        return Typename.values()[this.typename].toString();
     }
     
-    protected final Typename typename;
+    protected final int typename;
 }

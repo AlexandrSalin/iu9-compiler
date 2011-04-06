@@ -1,0 +1,379 @@
+{
+  "nodes": [
+    {
+      "node2": {
+        "nodes": [
+          {
+            "name": "args",
+            "position": {
+              "line": 1,
+              "position": 32,
+              "index": 31
+            },
+            "type": {
+              "type": {
+                "type": {
+                  "isConstant": true,
+                  "typename": 4
+                },
+                "isConstant": false,
+                "typename": 9
+              },
+              "isConstant": false,
+              "typename": 9
+            },
+            "nodeType": 2
+          }
+        ],
+        "nodeType": 9
+      },
+      "node3": {
+        "nodes": [
+          {
+            "name": "a",
+            "position": {
+              "line": 2,
+              "position": 13,
+              "index": 52
+            },
+            "type": {
+              "isConstant": false,
+              "typename": 0
+            },
+            "nodeType": 2
+          },
+          {
+            "node1": {
+              "name": "a",
+              "position": {
+                "line": 2,
+                "position": 13,
+                "index": 52
+              },
+              "nodeType": 11
+            },
+            "node2": {
+              "value": 0,
+              "position": {
+                "line": 2,
+                "position": 17,
+                "index": 56
+              },
+              "type": {
+                "isConstant": true,
+                "typename": 0
+              },
+              "nodeType": 12
+            },
+            "operation": 0,
+            "position": {
+              "line": 2,
+              "position": 15,
+              "index": 54
+            },
+            "nodeType": 0
+          },
+          {
+            "name": "b",
+            "position": {
+              "line": 2,
+              "position": 20,
+              "index": 59
+            },
+            "type": {
+              "isConstant": false,
+              "typename": 0
+            },
+            "nodeType": 2
+          },
+          {
+            "node1": {
+              "name": "b",
+              "position": {
+                "line": 2,
+                "position": 20,
+                "index": 59
+              },
+              "nodeType": 11
+            },
+            "node2": {
+              "value": 10,
+              "position": {
+                "line": 2,
+                "position": 24,
+                "index": 63
+              },
+              "type": {
+                "isConstant": true,
+                "typename": 0
+              },
+              "nodeType": 12
+            },
+            "operation": 0,
+            "position": {
+              "line": 2,
+              "position": 22,
+              "index": 61
+            },
+            "nodeType": 0
+          },
+          {
+            "node1": {
+              "nodes": [
+                {
+                  "name": "i",
+                  "position": {
+                    "line": 4,
+                    "position": 17,
+                    "index": 86
+                  },
+                  "type": {
+                    "isConstant": false,
+                    "typename": 0
+                  },
+                  "nodeType": 2
+                },
+                {
+                  "node1": {
+                    "name": "i",
+                    "position": {
+                      "line": 4,
+                      "position": 17,
+                      "index": 86
+                    },
+                    "nodeType": 11
+                  },
+                  "node2": {
+                    "value": 0,
+                    "position": {
+                      "line": 4,
+                      "position": 21,
+                      "index": 90
+                    },
+                    "type": {
+                      "isConstant": true,
+                      "typename": 0
+                    },
+                    "nodeType": 12
+                  },
+                  "operation": 0,
+                  "position": {
+                    "line": 4,
+                    "position": 19,
+                    "index": 88
+                  },
+                  "nodeType": 0
+                }
+              ],
+              "nodeType": 9
+            },
+            "node2": {
+              "node1": {
+                "name": "i",
+                "position": {
+                  "line": 4,
+                  "position": 24,
+                  "index": 93
+                },
+                "nodeType": 11
+              },
+              "node2": {
+                "value": 10,
+                "position": {
+                  "line": 4,
+                  "position": 29,
+                  "index": 98
+                },
+                "type": {
+                  "isConstant": true,
+                  "typename": 0
+                },
+                "nodeType": 12
+              },
+              "operation": 11,
+              "position": {
+                "line": 4,
+                "position": 26,
+                "index": 95
+              },
+              "nodeType": 0
+            },
+            "node3": {
+              "node1": {
+                "name": "i",
+                "position": {
+                  "line": 4,
+                  "position": 35,
+                  "index": 104
+                },
+                "nodeType": 11
+              },
+              "operation": 8,
+              "position": {
+                "line": 4,
+                "position": 33,
+                "index": 102
+              },
+              "nodeType": 1
+            },
+            "node4": {
+              "nodes": [
+                {
+                  "node3": {
+                    "nodes": [
+                      {
+                        "node1": {
+                          "name": "b",
+                          "position": {
+                            "line": 8,
+                            "position": 15,
+                            "index": 181
+                          },
+                          "nodeType": 11
+                        },
+                        "operation": 7,
+                        "position": {
+                          "line": 8,
+                          "position": 13,
+                          "index": 179
+                        },
+                        "nodeType": 1
+                      }
+                    ],
+                    "nodeType": 9
+                  },
+                  "node1": {
+                    "node1": {
+                      "name": "i",
+                      "position": {
+                        "line": 5,
+                        "position": 12,
+                        "index": 121
+                      },
+                      "nodeType": 11
+                    },
+                    "node2": {
+                      "value": 0,
+                      "position": {
+                        "line": 5,
+                        "position": 16,
+                        "index": 125
+                      },
+                      "type": {
+                        "isConstant": true,
+                        "typename": 0
+                      },
+                      "nodeType": 12
+                    },
+                    "operation": 8,
+                    "position": {
+                      "line": 5,
+                      "position": 14,
+                      "index": 123
+                    },
+                    "nodeType": 0
+                  },
+                  "node2": {
+                    "nodes": [
+                      {
+                        "node1": {
+                          "name": "a",
+                          "position": {
+                            "line": 6,
+                            "position": 13,
+                            "index": 143
+                          },
+                          "nodeType": 11
+                        },
+                        "operation": 0,
+                        "position": {
+                          "line": 6,
+                          "position": 14,
+                          "index": 144
+                        },
+                        "nodeType": 1
+                      }
+                    ],
+                    "nodeType": 9
+                  },
+                  "nodeType": 4
+                }
+              ],
+              "nodeType": 9
+            },
+            "nodeType": 3
+          },
+          {
+            "node1": {
+              "node1": {
+                "name": "a",
+                "position": {
+                  "line": 12,
+                  "position": 12,
+                  "index": 216
+                },
+                "nodeType": 11
+              },
+              "node2": {
+                "name": "b",
+                "position": {
+                  "line": 12,
+                  "position": 16,
+                  "index": 220
+                },
+                "nodeType": 11
+              },
+              "operation": 5,
+              "position": {
+                "line": 12,
+                "position": 14,
+                "index": 218
+              },
+              "nodeType": 0
+            },
+            "operation": 11,
+            "position": {
+              "line": 12,
+              "position": 12,
+              "index": 216
+            },
+            "nodeType": 1
+          }
+        ],
+        "nodeType": 9
+      },
+      "node1": {
+        "name": "main",
+        "position": {
+          "line": 1,
+          "position": 38,
+          "index": 37
+        },
+        "type": {
+          "type": {
+            "isConstant": false,
+            "typename": 0
+          },
+          "arguments": [
+            {
+              "type": {
+                "type": {
+                  "isConstant": true,
+                  "typename": 4
+                },
+                "isConstant": false,
+                "typename": 9
+              },
+              "isConstant": false,
+              "typename": 9
+            }
+          ],
+          "typename": 8
+        },
+        "nodeType": 2
+      },
+      "nodeType": 13
+    }
+  ],
+  "nodeType": 9
+}

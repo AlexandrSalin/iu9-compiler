@@ -3,7 +3,9 @@
  * and open the template in the editor.
  */
 
-package ru.bmstu.iu9.compiler.semantics.tree;
+package ru.bmstu.iu9.compiler.syntax.tree;
+
+import com.google.gson.annotations.SerializedName;
 
 /**
  *
@@ -14,8 +16,11 @@ final public class NoOperandOperationNode extends Node {
     
     public NoOperandOperationNode(Operation operation) {
         super(Node.NodeType.NO_OPERAND_OPERATION);
-        this.operation = operation;
+        this.operation = operation.ordinal();
     }
     
-    private Operation operation;
+    public Operation operation() { return Operation.values()[this.operation]; }
+    
+    @SerializedName("operation")
+    private int operation;
 }

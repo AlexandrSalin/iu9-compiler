@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package ru.bmstu.iu9.compiler.semantics.tree;
+package ru.bmstu.iu9.compiler.syntax.tree;
 
 /**
  *

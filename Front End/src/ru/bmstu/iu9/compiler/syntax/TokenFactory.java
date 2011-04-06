@@ -1,4 +1,4 @@
-package ru.bmstu.iu9.compiler.lexis.token;
+package ru.bmstu.iu9.compiler.syntax;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -7,7 +7,12 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.Iterator;
 import ru.bmstu.iu9.compiler.Fragment;
-import ru.bmstu.iu9.compiler.IntegerConstantToken;
+import ru.bmstu.iu9.compiler.lexis.token.CharConstantToken;
+import ru.bmstu.iu9.compiler.lexis.token.DoubleConstantToken;
+import ru.bmstu.iu9.compiler.lexis.token.IdentifierToken;
+import ru.bmstu.iu9.compiler.lexis.token.IntegerConstantToken;
+import ru.bmstu.iu9.compiler.lexis.token.SpecialToken;
+import ru.bmstu.iu9.compiler.lexis.token.Token;
 
 /**
  *
@@ -52,8 +57,7 @@ public final class TokenFactory implements Iterable<Token> {
                 }
                 @Override
                 public Token next() {
-                    ++counter;
-                    GeneralizedToken token = tokens[counter];
+                    GeneralizedToken token = tokens[counter++];
                     switch (Token.Type.values()[token.type]) {
                         case CONST_INT:
                             return new IntegerConstantToken(
@@ -77,7 +81,7 @@ public final class TokenFactory implements Iterable<Token> {
                     throw new UnsupportedOperationException();
                 }
                 
-                int counter = -1;
+                int counter = 0;
             };
     }
     

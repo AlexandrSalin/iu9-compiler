@@ -3,23 +3,25 @@
  * and open the template in the editor.
  */
 
-package ru.bmstu.iu9.compiler.semantics.tree;
+package ru.bmstu.iu9.compiler.syntax.tree;
+
+import com.google.gson.annotations.SerializedName;
+import ru.bmstu.iu9.compiler.Position;
 
 /**
  *
  * @author maggot
  */
-final public class CallNode extends Node {
-    public CallNode() {
-        super(Node.NodeType.CALL);
+final public class CallNode extends ExpressionNode {
+    public CallNode(Position position) {
+        super(Node.NodeType.CALL, position);
     }
-    public CallNode(Node function) {
-        super(Node.NodeType.CALL);
+    public CallNode(Node function, Position position) {
+        this(position);
         this.function = function;
     }
-    public CallNode(Node function, BlockNode arguments) {
-        super(Node.NodeType.CALL);
-        this.function = function;
+    public CallNode(Node function, BlockNode arguments, Position position) {
+        this(function, position);
         this.arguments = arguments;
     }
     
@@ -28,6 +30,8 @@ final public class CallNode extends Node {
     public BlockNode arguments() { return this.arguments; }
     public void addArgument(Node argument) { this.arguments.addChild(argument); }
     
+    @SerializedName("node1")
     private Node function;
+    @SerializedName("node2")
     private BlockNode arguments;
 }
