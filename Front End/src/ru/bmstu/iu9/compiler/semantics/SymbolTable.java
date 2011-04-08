@@ -1,13 +1,15 @@
 package ru.bmstu.iu9.compiler.semantics;
 
+import java.util.Iterator;
 import ru.bmstu.iu9.compiler.Type;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 /**
  *
  * @author maggot
  */
-class SymbolTable {
+class SymbolTable implements Iterable<Symbol> {
     public SymbolTable() { }
     
     public void setOpenScope(SymbolTable openScope) {
@@ -19,14 +21,9 @@ class SymbolTable {
     public Symbol get(String name) {
         if (symbols.containsKey(name)) {
             return symbols.get(name);
+        } else if (this.openScope != null) {
+            return openScope.get(name);
         } else {
-            SymbolTable openScope = this.openScope;
-            do {
-                Symbol tmp = openScope.get(name);
-                if (tmp != null)
-                    return tmp;
-                openScope = openScope.openScope();
-            } while (openScope != null);
             return null;
         }
     }
@@ -37,9 +34,16 @@ class SymbolTable {
     public Map<String, Symbol> symbols() { return this.symbols; }
     public SymbolTable openScope() { return this.openScope; }
     public Symbol associatedSymbol() { return this.associatedSymbol; }
-    public void setAssociatedSymbol(Symbol associatedSymbol) { this.associatedSymbol = associatedSymbol; }
+    public void setAssociatedSymbol(Symbol associatedSymbol) { 
+        this.associatedSymbol = associatedSymbol; 
+    }
+    
+    @Override
+    public Iterator<Symbol> iterator() {
+        return symbols.values().iterator();
+    }
 
-    private Map<String, Symbol> symbols = new HashMap<String, Symbol>();
+    private Map<String, Symbol> symbols = new LinkedHashMap<String, Symbol>();
     private SymbolTable openScope = null;
     private Symbol associatedSymbol = null;
 }

@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.math.BigDecimal;
 import java.util.Iterator;
 import ru.bmstu.iu9.compiler.Fragment;
 import ru.bmstu.iu9.compiler.lexis.token.CharConstantToken;
@@ -61,16 +62,16 @@ public final class TokenFactory implements Iterable<Token> {
                     switch (Token.Type.values()[token.type]) {
                         case CONST_INT:
                             return new IntegerConstantToken(
-                                    token.coordinates, (int)token.value);
+                                    token.coordinates, token.value.intValue());
                         case CONST_DOUBLE:
                             return new DoubleConstantToken(
-                                    token.coordinates, (double)token.value);
+                                    token.coordinates, token.value.doubleValue());
                         case CONST_CHAR:
                             return new CharConstantToken(
-                                    token.coordinates, (int)token.value);
+                                    token.coordinates, token.value.intValue());
                         case IDENTIFIER:
                             return new IdentifierToken(
-                                    token.coordinates, (String)token.value);
+                                    token.coordinates, token.name);
                         default:
                             return new SpecialToken(
                                     token.coordinates, Token.Type.values()[token.type]);
@@ -90,7 +91,8 @@ public final class TokenFactory implements Iterable<Token> {
 
         private int type;
         private Fragment coordinates;
-        private Object value;
+        private BigDecimal value;
+        private String name;
 
         public static class TokenInstanceCreator implements InstanceCreator<GeneralizedToken> {
             @Override

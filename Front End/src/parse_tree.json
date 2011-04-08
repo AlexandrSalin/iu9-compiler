@@ -1,200 +1,483 @@
 {
   "nodes": [
     {
-      "node2": {
+      "name": "abc",
+      "node1": {
         "nodes": [
           {
-            "name": "args",
-            "position": {
-              "line": 1,
-              "position": 32,
-              "index": 31
+            "vars": [
+              {
+                "name": "a"
+              },
+              {
+                "name": "b"
+              }
+            ],
+            "type": {
+              "typename": 0,
+              "constancy": false
             },
+            "nodeType": 2
+          },
+          {
+            "vars": [
+              {
+                "name": "c"
+              }
+            ],
+            "type": {
+              "typename": 3,
+              "constancy": false
+            },
+            "nodeType": 2
+          },
+          {
+            "vars": [
+              {
+                "name": "d"
+              }
+            ],
             "type": {
               "type": {
                 "type": {
-                  "isConstant": true,
-                  "typename": 4
+                  "typename": 5,
+                  "constancy": false
                 },
-                "isConstant": false,
-                "typename": 9
+                "arguments": [
+                  {
+                    "name": "q",
+                    "type": {
+                      "typename": 0,
+                      "constancy": false
+                    }
+                  },
+                  {
+                    "name": "w",
+                    "type": {
+                      "typename": 0,
+                      "constancy": false
+                    }
+                  },
+                  {
+                    "name": "e",
+                    "type": {
+                      "typename": 2,
+                      "constancy": false
+                    }
+                  },
+                  {
+                    "name": "r",
+                    "type": {
+                      "typename": 2,
+                      "constancy": false
+                    }
+                  }
+                ],
+                "typename": 8,
+                "constancy": false
               },
-              "isConstant": false,
-              "typename": 9
+              "typename": 9,
+              "constancy": false
             },
             "nodeType": 2
           }
         ],
         "nodeType": 9
       },
-      "node3": {
+      "type": {
+        "name": "abc",
+        "typename": 7,
+        "constancy": false
+      },
+      "nodeType": 14
+    },
+    {
+      "name": "foo",
+      "node1": {
         "nodes": [
           {
-            "name": "a",
-            "position": {
-              "line": 2,
-              "position": 13,
-              "index": 52
-            },
+            "vars": [
+              {
+                "name": "bar"
+              }
+            ],
             "type": {
-              "isConstant": false,
-              "typename": 0
+              "name": "abc",
+              "typename": 7,
+              "constancy": false
             },
             "nodeType": 2
           },
           {
+            "operation": 2,
+            "nodeType": 17
+          }
+        ],
+        "nodeType": 9
+      },
+      "type": {
+        "type": {
+          "typename": 5,
+          "constancy": false
+        },
+        "arguments": [
+          {
+            "name": "q",
+            "type": {
+              "typename": 0,
+              "constancy": false
+            }
+          },
+          {
+            "name": "w",
+            "type": {
+              "typename": 0,
+              "constancy": false
+            }
+          },
+          {
+            "name": "e",
+            "type": {
+              "typename": 2,
+              "constancy": false
+            }
+          },
+          {
+            "name": "r",
+            "type": {
+              "typename": 2,
+              "constancy": false
+            }
+          }
+        ],
+        "typename": 8,
+        "constancy": false
+      },
+      "nodeType": 13
+    },
+    {
+      "nodes": [
+        {
+          "node1": {
+            "vars": [
+              {
+                "name": "q"
+              }
+            ],
+            "type": {
+              "typename": 0,
+              "constancy": false
+            },
+            "nodeType": 2
+          },
+          "node2": {
+            "value": 5,
+            "position": {
+              "line": 13,
+              "position": 13,
+              "index": 193
+            },
+            "type": {
+              "typename": 0,
+              "constancy": true
+            },
+            "nodeType": 12
+          },
+          "operation": 0,
+          "position": {
+            "line": 13,
+            "position": 11,
+            "index": 191
+          },
+          "nodeType": 0
+        },
+        {
+          "node1": {
+            "vars": [
+              {
+                "name": "w"
+              }
+            ],
+            "type": {
+              "typename": 3,
+              "constancy": false
+            },
+            "nodeType": 2
+          },
+          "node2": {
+            "value": 9.9E-5,
+            "position": {
+              "line": 14,
+              "position": 16,
+              "index": 212
+            },
+            "type": {
+              "typename": 3,
+              "constancy": true
+            },
+            "nodeType": 12
+          },
+          "operation": 0,
+          "position": {
+            "line": 14,
+            "position": 14,
+            "index": 210
+          },
+          "nodeType": 0
+        }
+      ],
+      "nodeType": 9
+    },
+    {
+      "name": "main",
+      "node1": {
+        "nodes": [
+          {
+            "nodes": [
+              {
+                "node1": {
+                  "vars": [
+                    {
+                      "name": "a"
+                    }
+                  ],
+                  "type": {
+                    "typename": 0,
+                    "constancy": false
+                  },
+                  "nodeType": 2
+                },
+                "node2": {
+                  "value": 0,
+                  "position": {
+                    "line": 19,
+                    "position": 17,
+                    "index": 284
+                  },
+                  "type": {
+                    "typename": 0,
+                    "constancy": true
+                  },
+                  "nodeType": 12
+                },
+                "operation": 0,
+                "position": {
+                  "line": 19,
+                  "position": 15,
+                  "index": 282
+                },
+                "nodeType": 0
+              },
+              {
+                "node1": {
+                  "vars": [
+                    {
+                      "name": "b"
+                    }
+                  ],
+                  "type": {
+                    "typename": 0,
+                    "constancy": false
+                  },
+                  "nodeType": 2
+                },
+                "node2": {
+                  "value": 10,
+                  "position": {
+                    "line": 20,
+                    "position": 17,
+                    "index": 304
+                  },
+                  "type": {
+                    "typename": 0,
+                    "constancy": true
+                  },
+                  "nodeType": 12
+                },
+                "operation": 0,
+                "position": {
+                  "line": 20,
+                  "position": 15,
+                  "index": 302
+                },
+                "nodeType": 0
+              }
+            ],
+            "nodeType": 9
+          },
+          {
             "node1": {
-              "name": "a",
+              "vars": [
+                {
+                  "name": "c"
+                }
+              ],
+              "type": {
+                "typename": 4,
+                "constancy": false
+              },
+              "nodeType": 2
+            },
+            "node2": {
+              "value": 97,
               "position": {
-                "line": 2,
-                "position": 13,
-                "index": 52
+                "line": 23,
+                "position": 18,
+                "index": 340
+              },
+              "type": {
+                "typename": 4,
+                "constancy": true
+              },
+              "nodeType": 12
+            },
+            "operation": 0,
+            "position": {
+              "line": 23,
+              "position": 16,
+              "index": 338
+            },
+            "nodeType": 0
+          },
+          {
+            "node1": {
+              "name": "args",
+              "position": {
+                "line": 24,
+                "position": 5,
+                "index": 350
+              },
+              "nodeType": 11
+            },
+            "node2": {
+              "node1": {
+                "node1": {
+                  "name": "c",
+                  "position": {
+                    "line": 24,
+                    "position": 14,
+                    "index": 359
+                  },
+                  "nodeType": 11
+                },
+                "operation": 4,
+                "position": {
+                  "line": 24,
+                  "position": 13,
+                  "index": 358
+                },
+                "nodeType": 1
+              },
+              "operation": 4,
+              "position": {
+                "line": 24,
+                "position": 12,
+                "index": 357
+              },
+              "nodeType": 1
+            },
+            "operation": 0,
+            "position": {
+              "line": 24,
+              "position": 10,
+              "index": 355
+            },
+            "nodeType": 0
+          },
+          {
+            "node1": {
+              "name": "bar",
+              "position": {
+                "line": 25,
+                "position": 5,
+                "index": 367
               },
               "nodeType": 11
             },
             "node2": {
               "value": 0,
               "position": {
-                "line": 2,
-                "position": 17,
-                "index": 56
+                "line": 25,
+                "position": 11,
+                "index": 373
               },
               "type": {
-                "isConstant": true,
-                "typename": 0
+                "typename": 0,
+                "constancy": true
               },
               "nodeType": 12
             },
             "operation": 0,
             "position": {
-              "line": 2,
-              "position": 15,
-              "index": 54
-            },
-            "nodeType": 0
-          },
-          {
-            "name": "b",
-            "position": {
-              "line": 2,
-              "position": 20,
-              "index": 59
-            },
-            "type": {
-              "isConstant": false,
-              "typename": 0
-            },
-            "nodeType": 2
-          },
-          {
-            "node1": {
-              "name": "b",
-              "position": {
-                "line": 2,
-                "position": 20,
-                "index": 59
-              },
-              "nodeType": 11
-            },
-            "node2": {
-              "value": 10,
-              "position": {
-                "line": 2,
-                "position": 24,
-                "index": 63
-              },
-              "type": {
-                "isConstant": true,
-                "typename": 0
-              },
-              "nodeType": 12
-            },
-            "operation": 0,
-            "position": {
-              "line": 2,
-              "position": 22,
-              "index": 61
+              "line": 25,
+              "position": 9,
+              "index": 371
             },
             "nodeType": 0
           },
           {
             "node1": {
-              "nodes": [
-                {
-                  "name": "i",
-                  "position": {
-                    "line": 4,
-                    "position": 17,
-                    "index": 86
-                  },
-                  "type": {
-                    "isConstant": false,
-                    "typename": 0
-                  },
-                  "nodeType": 2
+              "node1": {
+                "vars": [
+                  {
+                    "name": "i"
+                  }
+                ],
+                "type": {
+                  "typename": 0,
+                  "constancy": false
                 },
-                {
-                  "node1": {
-                    "name": "i",
-                    "position": {
-                      "line": 4,
-                      "position": 17,
-                      "index": 86
-                    },
-                    "nodeType": 11
-                  },
-                  "node2": {
-                    "value": 0,
-                    "position": {
-                      "line": 4,
-                      "position": 21,
-                      "index": 90
-                    },
-                    "type": {
-                      "isConstant": true,
-                      "typename": 0
-                    },
-                    "nodeType": 12
-                  },
-                  "operation": 0,
-                  "position": {
-                    "line": 4,
-                    "position": 19,
-                    "index": 88
-                  },
-                  "nodeType": 0
-                }
-              ],
-              "nodeType": 9
+                "nodeType": 2
+              },
+              "node2": {
+                "value": 0,
+                "position": {
+                  "line": 27,
+                  "position": 21,
+                  "index": 399
+                },
+                "type": {
+                  "typename": 0,
+                  "constancy": true
+                },
+                "nodeType": 12
+              },
+              "operation": 0,
+              "position": {
+                "line": 27,
+                "position": 19,
+                "index": 397
+              },
+              "nodeType": 0
             },
             "node2": {
               "node1": {
                 "name": "i",
                 "position": {
-                  "line": 4,
+                  "line": 27,
                   "position": 24,
-                  "index": 93
+                  "index": 402
                 },
                 "nodeType": 11
               },
               "node2": {
                 "value": 10,
                 "position": {
-                  "line": 4,
+                  "line": 27,
                   "position": 29,
-                  "index": 98
+                  "index": 407
                 },
                 "type": {
-                  "isConstant": true,
-                  "typename": 0
+                  "typename": 0,
+                  "constancy": true
                 },
                 "nodeType": 12
               },
               "operation": 11,
               "position": {
-                "line": 4,
+                "line": 27,
                 "position": 26,
-                "index": 95
+                "index": 404
               },
               "nodeType": 0
             },
@@ -202,17 +485,17 @@
               "node1": {
                 "name": "i",
                 "position": {
-                  "line": 4,
+                  "line": 27,
                   "position": 35,
-                  "index": 104
+                  "index": 413
                 },
                 "nodeType": 11
               },
               "operation": 8,
               "position": {
-                "line": 4,
+                "line": 27,
                 "position": 33,
-                "index": 102
+                "index": 411
               },
               "nodeType": 1
             },
@@ -225,17 +508,17 @@
                         "node1": {
                           "name": "b",
                           "position": {
-                            "line": 8,
+                            "line": 31,
                             "position": 15,
-                            "index": 181
+                            "index": 490
                           },
                           "nodeType": 11
                         },
                         "operation": 7,
                         "position": {
-                          "line": 8,
+                          "line": 31,
                           "position": 13,
-                          "index": 179
+                          "index": 488
                         },
                         "nodeType": 1
                       }
@@ -246,30 +529,30 @@
                     "node1": {
                       "name": "i",
                       "position": {
-                        "line": 5,
+                        "line": 28,
                         "position": 12,
-                        "index": 121
+                        "index": 430
                       },
                       "nodeType": 11
                     },
                     "node2": {
                       "value": 0,
                       "position": {
-                        "line": 5,
+                        "line": 28,
                         "position": 16,
-                        "index": 125
+                        "index": 434
                       },
                       "type": {
-                        "isConstant": true,
-                        "typename": 0
+                        "typename": 0,
+                        "constancy": true
                       },
                       "nodeType": 12
                     },
                     "operation": 8,
                     "position": {
-                      "line": 5,
+                      "line": 28,
                       "position": 14,
-                      "index": 123
+                      "index": 432
                     },
                     "nodeType": 0
                   },
@@ -279,17 +562,17 @@
                         "node1": {
                           "name": "a",
                           "position": {
-                            "line": 6,
+                            "line": 29,
                             "position": 13,
-                            "index": 143
+                            "index": 452
                           },
                           "nodeType": 11
                         },
                         "operation": 0,
                         "position": {
-                          "line": 6,
+                          "line": 29,
                           "position": 14,
-                          "index": 144
+                          "index": 453
                         },
                         "nodeType": 1
                       }
@@ -308,69 +591,64 @@
               "node1": {
                 "name": "a",
                 "position": {
-                  "line": 12,
+                  "line": 35,
                   "position": 12,
-                  "index": 216
+                  "index": 525
                 },
                 "nodeType": 11
               },
               "node2": {
                 "name": "b",
                 "position": {
-                  "line": 12,
+                  "line": 35,
                   "position": 16,
-                  "index": 220
+                  "index": 529
                 },
                 "nodeType": 11
               },
               "operation": 5,
               "position": {
-                "line": 12,
+                "line": 35,
                 "position": 14,
-                "index": 218
+                "index": 527
               },
               "nodeType": 0
             },
             "operation": 11,
             "position": {
-              "line": 12,
+              "line": 35,
               "position": 12,
-              "index": 216
+              "index": 525
             },
             "nodeType": 1
           }
         ],
         "nodeType": 9
       },
-      "node1": {
-        "name": "main",
-        "position": {
-          "line": 1,
-          "position": 38,
-          "index": 37
-        },
+      "type": {
         "type": {
-          "type": {
-            "isConstant": false,
-            "typename": 0
-          },
-          "arguments": [
-            {
+          "typename": 0,
+          "constancy": false
+        },
+        "arguments": [
+          {
+            "name": "args",
+            "type": {
               "type": {
                 "type": {
-                  "isConstant": true,
-                  "typename": 4
+                  "typename": 4,
+                  "constancy": false
                 },
-                "isConstant": false,
-                "typename": 9
+                "typename": 9,
+                "constancy": false
               },
-              "isConstant": false,
-              "typename": 9
+              "typename": 9,
+              "constancy": false
             }
-          ],
-          "typename": 8
-        },
-        "nodeType": 2
+          }
+        ],
+        "typename": 8,
+        "constancy": false
       },
       "nodeType": 13
     }

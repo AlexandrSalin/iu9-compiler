@@ -9,7 +9,7 @@ import ru.bmstu.iu9.compiler.Position;
  */
 public final class DoubleConstantToken extends ConstantToken {
     public DoubleConstantToken(Fragment coordinates, double value) {
-        super(coordinates, Type.CONST_INT);
+        super(coordinates, Type.CONST_DOUBLE);
         this.value = value;
     }
     public DoubleConstantToken(Position starting, Position ending, double value) {

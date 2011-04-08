@@ -30,7 +30,7 @@ public abstract class Token {
 
 
         PrimitiveType(new Type[] {
-            INT, FLOAT, DOUBLE, CHAR, VOID, STRUCT, BOOL
+            INT, FLOAT, DOUBLE, CHAR, VOID, BOOL
         }),
         Constant(new Type[] {
             CONST_DOUBLE, CONST_INT, CONST_CHAR, TRUE, FALSE

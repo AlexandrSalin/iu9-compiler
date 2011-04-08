@@ -31,6 +31,9 @@ public class NodeFactory {
                         registerTypeAdapter(
                             Type.class,
                             new GeneralizedType.TypeInstanceCreator()).
+                        registerTypeAdapter(
+                            FunctionType.Argument.class,
+                            new GeneralizedArgument.ArgumentInstanceCreator()).
                         create();
             
             reader = new BufferedReader(
@@ -80,10 +83,10 @@ public class NodeFactory {
                 return new UnaryOperationNode(
                         UnaryOperationNode.Operation.values()[node.operation],
                         type, node1, node.position);
-            case DECLARATION:
+            case VARS_DECL:
                 type = getType(node.type);
                 
-                return new DeclarationLeaf(node.name, type, node.position);
+                return new VariablesDeclNode(node.vars, type);
             case FOR:
                 node1 = processNode(node.node1);
                 node2 = processNode(node.node2);
@@ -131,18 +134,14 @@ public class NodeFactory {
                 type = getType(node.type);
                 
                 return new ConstantLeaf(node.value, type, node.position);
-            case FUNCTION:
+            case FUNCTION_DECL:
                 node1 = processNode(node.node1);
-                node2 = processNode(node.node2);
-                node3 = processNode(node.node3);
                 
-                return new FunctionNode(
-                        (DeclarationLeaf)node1, (BlockNode)node2, (BlockNode)node3);
-            case STRUCT:
+                return new FunctionDeclNode(node.name, getType(node.type), (BlockNode)node1);
+            case STRUCT_DECL:
                 node1 = processNode(node.node1);
-                node2 = processNode(node.node2);
                 
-                return new StructNode((DeclarationLeaf)node1, (BlockNode)node2);
+                return new StructDeclNode(node.name, new StructType(node.name), (BlockNode)node1);
             case INVALID:
                 return new InvalidNode();
             case CALL:
@@ -162,24 +161,22 @@ public class NodeFactory {
         if(type == null) 
             return null;
         switch (Type.Typename.values()[type.typename]) {
-            case INT:
-            case BOOL:
-            case DOUBLE:
-            case FLOAT:
-            case CHAR:
-            case VOID:
-                return new PrimitiveType(Type.Typename.values()[type.typename], 
-                        type.isConstant);
+            case PRIMITIVE_TYPE:
+                return new PrimitiveType(PrimitiveType.Typename.values()[type.primitive], 
+                        type.constancy);
             case STRUCT:
                 return new StructType(type.name);
             case FUNCTION:
-                Type[] arguments = new Type[type.arguments.length];
-                for (int i = 0; i < arguments.length; ++i) {
-                    arguments[i] = getType(type.arguments[i]);
-                }
                 Type returnType = getType(type.type);
+                FunctionType.Argument[] args = 
+                        new FunctionType.Argument[type.arguments.length];
                 
-                return new FunctionType(returnType, arguments);
+                for (int i = 0; i < args.length; ++i)
+                    args[i] = new FunctionType.Argument(
+                            getType(type.arguments[i].type), 
+                            type.arguments[i].name);
+                
+                return new FunctionType(returnType, args);
             case ARRAY:
                 Type elementType = getType(type.type);
                 
@@ -187,7 +184,7 @@ public class NodeFactory {
             case POINTER:
                 Type pointerType = getType(type.type);
                 
-                return new PointerType(pointerType, type.isConstant);
+                return new PointerType(pointerType, type.constancy);
             default:
                 return null;
         }
@@ -207,6 +204,7 @@ public class NodeFactory {
         private String name;
         private Integer nodeType;
         private Position position;
+        private VariablesDeclNode.Variable[] vars;
         
         public static class NodeInstanceCreator implements InstanceCreator<GeneralizedNode> {
             @Override
@@ -219,17 +217,32 @@ public class NodeFactory {
     private static class GeneralizedType {
         private GeneralizedType() { }
         
+        private Integer primitive;
         private Integer typename;
-        private boolean isConstant;
+        private boolean constancy;
         private GeneralizedType type;
         private Integer length;
-        private GeneralizedType[] arguments;
+        private GeneralizedArgument[] arguments;
         private String name;
+        private long size;
         
         public static class TypeInstanceCreator implements InstanceCreator<GeneralizedType> {
             @Override
             public GeneralizedType createInstance(java.lang.reflect.Type type) {
                 return new GeneralizedType();
+            }
+        }
+    }
+    private static class GeneralizedArgument {
+        private GeneralizedArgument() { }
+        
+        private String name;
+        private GeneralizedType type;
+        
+        public static class ArgumentInstanceCreator implements InstanceCreator<GeneralizedArgument> {
+            @Override
+            public GeneralizedArgument createInstance(java.lang.reflect.Type type) {
+                return new GeneralizedArgument();
             }
         }
     }

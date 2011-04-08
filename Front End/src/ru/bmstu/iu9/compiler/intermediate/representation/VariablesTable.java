@@ -1,42 +1,71 @@
 package ru.bmstu.iu9.compiler.intermediate.representation;
 
-import ru.bmstu.iu9.compiler.Type;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import ru.bmstu.iu9.compiler.Type;
+
 
 /**
  *
  * @author maggot
  */
 class VariablesTable {
-    public void add(String name, Type type) {
-        Variable var = new Variable(name, type);
-        symbols.put(var.number(), var);
+    public Variable get(long number) {
+        return vars.get(number);
     }
-    public Operand get(int number) {
-        return symbols.get(number);
-    }
-    
-    private Map<Integer, Operand> symbols = new HashMap<Integer, Operand>();
-}
-
-/*
-class Nonterminal {
-    public Quadruple code() { return this.code; }
-    public void setCode(Quadruple value) { code = value; }
-    public Operand address() { return this.address; }
-    public void setAddress(Operand value) { address = value; }
-    
-    protected Quadruple code;
-    protected Operand address;
-    protected Type type;
-}
-
-class ArrayNonterminal extends Nonterminal {
-    public ArrayNonterminal() {
+    public long add(Variable variable) {
+        long number = numerator.next();
+        vars.put(number, variable);
         
+        return number;
     }
     
-    protected Operand array;
+    private Iterator<Long> numerator = 
+            new Iterator<Long>() {
+                @Override
+                public boolean hasNext() {
+                    return true;
+                }
+
+                @Override
+                public Long next() {
+                    return ++counter;
+                }
+
+                @Override
+                public void remove() {
+                    throw new UnsupportedOperationException("Not supported yet.");
+                }
+                
+                private long counter = 0;
+            };
+    private Map<Long, Variable> vars = new HashMap<Long, Variable>();
 }
-*/
+
+abstract class Variable {
+    protected Variable(Type type) {
+        this.type = type;
+    }
+    
+    public Type type() { return this.type; }
+    
+    protected final Type type;
+}
+
+class NamedVariable extends Variable {
+    public NamedVariable(String name, Type type) {
+        super(type);
+        this.name = name;
+    }
+    
+    public String name() { return this.name; }
+    
+    private final String name;
+}
+
+class TmpVariable extends Variable {
+    public TmpVariable(Type type) {
+        super(type);
+    }
+}

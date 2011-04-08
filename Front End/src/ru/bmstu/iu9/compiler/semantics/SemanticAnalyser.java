@@ -35,11 +35,11 @@ class SemanticAnalyser {
                 checkTypes(bNode.leftChild().type(), bNode.rightChild().type(),
                         bNode.position());
                 if (bNode.operation().is(BinaryOperationNode.Operation.Bitwise)) {
-                    checkTypes(bNode.type(), Type.Typename.INT, bNode.position());
+                    checkTypes(bNode.type(), PrimitiveType.Typename.INT, bNode.position());
                 }
                 
                 if (bNode.operation().is(BinaryOperationNode.Operation.Comparison)) {
-                    node.setType(new PrimitiveType(Type.Typename.BOOL, true));
+                    node.setType(new PrimitiveType(PrimitiveType.Typename.BOOL, true));
                 } else {
                     node.setType(((BinaryOperationNode)node).leftChild().type());
                 }
@@ -56,8 +56,8 @@ class SemanticAnalyser {
                     case PRE_INC:
                     case PRE_DEC:
                         checkTypes(uNode.child().type(), 
-                                new Type.Typename[] {
-                                    Type.Typename.INT, Type.Typename.CHAR
+                                new PrimitiveType.Typename[] {
+                                    PrimitiveType.Typename.INT, PrimitiveType.Typename.CHAR
                                 }, uNode.position());
                         
                         node.setType(uNode.child().type());
@@ -65,9 +65,10 @@ class SemanticAnalyser {
                     case MINUS:
                     case PLUS:
                         checkTypes(uNode.child().type(),
-                                new Type.Typename[] {
-                                    Type.Typename.INT, Type.Typename.DOUBLE,
-                                    Type.Typename.FLOAT
+                                new PrimitiveType.Typename[] {
+                                    PrimitiveType.Typename.INT, 
+                                    PrimitiveType.Typename.DOUBLE,
+                                    PrimitiveType.Typename.FLOAT
                                 }, uNode.position());
                         
                         node.setType(uNode.child().type());
@@ -84,8 +85,7 @@ class SemanticAnalyser {
                         node.setType(new PointerType(uNode.child().type(), true));
                         break;
                     case RETURN:
-                        checkTypes(uNode.child().type(), 
-                                currentFunction.returnValueType(), uNode.position());
+                        checkTypes(uNode.child().type(), returnType, uNode.position());
                         
                         node.setType(((UnaryOperationNode)node).child().type());
                         break;
@@ -95,31 +95,18 @@ class SemanticAnalyser {
                 break;
                 
                 
-            case DECLARATION:
-                DeclarationLeaf leaf = (DeclarationLeaf)node;
-                if(leaf.type().Typename().is(
-                        new Type.Typename[] {
-                            Type.Typename.PrimitiveType, Type.Typename.POINTER,
-                            Type.Typename.ARRAY
-                        })) {
-                    SymbolTable newScope = new SymbolTable();
-                    newScope.setOpenScope(currentScope);
-                    currentScope = newScope;
-                    
-                    currentScope.add(new VariableSymbol(leaf.name(), leaf.type()));
-                } else if (leaf.type().Typename().is(Type.Typename.FUNCTION)) {
-                    ambientScope = currentScope;
-                    currentScope = new SymbolTable();
-                    
-                    ambientScope.add(
-                        new FunctionSymbol(leaf.name(), leaf.type(), ambientScope, currentScope));
-                } else if (leaf.type().Typename().is(Type.Typename.STRUCT)) {
-                    ambientScope = currentScope;
-                    currentScope = new SymbolTable();
-                    
-                    ambientScope.add(
-                        new StructSymbol(leaf.name(), leaf.type(), ambientScope, currentScope));
-                }
+            case VARS_DECL:
+                VariablesDeclNode leaf = (VariablesDeclNode)node;
+
+                SymbolTable newScope = new SymbolTable();
+                newScope.setOpenScope(currentScope);
+                currentScope = newScope;
+
+                for (VariablesDeclNode.Variable var : leaf)                    
+                    currentScope.add(new VariableSymbol(
+                            var.name(), 
+                            analyseType(var.type())
+                        ));
                 break;
             case FOR:
                 ForNode forNode = (ForNode)node;
@@ -129,7 +116,7 @@ class SemanticAnalyser {
                 processNode(forNode.increase());
                 processNode(forNode.block());
                 
-                checkTypes(forNode.condition().type(), Type.Typename.BOOL,
+                checkTypes(forNode.condition().type(), PrimitiveType.Typename.BOOL,
                         ((ExpressionNode)forNode.condition()).position());
                 break;
             case IF:
@@ -139,7 +126,7 @@ class SemanticAnalyser {
                 processNode(ifNode.block());
                 processNode(ifNode.elseBlock());
                 
-                checkTypes(ifNode.expression().type(), Type.Typename.BOOL, 
+                checkTypes(ifNode.expression().type(), PrimitiveType.Typename.BOOL, 
                         ((ExpressionNode)ifNode.expression()).position());
                 break;
             case SWITCH:
@@ -165,7 +152,7 @@ class SemanticAnalyser {
                 processNode(cbNode.expression());
                 processNode(cbNode.block());
                 
-                checkTypes(cbNode.expression().type(), Type.Typename.BOOL,
+                checkTypes(cbNode.expression().type(), PrimitiveType.Typename.BOOL,
                         ((ExpressionNode)cbNode.expression()).position());
                 break;
             case BLOCK:
@@ -185,20 +172,37 @@ class SemanticAnalyser {
                 break;
             case CONSTANT:
                 break;
-            case FUNCTION:
-                // starts new symbol table
-                processNode(((FunctionNode)node).declaration());
-                processNode(((FunctionNode)node).arguments());
+            case FUNCTION_DECL:
+                FunctionDeclNode function = (FunctionDeclNode)node;
                 
-                this.currentFunction = (FunctionType)((FunctionNode)node).declaration().type();
-                processNode(((FunctionNode)node).block());
+                ambientScope = currentScope;
+                currentScope = new SymbolTable();
+                                
+                this.returnType = ((FunctionType)function.type()).returnType();
+                ambientScope.add(new FunctionSymbol(function.name(), 
+                        function.type(), ambientScope, currentScope));
+                for (FunctionType.Argument arg : ((FunctionType)function.type()).argumentsIterator()) {
+                    currentScope.add(new VariableSymbol(arg.name(), arg.type()));
+                }
+                
+                processNode(((FunctionDeclNode)node).block());
                 // restore symbol table
                 currentScope = ambientScope;
                 break;
-            case STRUCT:
-                // starts new symbol table
-                processNode(((StructNode)node).declaration());
-                processNode(((StructNode)node).declarations());
+            case STRUCT_DECL:
+                ambientScope = currentScope;
+                currentScope = new SymbolTable();
+                
+                processNode(((StructDeclNode)node).declarations());
+                
+                long size = 0;
+                for(Symbol s : currentScope) {
+                    size += s.type().size() + s.type().getAlignedAddress(size);
+                } 
+                
+                ambientScope.add(new StructSymbol(((StructDeclNode)node).name(),
+                        new StructType(((StructDeclNode)node).name(), size),
+                        ambientScope, currentScope));
                 // restore symbol table
                 currentScope = ambientScope;
                 break;
@@ -211,52 +215,111 @@ class SemanticAnalyser {
                 processNode(call.arguments());
                 
                 if (checkTypes(call.function().type(), Type.Typename.FUNCTION, call.position())) {
-                    FunctionType function = (FunctionType)((CallNode)node).function().type();
+                    FunctionType func = (FunctionType)((CallNode)node).function().type();
                     
-                    if (function.argumentsTypes().length == ((CallNode)node).arguments().children().size()) {
-                        for (int i = 0; 
-                             i < function.argumentsTypes().length;
-                             ++i) {
-                            checkTypes(function.argumentsTypes()[i], call.arguments().children().get(i).type(), call.position());
+                    if (func.arguments().length == ((CallNode)node).arguments().children().size()) {
+                        for (int i = 0; i < func.arguments().length; ++i) {
+                            checkTypes(
+                                    func.arguments()[i].type(), 
+                                    call.arguments().children().get(i).type(), 
+                                    call.position());
                         }
                     }
                 }
                 
-                node.setType(((FunctionType)((CallNode)node).function().type()).returnValueType());
+                node.setType(((FunctionType)((CallNode)node).function().type()).returnType());
             case NO_OPERAND_OPERATION:
                 break;
         }
     }
     
+    private Type analyseType(Type type) {
+        switch (type.typename()) {
+            case PRIMITIVE_TYPE:
+                switch (((PrimitiveType)type).primitive()) {
+                    case POINTER:
+                        PointerType pointer = (PointerType)type;
+                        pointer.setType(analyseType(pointer.type()));
+                        return pointer;
+                    default:
+                        return type;
+                }
+            case STRUCT:
+                Symbol struct = currentScope.get(((StructType)type).name());
+                if (struct != null && struct instanceof StructSymbol) {
+                    return struct.type();
+                } else {
+                    Logger.logUndeclaredType(((StructType)type).name(), null);
+                    return new InvalidType();
+                }
+            case FUNCTION:
+                FunctionType function = (FunctionType)type;
+                
+                function.setReturnType(analyseType(function.returnType()));
+                for (FunctionType.Argument arg : function.argumentsIterator()) {
+                    arg.setType(analyseType(arg.type()));
+                }
+                return function;
+            case ARRAY:
+                ArrayType array = (ArrayType)type;
+                array.setElementType(analyseType(array.elementType()));
+                return array;
+            default:
+                return type;
+        }
+    }
+    
     private boolean checkTypes(Type found, Type required, Position position) {
         boolean result;
-        if (result = !found.equals(required))
-            Logger.logIncompatibleTypes(found, required, position);
+        if (result = (found == null || !found.equals(required)))
+            Logger.logIncompatibleTypes(found.toString(), required.toString(), position);
         return !result;
     }
     private boolean checkTypes(Type found, Type.Typename required, Position position) {
         boolean result;
-        if (result = !found.Typename().is(required))
-            Logger.logIncompatibleTypes(found, required, position);
+        if (result = (found == null || !found.typename().is(required)))
+            Logger.logIncompatibleTypes(found.toString(), required.name(), position);
+        return !result;
+    }
+    private boolean checkTypes(Type found, PrimitiveType.Typename required, Position position) {
+        boolean result;
+        if (result = (found == null || !(found instanceof PrimitiveType) || 
+                !(((PrimitiveType)found).primitive() == required)))
+            Logger.logIncompatibleTypes(found.toString(), required.name(), position);
         return !result;
     }
     private boolean checkTypes(Type found, Type.Typename[] required, Position position) {
-        boolean result = true;
-        StringBuilder str = new StringBuilder();
-        for (int i = 0; i < required.length; ++i) {
-            if (i > 0)
+        boolean result = (found == null || !found.typename().is(required));
+        if (result) {
+            StringBuilder str = new StringBuilder();
+            for (int i = 0; i < required.length; ++i) {
+                str.append(required[i]);
                 str.append(" or ");
-            result = result && (!found.Typename().is(required[i]));
-            str.append(required[i]);
+            }
+            str.delete(str.length() - 4, str.length());
+            Logger.logIncompatibleTypes(found.toString(), str.toString(), position);
         }
-        if (result)
-            Logger.logIncompatibleTypes(found, str.toString(), position);
+        
+        return !result;
+    }
+    private boolean checkTypes(Type found, PrimitiveType.Typename[] required, Position position) {
+        boolean result = (found == null || !(found instanceof PrimitiveType) ||
+                !((PrimitiveType)found).primitive().is(required));
+        if (result) {
+            StringBuilder str = new StringBuilder();
+            for (int i = 0; i < required.length; ++i) {
+                str.append(required[i]);
+                str.append(" or ");
+            }
+            str.delete(str.length() - 4, str.length());
+            Logger.logIncompatibleTypes(found.toString(), str.toString(), position);
+        }
         
         return !result;
     }
     
     private Node parseTree;
-    private FunctionType currentFunction;
+    private Type returnType;
     private SymbolTable currentScope = new SymbolTable();
     private SymbolTable ambientScope;
 }

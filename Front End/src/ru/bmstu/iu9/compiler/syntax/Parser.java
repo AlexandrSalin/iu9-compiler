@@ -3,6 +3,7 @@ package ru.bmstu.iu9.compiler.syntax;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.io.PrintWriter;
+import java.util.Arrays;
 import ru.bmstu.iu9.compiler.lexis.token.Token;
 import ru.bmstu.iu9.compiler.*;
 import java.util.Iterator;
@@ -55,6 +56,7 @@ public class Parser {
                     registerTypeAdapter(
                         BlockNode.class, 
                         new BlockNode.BlockNodeSerializer()).
+                    setExclusionStrategies(new NodeExclusionStrategy()).
                     create();
             writer = new PrintWriter(filename);
             gson.toJson(parseTree, writer);
@@ -92,224 +94,154 @@ public class Parser {
     private void Program() {
         nextToken();
         while (current.type().is(new Token.Type[] { 
-                    Token.Type.CONST, Token.Type.VAR, 
-                    Token.Type.FUNC, Token.Type.STRUCT
+                    Token.Type.Modifier, Token.Type.FUNC, Token.Type.STRUCT
                 })) {
             
             if(current.type().is(Token.Type.FUNC)) {
-                nextToken();
-                FunctionNode function = new FunctionNode();
-                
-                Type returnValueType = Type();
-                String name = Identifier();
-                Type[] argsTypes = FuncArgList(function);
-                
-                function.setDeclaration(
-                        new DeclarationLeaf(name, 
-                            new FunctionType(returnValueType, argsTypes),
-                            current.coordinates().starting()));
-                function.setBlock(Code());
-                
-                parseTree.addChild(function);
+                parseTree.addChild(FunctionDecl());
             } else if (current.type().is(Token.Type.STRUCT)) {
-                parseTree.addChild(StructDef());
+                parseTree.addChild(StructDecl());
+                Semicolon();
+            } else if (current.type().is(Token.Type.VAR)){
+                parseTree.addChild(VariableDecl());
                 Semicolon();
             } else {
-                parseTree.addChildren(VariableDef());
+                parseTree.addChild(ConstantDecl());
                 Semicolon();
             }
         }
     }
-    
-    
-    private class Pair {
-        public Pair(Type type1, Type type2) {
-            this.type1 = type1;
-            this.type2 = type2;
-        }
+    private Node FunctionDecl() {
+        nextToken();
+        String name = Identifier();
+        FunctionType signature = Signature();
+        BlockNode code = Code();
         
-        public Type type1() { return this.type1; }
-        public Type type2() { return this.type2; }
-        public void setType2(Type type) { this.type2 = type; }
-        
-        private Type type1;
-        private Type type2;
+        return new FunctionDeclNode(name, signature, code);
     }
     
     private Type Type() {
-        Type type = PrimitiveType();
-        type = AmbientType(type);
+        Type type;
+        if (current.type().is(Token.Type.PrimitiveType)) {
+            type = PrimitiveType();
+        } else if (current.type().is(new Token.Type[] {
+            Token.Type.ASTERISK, Token.Type.LEFT_SQUARE_BRACKET,
+            Token.Type.STRUCT, Token.Type.FUNC
+        })) {
+            type = TypeLit();
+        } else {
+            LeftBracket();
+            type = Type();
+            RightBracket();
+        }
         
         return type;
     }
-    private Type AmbientType(Type type) {
-        if (current.type().is(Token.Type.ASTERISK)) {
-            Pair result = Pointer();
-            ((PointerType)result.type2()).setType(type);
-            type = result.type1();
-        }
-        Pair innerType = TypeExpr1(new Pair(null, null));
-        if (current.type() == Token.Type.LEFT_SQUARE_BRACKET) {
-            type = ArrayDim(type);
-        }
-        
-        if (innerType.type1() != null) {
-            switch (innerType.type2().Typename()) {
-                case FUNCTION:
-                    ((FunctionType)innerType.type2()).setReturnValueType(type);
-                    break;
-                case POINTER:
-                    ((PointerType)innerType.type2()).setType(type);
-                    break;
-                case ARRAY:
-                    ((ArrayType)innerType.type2()).setElementType(type);
-                    break;
-            }
-            return innerType.type1();
-        } else {
-            return type;
+    private Type TypeLit() {
+        switch (current.type()) {
+            case ASTERISK:
+                return PointerType();
+            case LEFT_SQUARE_BRACKET:
+                return ArrayType();
+            case FUNC:
+                return FunctionType();
+            case STRUCT:
+                return StructType();
+            default:
+                return new InvalidType();
         }
     }
-    private Pair TypeExpr0(Type type) {
-        if (current.type().is(Token.Type.ASTERISK)) {
-            Pair pointers = Pointer();
-            return TypeExpr1(pointers);
-        } else {
-            return TypeExpr1(new Pair(type, type));
-        }
-    }
-    private Pair TypeExpr1(Pair typesPair) {
-        if (current.type().is(Token.Type.LEFT_BRACKET)) {
-            Pair result = TypeExpr2(typesPair.type1());
-            
-            if (current.type().is(Token.Type.LEFT_BRACKET)) {
-                Type[] argsTypes = FuncArgsTypes();
-
-                ((PointerType)result.type2()).setType(new FunctionType(typesPair.type1(), argsTypes));
-                result.setType2(typesPair.type2());
-            }
-
-            return result;
-        } else if (current.type().is(Token.Type.LEFT_SQUARE_BRACKET)) {
-            return new Pair(ArrayDim(typesPair.type1()), typesPair.type2());
-        }
-        
-        return typesPair;
-    }
-    private Pair TypeExpr2(Type type) {
-        LeftBracket();
-        Pair result = TypeExpr0(type);
-        RightBracket();
-        
-        return result;
-    }
-    
-    private Pair Pointer() {
-        Type pointer = null;
-        
+    private StructType StructType() {
         nextToken();
-        if (current.type().is(Token.Type.CONST)) {
-            pointer = new PointerType(pointer, true);
-        } else {
-            pointer = new PointerType(pointer, false);
-        }
-        
-        Type innerPointer = pointer;
-        while (current.type().is(Token.Type.ASTERISK)) {
-            nextToken();
-            if (current.type().is(Token.Type.CONST)) {
-                pointer = new PointerType(pointer, true);
-            } else {
-                pointer = new PointerType(pointer, false);
-            }
-        }
-        return new Pair(pointer, innerPointer);
+        return new StructType(Identifier());
     }
-    private Type[] FuncArgsTypes() {
-        List<Type> args = new LinkedList<Type>();
-        LeftBracket();
-        if (current.type().is(Token.Type.Modifier)) {                   
-            Type argType = Type();
-            args.add(argType);
-            
-            while (current.type().is(Token.Type.COMMA)) {
-                nextToken();
-                argType = Type();
-                args.add(argType);
-            }
-        }
-        RightBracket();
-        
-        return args.toArray(new Type[0]);
-    }
-    private Type ArrayDim (Type elementType) {
-        ArrayType array = null;
-        
+    private ArrayType ArrayType() {
+        Integer length = null;
         LeftSquareBracket();
-        Position pos = current.coordinates().starting();
-        if (current.type().is(Token.Type.CONST_INT)) {
-            array = new ArrayType(elementType, (int)current.value());
-        } else  if (current.type().is(Token.Type.RIGHT_SQUARE_BRACKET)) {
-            array = new ArrayType(elementType);
-        } else {
-            array = new ArrayType(elementType);
-            Logger.logUnexpectedToken(current.type(), Token.Type.CONST_INT, pos);
+        if (checkTokens(current, Token.Type.CONST_INT, current.coordinates().starting())) {
+            length = (int)current.value();
         }
         RightSquareBracket();
         
-        while (current.type().is(Token.Type.LEFT_SQUARE_BRACKET)) {
-            LeftSquareBracket();
-            pos = current.coordinates().starting();
-            if (current.type().is(Token.Type.CONST_INT)) {
-                array = new ArrayType(array, (int)current.value());
-                nextToken();
-            } else {
-                array = new ArrayType(elementType);
-                Logger.logUnexpectedToken(current.type(), Token.Type.CONST_INT, pos);
-            }
-            RightSquareBracket();
-        }
-        
-        return array;
+        if (length == null)
+            return new ArrayType(Type());
+        else
+            return new ArrayType(Type(), length);
     }
-    
-    private Type PrimitiveType() {
-        Type type = null;
+    private PointerType FunctionType() {
+        nextToken();
+        return new PointerType(Signature());
+    }
+    private FunctionType Signature() {
+        FunctionType.Argument[] args = Parameters();
+        Type result = Type();
         
-        boolean isConst = false;
-        if (current.type().is(Token.Type.CONST)) {
-            isConst = true;
+        return new FunctionType(result, args);
+    }
+    private FunctionType.Argument[] Parameters() {
+        LeftBracket();
+        FunctionType.Argument args[] = ParameterList();
+        RightBracket();
+        
+        return args;
+    }
+    private FunctionType.Argument[] ParameterList() {
+        List<FunctionType.Argument> args = 
+                new LinkedList<FunctionType.Argument>();
+        
+        args.addAll(Arrays.asList(ParameterDecl()));
+        while (current.type().is(Token.Type.COMMA)) {
             nextToken();
-        } else if (current.type().is(Token.Type.VAR)) {
-            isConst = false;
-            nextToken();
-        } else {
-            Logger.logUnexpectedToken(current.type(), Token.Type.Modifier, 
-                    current.coordinates().starting());
+            args.addAll(Arrays.asList(ParameterDecl()));
         }
+        
+        return args.toArray(new FunctionType.Argument[0]);
+    }
+    private FunctionType.Argument[] ParameterDecl() {
+        String[] names = null;
+        if (current.type().is(Token.Type.IDENTIFIER)) {
+            names = IdentifierList();
+        }
+        Type type = Type();
+        
+        return FunctionType.Argument.getArguments(type, names);
+    }
+    private String[] IdentifierList() {
+        List<String> idents = new LinkedList<String>();
+        
+        idents.add(Identifier());
+        while (current.type().is(Token.Type.COMMA)) {
+            nextToken();
+            idents.add(Identifier());
+        }
+        
+        return idents.toArray(new String[0]);
+    }
+    private PointerType PointerType() {
+        nextToken();
+        return new PointerType(Type(), false);
+    }
+    private PrimitiveType PrimitiveType() {
+        PrimitiveType type = null;
         
         switch (current.type()) {
             case INT:
-                type = new PrimitiveType(Type.Typename.INT, isConst);
+                type = new PrimitiveType(PrimitiveType.Typename.INT);
                 break;
             case DOUBLE:
-                type = new PrimitiveType(Type.Typename.DOUBLE, isConst);
+                type = new PrimitiveType(PrimitiveType.Typename.DOUBLE);
                 break;
             case FLOAT:
-                type = new PrimitiveType(Type.Typename.FLOAT, isConst);
+                type = new PrimitiveType(PrimitiveType.Typename.FLOAT);
                 break;
             case BOOL:
-                type = new PrimitiveType(Type.Typename.BOOL, isConst);
+                type = new PrimitiveType(PrimitiveType.Typename.BOOL);
                 break;
             case CHAR:
-                type = new PrimitiveType(Type.Typename.CHAR, isConst);
+                type = new PrimitiveType(PrimitiveType.Typename.CHAR);
                 break;
             case VOID:
-                type = new PrimitiveType(Type.Typename.VOID, isConst);
-                break;
-            case STRUCT:
-                nextToken();
-                type = new StructType(Identifier());
+                type = new PrimitiveType(PrimitiveType.Typename.VOID);
                 break;
             default:
                 Logger.logUnexpectedToken(current.type(), Token.Type.PrimitiveType, 
@@ -327,32 +259,8 @@ public class Parser {
             nextToken();
             return identifier;
         } else {
-            return null;
+            return "";
         }
-    }
-    private Type[] FuncArgList(FunctionNode function) {
-        List<Type> args = null;
-        
-        LeftBracket();
-        if (current.type().is(Token.Type.Modifier)) {
-            args = new LinkedList<Type>();
-                    
-            Type argType = Type();
-            Position pos = current.coordinates().starting();
-            function.addArgument(new DeclarationLeaf(Identifier(), argType, pos));
-            args.add(argType);
-            
-            while (current.type().is(Token.Type.COMMA)) {
-                nextToken();
-                argType = Type();
-                pos = current.coordinates().starting();
-                function.addArgument(new DeclarationLeaf(Identifier(), argType, pos));
-                args.add(argType);
-            }
-        }
-        RightBracket();
-        
-        return args.toArray(new Type[0]);
     }
     private BlockNode Code() {
         LeftBrace();
@@ -371,7 +279,9 @@ public class Parser {
             Token.Type.Modifier
         })) {
             
-            if (current.type().is(Token.Type.FirstOfControlStructure)) {
+            if (current.type().is(new Token.Type[] {
+                Token.Type.FirstOfControlStructure, Token.Type.Modifier
+            })) {
                 switch (current.type()) {
                     case FOR:
                         block.addChild(For());
@@ -412,10 +322,15 @@ public class Parser {
                         block.addChild(Break());
                         Semicolon();
                         break;
+                    case VAR:
+                        block.addChild(VariableDecl());
+                        Semicolon();
+                        break;
+                    case CONST:
+                        block.addChild(ConstantDecl());
+                        Semicolon();
+                        break;
                 }
-            } else if(current.type().is(Token.Type.Modifier)) {
-                block.addChildren(VariableDef());
-                Semicolon();
             } else if(current.type().is(Token.Type.FirstOfExpression)) {
                 block.addChild(Expression());
                 Semicolon();
@@ -431,7 +346,7 @@ public class Parser {
         LeftBracket();
 
         if (current.type().is(Token.Type.Modifier)) {
-            node.setInitialization(VariableDef());
+            node.setInitialization(VariableDecl());
         } else if (current.type().is(Token.Type.FirstOfExpression)) {
             node.setInitialization(Expression());
         }
@@ -944,26 +859,30 @@ public class Parser {
 
             return new UnaryOperationNode(operation, node, pos);
         } else {
-            Node node = EExpression();
-            while (current.type() == Token.Type.AMPERSAND ||
-                   current.type() == Token.Type.ASTERISK) {
-                UnaryOperationNode.Operation operation;
-                switch (current.type()) {
-                    case AMPERSAND:
-                        operation = UnaryOperationNode.Operation.REF;
-                        break;
-                    case ASTERISK:
-                        operation = UnaryOperationNode.Operation.DEREF;
-                        break;
-                    default:
-                        return new InvalidNode();
-                }
-                Position pos = current.coordinates().starting();
-                nextToken();
-                
-                node = new UnaryOperationNode(operation, node, pos);
+            return RefDeref();
+        }
+    }
+    private Node RefDeref() {
+        Position pos = current.coordinates().starting();
+        
+        if (current.type().is(new Token.Type[] {
+            Token.Type.AMPERSAND, Token.Type.ASTERISK
+        })) {
+            UnaryOperationNode.Operation operation;
+            switch (current.type()) {
+                case AMPERSAND:
+                    operation = UnaryOperationNode.Operation.REF;
+                    break;
+                case ASTERISK:
+                    operation = UnaryOperationNode.Operation.DEREF;
+                    break;
+                default:
+                    return new InvalidNode();
             }
-            return node;
+            nextToken();
+            return new UnaryOperationNode(operation, RefDeref(), pos);
+        } else {
+            return EExpression();
         }
     }
     private Node EExpression() {
@@ -1048,27 +967,27 @@ public class Parser {
             case CONST_CHAR:
                 node = new ConstantLeaf(
                         current.value(), 
-                        new PrimitiveType(Type.Typename.CHAR, true), pos);
+                        new PrimitiveType(PrimitiveType.Typename.CHAR, true), pos);
                 break;
             case CONST_DOUBLE:
                 node = new ConstantLeaf(
                         current.value(),
-                        new PrimitiveType(Type.Typename.DOUBLE, true), pos);
+                        new PrimitiveType(PrimitiveType.Typename.DOUBLE, true), pos);
                 break;
             case CONST_INT:
                 node = new ConstantLeaf(
                         current.value(),
-                        new PrimitiveType(Type.Typename.INT, true), pos);
+                        new PrimitiveType(PrimitiveType.Typename.INT, true), pos);
                 break;
             case TRUE:
                 node = new ConstantLeaf(
                         Boolean.TRUE,
-                        new PrimitiveType(Type.Typename.BOOL, true), pos);
+                        new PrimitiveType(PrimitiveType.Typename.BOOL, true), pos);
                 break;
             case FALSE:
                 node = new ConstantLeaf(
                         Boolean.FALSE,
-                        new PrimitiveType(Type.Typename.BOOL, true), pos);
+                        new PrimitiveType(PrimitiveType.Typename.BOOL, true), pos);
                 break;
             default:
                 node = new InvalidNode();
@@ -1077,88 +996,142 @@ public class Parser {
         nextToken();
         return node;
     }
-    
-    private Node StructDef() {
+
+    private Node StructDecl() {
         Position pos = current.coordinates().starting();
         nextToken();
         
         String structName = Identifier();
-        StructNode struct = new StructNode(
-                new DeclarationLeaf(structName, new StructType(structName), pos));
+        StructDeclNode struct = 
+                new StructDeclNode(structName, new StructType(structName));
         
         LeftBrace();
-        while (current.type().is(Token.Type.Modifier)) {
-            Type type = Type();
-
-            pos = current.coordinates().starting();
-            String name = Identifier();
-            if (name != null) {
-                struct.addDeclaration(new DeclarationLeaf(name, type, pos));
-            } else {
-                struct.addDeclaration(new InvalidNode());
-            }
-
-            if (current.type() == Token.Type.COMMA) {            
-                while (current.type() == Token.Type.COMMA) {
-                    nextToken();
-                    pos = current.coordinates().starting();
-                    name = Identifier();
-                    if (name != null) {
-                        struct.addDeclaration(new DeclarationLeaf(name, type, pos));
-                    } else {
-                        struct.addDeclaration(new InvalidNode());
-                    }
-                }
-            }
-            Semicolon();
+        while (current.type().is(Token.Type.IDENTIFIER)) {
+            struct.addDeclaration(FieldDecl());
         }
-
         RightBrace();
         
         return struct;
     }
-    private List<Node> VariableDef() {
-        List<Node> nodes = new LinkedList<Node>();
+    private Node FieldDecl() {
+        Position pos = current.coordinates().starting();
         
+        String[] fields = IdentifierList();
         Type type = Type();
+        Semicolon();
         
-        nodes.addAll(Variable(type));
-        if (current.type() == Token.Type.COMMA) {            
-            while (current.type() == Token.Type.COMMA) {
-                nextToken();
-                nodes.addAll(Variable(type));
-            }
-        }
-        
-        return nodes;
+        return new VariablesDeclNode(fields, type);
     }
-    private List<Node> Variable(Type type) {
+    
+    private boolean Modifier() {
+        boolean constancy = true;
+        switch (current.type()) {
+            case VAR:
+                nextToken();
+                constancy = false;
+                break;
+            case CONST:
+                nextToken();
+                constancy = true;
+                break;
+            default:
+                Logger.logUnexpectedToken(current.type(), Token.Type.Modifier, 
+                        current.coordinates().starting());
+        }
+        return constancy;
+    }
+    
+    private Node ConstantDecl() {
+        nextToken();
+        
+        if (current.type().is(Token.Type.LEFT_BRACKET)) {
+            LeftBracket();
+            BlockNode decls = new BlockNode();
+            decls.addChild(ConstantSpec());
+            Semicolon();
+            
+            while (current.type().is(Token.Type.IDENTIFIER)) {
+                decls.addChild(ConstantSpec());
+                Semicolon();
+            }
+            
+            RightBracket();
+            
+            return decls;
+        } else {
+            return ConstantSpec();
+        }
+    }
+    private Node ConstantSpec() {
         Position pos = current.coordinates().starting();
         String name = Identifier();
         
-        List<Node> nodes = new LinkedList<Node>();
-        
-        if (name != null) {
-            nodes.add(new DeclarationLeaf(name, type, pos));
-        } else {
-            nodes.add(new InvalidNode());
-        }
-      
-        if (current.type() == Token.Type.ASSIGN) {
-            Position posAssing = current.coordinates().starting();
+        Type type = Type();
+
+        Position posAssign = current.coordinates().starting();
+        if (checkTokens(current, Token.Type.ASSIGN, posAssign))
             nextToken();
-             
-            BinaryOperationNode binOp = 
-                    new BinaryOperationNode(BinaryOperationNode.Operation.ASSIGN, posAssing);
-            binOp.setLeftChild(new VariableLeaf(name, pos));
+
+        BinaryOperationNode binOp = 
+                new BinaryOperationNode(BinaryOperationNode.Operation.ASSIGN, posAssign);
+        binOp.setLeftChild(new VariablesDeclNode(name, type));
+        binOp.setRightChild(Expression());
+
+        return binOp;
+    }
+    
+    
+    private Node VariableDecl() {        
+        nextToken();
+        
+        if (current.type().is(Token.Type.LEFT_BRACKET)) {
+            LeftBracket();
+            BlockNode decls = new BlockNode();
+            decls.addChild(VariableSpec());
+            Semicolon();
             
-            if (current.type().is(Token.Type.FirstOfExpression))
-                binOp.setRightChild(Expression());
+            while (current.type().is(Token.Type.IDENTIFIER)) {
+                decls.addChild(VariableSpec());
+                Semicolon();
+            }
             
-            nodes.add(binOp);
+            RightBracket();
+            
+            return decls;
+        } else {
+            return VariableSpec();
         }
-   
-        return nodes;
+    }
+    private Node VariableSpec() {
+        Position pos = current.coordinates().starting();
+        String name = Identifier();
+        
+        if (current.type().is(Token.Type.COMMA)) {
+            List<String> names = new LinkedList<String>();
+            names.add(name);
+            
+            while (current.type().is(Token.Type.COMMA)) {
+                nextToken();
+                names.add(Identifier());
+            }
+            Type type = Type();
+            return new VariablesDeclNode(names.toArray(new String[0]), type);
+        } else {
+            Type type = Type();
+            if (current.type().is(Token.Type.ASSIGN)) {
+                Position posAssign = current.coordinates().starting();
+                nextToken();
+
+                BinaryOperationNode binOp = 
+                        new BinaryOperationNode(BinaryOperationNode.Operation.ASSIGN, posAssign);
+                binOp.setLeftChild(new VariablesDeclNode(name, type));
+                binOp.setRightChild(Expression());
+
+                return binOp;
+            } else {
+                return new VariablesDeclNode(name, type);
+            }
+        }
     }
     
     private void LeftSquareBracket() {

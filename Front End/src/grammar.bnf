@@ -2,14 +2,22 @@ Const         ::= Number | "'" UnicodeChar "'" | "true" | "false"
 Number        ::= DecimalLit | OctalLit | HexLit | FloatLit 
 
 
-Type          ::= ["const"] PrimitiveType TypeExpr0
-TypeExpr0     ::= [Poiter] Expr1
-TypeExpr1     ::= [Expr2 [FuncArgsTypes] | ArrayDim]
-TypeExpr2     ::= "(" TypeExpr0 ")"
+Type          ::= TypeName | TypeLit | "(" Type ")"
+TypeName      ::= "int" | "bool" | "double" | "float" | "void"
+TypeLit       ::= ArrayType | StructType | PointerType | FunctionType
 
-Pointer       ::= Asterisk ["const"] { Asterisk ["const"] }
-FuncArgsTypes ::= "(" [ Type, { "," Type }] ")"
-ArrayDim      ::= "[" [ IntLit ] "]" { "[" IntLit "]" }
+ArrayType     ::= "[" DecimalLit "]" Type
+
+StructType    ::= "struct" Identifier
+
+PointerType   ::= "*" Type
+
+FunctionType  ::= "func" Signature
+Signature     ::= Parameters Type
+Parameters    ::= "(" [ ParameterList [ "," ] ] ")"
+ParameterList ::= ParameterDecl { "," ParameterDecl }
+ParameterDecl ::= [ IdentifierList ] Type
+
 
 
 Identifier    ::= Letter { Letter | UnicodeDigit } 
@@ -50,7 +58,8 @@ Sequencing    ::= ","
 
 Program       ::= { FunctionDef | VariableDef ";" | StructDef ";" }
 
-FunctionDef   ::= "func" Type Identifier FuncArgList Code 
+FunctionDecl  ::= "func" Identifier Signature Block
+
 VariableDef   ::= Type Variable { "," Variable }
 Variable      ::= Identifier [ "=" Expression ]
 

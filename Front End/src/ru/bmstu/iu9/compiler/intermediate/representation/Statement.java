@@ -8,10 +8,13 @@ import ru.bmstu.iu9.compiler.*;
  */
 abstract class Statement {
     public enum Operation { 
-        MUL, UNARY_MINUS, MINUS, UNARY_PLUS, PLUS,
-        PARAM, CALL, RETURN, GOTO, IF_GOTO,
-        INDEX, INDIRECT_ASSIGN, ASSIGN, RUN, BARRIER,
-        REF, DEREF};
+        MUL, UNARY_MINUS, MINUS, PLUS, PARAM, CALL, RETURN, GOTO, IF_GOTO,
+        INDEX, INDIRECT_ASSIGN, ASSIGN, RUN, BARRIER, REF, DEREF, DIV, MOD,
+    };
+    
+    protected Statement(Operation operation) {
+        this.operation = operation;
+    }
     
     public Operand operand1() { return null; }
     public Operand operand2() { return null; }
@@ -21,9 +24,10 @@ abstract class Statement {
     protected Operation operation;
 }
 
-final class Assign extends Statement {
-    public Assign(Operand value, Variable result) {
-        this.operation = Operation.ASSIGN;
+
+final class Assignment extends Statement {
+    public Assignment(Operand value, VariableOperand result) {
+        super(Operation.ASSIGN);
         this.result = result;
         this.value = value;
     }
@@ -34,11 +38,13 @@ final class Assign extends Statement {
     public Operand result() { return this.result; }
     
     private Operand value;
-    private Variable result;
+    private VariableOperand result;
 }
+
+
 final class IndirectAssignment extends Statement {
-    public IndirectAssignment(Operand value, Variable result) {
-        this.operation = Operation.INDIRECT_ASSIGN;
+    public IndirectAssignment(Operand value, VariableOperand result) {
+        super(Operation.INDIRECT_ASSIGN);
         this.result = result;
         this.value = value;
     }
@@ -49,15 +55,17 @@ final class IndirectAssignment extends Statement {
     public Operand result() { return this.result; }
     
     private Operand value;
-    private Variable result;
+    private VariableOperand result;
 }
+
+
 final class BinaryOperation extends Statement {
     public BinaryOperation(Operand operand1, Operand operand2, Operand result,
             Operation operation) {
+        super(operation);
         this.result = result;
         this.operand1 = operand1;
         this.operand2 = operand2;
-        this.operation = operation;
     }
     
     @Override
@@ -71,22 +79,26 @@ final class BinaryOperation extends Statement {
     private Operand operand2;
     private Operand result;
 }
+
+
 final class GoTo extends Statement {
     public GoTo(int offset) {
-        this.operation = Operation.GOTO;
-        this.offset = new Constant(new PrimitiveType(Type.Typename.INT, true), offset);
+        super(Operation.GOTO);
+        this.offset = new ConstantOperand(new PrimitiveType(PrimitiveType.Typename.INT, true), offset);
     }
     
     @Override
     public Operand operand1() { return this.offset; }
     
-    private Constant offset;
+    private ConstantOperand offset;
 }
+
+
 final class If extends Statement {
-    public If(Variable variable, int offset) {
-        this.operation = Operation.IF_GOTO;
+    public If(VariableOperand variable, int offset) {
+        super(Operation.IF_GOTO);
         this.condition = variable;
-        this.offset = new Constant(new PrimitiveType(Type.Typename.INT, true), offset);
+        this.offset = new ConstantOperand(new PrimitiveType(PrimitiveType.Typename.INT, true), offset);
     }
     
     @Override
@@ -94,24 +106,22 @@ final class If extends Statement {
     @Override
     public Operand operand2() { return this.offset; }
     
-    private Variable condition;
-    private Constant offset;
+    private VariableOperand condition;
+    private ConstantOperand offset;
 }
+
+
 final class Call extends Statement {
-    public Call(Constant function, int argsNumber, Variable result) {
-        this.operation = Operation.CALL;
+    public Call(ConstantOperand function, int argsNumber, VariableOperand result) {
+        super(Operation.CALL);
         this.function = function;
         this.argsNumber = 
-                new Constant(new PrimitiveType(Type.Typename.INT, true), argsNumber);
+                new ConstantOperand(new PrimitiveType(PrimitiveType.Typename.INT, true), argsNumber);
         this.result = result;
     }
         
-    public Call(Constant function, int argsNumber) {
-        this.operation = Operation.CALL;
-        this.function = function;
-        this.argsNumber = 
-                new Constant(new PrimitiveType(Type.Typename.INT, true), argsNumber);
-        this.result = null;
+    public Call(ConstantOperand function, int argsNumber) {
+        this(function, argsNumber, null);
     }
     
     @Override
@@ -121,13 +131,15 @@ final class Call extends Statement {
     @Override
     public Operand result() { return this.result; }
     
-    private Constant function;
-    private Constant argsNumber;
-    private Variable result;
+    private ConstantOperand function;
+    private ConstantOperand argsNumber;
+    private VariableOperand result;
 }
+
+
 final class Ref extends Statement {
-    public Ref(Variable variable, Variable result) {
-        this.operation = Operation.REF;
+    public Ref(VariableOperand variable, VariableOperand result) {
+        super(Operation.REF);
         this.variable = variable;
         this.result = result;
     }
@@ -136,12 +148,14 @@ final class Ref extends Statement {
     @Override
     public Operand result() { return this.result; }
     
-    private Variable variable;
-    private Variable result;
+    private VariableOperand variable;
+    private VariableOperand result;
 }
+
+
 class Deref extends Statement {
-    public Deref(Variable variable, Variable result) {
-        this.operation = Operation.REF;
+    public Deref(VariableOperand variable, VariableOperand result) {
+        super(Operation.REF);
         this.variable = variable;
         this.result = result;
     }
@@ -150,21 +164,21 @@ class Deref extends Statement {
     @Override
     public Operand result() { return this.result; }
     
-    private Variable variable;
-    private Variable result;
+    private VariableOperand variable;
+    private VariableOperand result;
 }
+
+
 final class ArrayIndex extends Statement {
-    public ArrayIndex(Variable array, Constant index, Variable result) {
-        this.operation = Operation.INDEX;
+    public ArrayIndex(VariableOperand array, ConstantOperand index, 
+            VariableOperand result) {
+        super(Operation.INDEX);
         this.array = array;
         this.index = index;
         this.result = result;
     }
     
-    private Variable array;
-    private Constant index;
-    private Variable result;
+    private VariableOperand array;
+    private ConstantOperand index;
+    private VariableOperand result;
 }
-//class AddressAssignment extends Quadruple {
-//
-//}

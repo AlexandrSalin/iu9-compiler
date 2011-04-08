@@ -13,9 +13,9 @@ import ru.bmstu.iu9.compiler.Type;
  * @author maggot
  */
 abstract public class Node {
-    public enum NodeType { BINARY_OPERATION, UNARY_OPERATION, DECLARATION,
+    public enum NodeType { BINARY_OPERATION, UNARY_OPERATION, VARS_DECL,
         FOR, IF, SWITCH, CASE, WHILE, DO_WHILE, BLOCK, EXPRESSION, VARIABLE,
-        CONSTANT, FUNCTION, STRUCT, INVALID, CALL, NO_OPERAND_OPERATION
+        CONSTANT, FUNCTION_DECL, STRUCT_DECL, INVALID, CALL, NO_OPERAND_OPERATION
     };
     
     protected Node(Type type, NodeType nodeType) {

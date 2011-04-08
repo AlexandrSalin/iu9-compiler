@@ -28,38 +28,14 @@ abstract class Logger {
                     name, position
                 });
     }
-    public static void logUndeclaredType(Type type, Position position) {
-        logger.log(Level.WARNING, 
-                "Type {0} is used at {1} but not declared", 
-                new Object[] {
-                    type, position
-                });
-    }
     public static void logUnknownError(Position position) {
         logger.log(
                 java.util.logging.Level.WARNING, 
                 "Unknown error at {0}", 
                 position);
     }
-    public static void logIncompatibleTypes(Type found, Type required, 
+    public static void logIncompatibleTypes(String found, String required, 
             Position position) {
-        logger.log(
-                java.util.logging.Level.WARNING, 
-                "Type mismatch at {0}: found {1}, required {2}", 
-                new Object[]{
-                    position, found, required
-                });
-    }
-    public static void logIncompatibleTypes(Type found, String requiredTypeClass, 
-            Position position) {
-        logger.log(
-                java.util.logging.Level.WARNING, 
-                "Type mismatch at {0}: found {1}, required {2}", 
-                new Object[]{
-                    position, found, requiredTypeClass
-                });
-    }
-    public static void logIncompatibleTypes(Type found, Type.Typename required, Position position) {
         logger.log(
                 java.util.logging.Level.WARNING, 
                 "Type mismatch at {0}: found {1}, required {2}", 

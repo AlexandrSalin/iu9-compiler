@@ -6,20 +6,28 @@ package ru.bmstu.iu9.compiler;
  */
 public final class ArrayType extends Type {
     public ArrayType(Type elementType, int length) {
-        super(Typename.ARRAY);
+        super(Typename.ARRAY, elementType.size * length);
         this.type = elementType;
         this.length = length;
     }
     public ArrayType(Type elementType) {
-        super(Typename.ARRAY);
+        super(Typename.ARRAY, 0);
         this.type = elementType;
         this.length = null;
     }
     
-    public void setElementType(Type type) { this.type = type; }
-    public void setLenght(int length) { this.length = length; }
+//    public void setElementType(Type type) { this.type = type; }
+//    public void setLenght(int length) { this.length = length; }
     public Integer length() { return this.length; }
     public Type elementType() { return this.type; }
+    public void setElementType(Type type) {
+        this.type = type;
+    }
+    
+    @Override
+    public long getAlignedAddress(long rawAddress) {
+        return rawAddress + (this.type.size - rawAddress % this.type.size);
+    }
     
     @Override
     public boolean equals(Object obj) {

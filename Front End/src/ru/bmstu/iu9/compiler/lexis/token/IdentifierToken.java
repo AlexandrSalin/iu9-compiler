@@ -1,5 +1,6 @@
 package ru.bmstu.iu9.compiler.lexis.token;
 
+import com.google.gson.annotations.SerializedName;
 import ru.bmstu.iu9.compiler.Fragment;
 import ru.bmstu.iu9.compiler.Position;
 
@@ -20,5 +21,6 @@ public final class IdentifierToken extends Token {
     @Override
     public String value() { return this.value; }
     
+    @SerializedName("name")
     private String value;
 }

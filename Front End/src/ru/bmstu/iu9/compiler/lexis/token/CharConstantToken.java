@@ -9,7 +9,7 @@ import ru.bmstu.iu9.compiler.Position;
  */
 public final class CharConstantToken extends ConstantToken {
     public CharConstantToken(Fragment coordinates, int value) {
-        super(coordinates, Type.CONST_INT);
+        super(coordinates, Type.CONST_CHAR);
         this.value = value;
     }
     public CharConstantToken(Position starting, Position ending, int value) {

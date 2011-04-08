@@ -5,18 +5,10 @@ package ru.bmstu.iu9.compiler;
  */
 public abstract class Type {
     public enum Typename { 
-        INT, BOOL, FLOAT, DOUBLE, CHAR, VOID, 
-        ARRAY, STRUCT, FUNCTION, POINTER,
-        PrimitiveType(new Typename[] {
-            INT, VOID, DOUBLE, FLOAT, CHAR, BOOL
-        });
+        ARRAY, STRUCT, FUNCTION, POINTER, PRIMITIVE_TYPE, INVALID;
         
         private Typename() {
             this.value = 1 << this.ordinal();
-        }
-        private Typename(Typename[] typenames) {
-            for (int i = 0; i < typenames.length; ++i)
-                this.value = this.value | typenames[i].value;
         }
         
         public boolean is(Typename typename) {
@@ -33,12 +25,19 @@ public abstract class Type {
         private int value = 0;
     };
     
-    protected Type(Typename typename) {
-        
+    protected Type(Typename typename, long size) {
+        this(typename, false, size);
+    }
+    protected Type(Typename typename, boolean constancy, long size) {
         this.typename = typename.ordinal();
+        this.constancy = constancy;
+        this.size = size;
     }
     
-    public Typename Typename() { return Typename.values()[this.typename]; }
+    public Typename typename() { return Typename.values()[this.typename]; }
+    public boolean isConstant() { return this.constancy; }
+    public void setConstancy(boolean constancy) { this.constancy = constancy; }
+    public long size() { return this.size; }
     
     @Override
     public boolean equals(Object obj) {
@@ -47,8 +46,13 @@ public abstract class Type {
     }
     @Override
     public String toString() {
-        return Typename.values()[this.typename].toString();
+        return ((constancy) ? "CONST " : "") + 
+                Typename.values()[this.typename].toString();
     }
     
     protected final int typename;
+    protected boolean constancy;
+    
+    protected final long size;
+    public abstract long getAlignedAddress(long rawAddress);
 }

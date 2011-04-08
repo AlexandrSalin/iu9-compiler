@@ -1,12 +1,6 @@
 package ru.bmstu.iu9.compiler.lexis;
 
-import ru.bmstu.iu9.compiler.lexis.token.IntegerConstantToken;
-import ru.bmstu.iu9.compiler.lexis.token.DoubleConstantToken;
-import ru.bmstu.iu9.compiler.lexis.token.CharConstantToken;
-import ru.bmstu.iu9.compiler.lexis.token.Token;
-import ru.bmstu.iu9.compiler.lexis.token.IdentifierToken;
-import ru.bmstu.iu9.compiler.lexis.token.SpecialToken;
-import ru.bmstu.iu9.compiler.*;
+import ru.bmstu.iu9.compiler.lexis.token.*;
 import ru.bmstu.iu9.compiler.Fragment;
 import com.google.gson.*;
 import java.io.BufferedReader;
@@ -63,12 +57,12 @@ public class Lexer {
             lex.toJson(
                     "C:\\Users\\maggot\\Documents\\NetBeansProjects\\ru.bmstu.iu9.compiler\\Front End\\src\\output.json");
         } catch(java.io.IOException ex) {
-            ex.printStackTrace();
+//            ex.printStackTrace();
         } finally {
             try {
                 reader.close();
             } catch(java.io.IOException ex) {
-                ex.printStackTrace();
+//                ex.printStackTrace();
             }
         }
     }

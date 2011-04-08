@@ -6,11 +6,11 @@ package ru.bmstu.iu9.compiler;
  */
 public final class PointerType extends PrimitiveType {
     public PointerType(Type type, boolean isConstant) {
-        super(Typename.POINTER, isConstant);
+        super(PrimitiveType.Typename.POINTER, isConstant);
         this.type = type;
     }
-    public PointerType(boolean isConstant) {
-        super(Typename.POINTER, isConstant);
+    public PointerType(Type type) {
+        this(type, false);
     }
     
     public Type type() { return type; }

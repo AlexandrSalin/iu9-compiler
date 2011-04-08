@@ -2,44 +2,48 @@ package ru.bmstu.iu9.compiler.intermediate.representation;
 
 import ru.bmstu.iu9.compiler.*;
 
-abstract class Operand implements Cloneable {
-    protected Operand(Type type) {
-        this.type = type;
-    }
-    
-    public Type type() { return this.type; }
-    
-    protected Type type;
+abstract class Operand implements Cloneable {    
+    public abstract Type type();
 }
 
-class Variable extends Operand {
-    public Variable(String name, Type type) {
-        super(type);
-        this.name = name;
+class VariableOperand extends Operand {
+    public VariableOperand(String name, Type type, VariablesTable table) {
+        this.table = table;
+        this.number = this.table.add(new NamedVariable(name, type));
     }
-    
-    public String name() { return this.name; }
-    
+    private VariableOperand(VariablesTable table, long number) {
+        this.table = table;
+        this.number = number;
+    }
+
+    public String name() { return ((NamedVariable)this.table.get(number)).name(); }
+    @Override
+    public Type type() { return this.table.get(number).type(); }
+
     @Override
     public Object clone() {
-        return new Variable(this.name, this.type);
+        return new VariableOperand(this.table, this.number);
     }
-    
-    private String name;
+
+    private VariablesTable table;
+    private long number;
 }
 
-class Constant extends Operand {
-    public Constant(Type type, Object value) {
-        super(type);
+class ConstantOperand extends Operand {
+    public ConstantOperand(Type type, Object value) {
+        this.type = type;
         this.value = value;
     }
     
     public Object value() { return this.value; }
+    @Override
+    public Type type() { return this.type; }
     
     @Override
     public Object clone() {
-        return new Constant(this.type, this.value);
+        return new ConstantOperand(this.type, this.value);
     }
     
     private Object value;
+    protected Type type;
 }
