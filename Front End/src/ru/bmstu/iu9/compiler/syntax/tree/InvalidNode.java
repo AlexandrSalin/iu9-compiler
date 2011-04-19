@@ -5,12 +5,14 @@
 
 package ru.bmstu.iu9.compiler.syntax.tree;
 
+import ru.bmstu.iu9.compiler.Position;
+
 /**
  *
  * @author maggot
  */
 final public class InvalidNode extends Node {
-    public InvalidNode() {
-        super(Node.NodeType.INVALID);
+    public InvalidNode(Position position) {
+        super(Node.NodeType.INVALID, position);
     }
 }

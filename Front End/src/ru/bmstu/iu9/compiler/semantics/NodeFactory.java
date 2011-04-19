@@ -10,6 +10,8 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.util.LinkedList;
+import java.util.List;
 import ru.bmstu.iu9.compiler.*;
 import ru.bmstu.iu9.compiler.Type;
 import ru.bmstu.iu9.compiler.syntax.tree.*;
@@ -86,7 +88,7 @@ public class NodeFactory {
             case VARS_DECL:
                 type = getType(node.type);
                 
-                return new VariablesDeclNode(node.vars, type);
+                return new VariableDeclNode(node.name, type, node.position);
             case FOR:
                 node1 = processNode(node.node1);
                 node2 = processNode(node.node2);
@@ -137,13 +139,16 @@ public class NodeFactory {
             case FUNCTION_DECL:
                 node1 = processNode(node.node1);
                 
-                return new FunctionDeclNode(node.name, getType(node.type), (BlockNode)node1);
+                return new FunctionDeclNode(node.name, getType(node.type), 
+                        (BlockNode)node1, node.position);
             case STRUCT_DECL:
                 node1 = processNode(node.node1);
                 
-                return new StructDeclNode(node.name, new StructType(node.name), (BlockNode)node1);
+                return new StructDeclNode(node.name, 
+                        new StructType(node.name, false), (BlockNode)node1,
+                        node.position);
             case INVALID:
-                return new InvalidNode();
+                return new InvalidNode(node.position);
             case CALL:
                 node1 = processNode(node.node1);
                 node2 = processNode(node.node2);
@@ -151,42 +156,40 @@ public class NodeFactory {
                 return new CallNode(node1, (BlockNode)node2, node.position);
             case NO_OPERAND_OPERATION:
                 return new NoOperandOperationNode(
-                        NoOperandOperationNode.Operation.values()[node.operation]);
+                        NoOperandOperationNode.Operation.values()[node.operation],
+                        node.position);
             default:
-                return new InvalidNode();
+                return new InvalidNode(node.position);
         }
     }
     
     private Type getType(GeneralizedType type) {
-        if(type == null) 
-            return null;
         switch (Type.Typename.values()[type.typename]) {
             case PRIMITIVE_TYPE:
                 return new PrimitiveType(PrimitiveType.Typename.values()[type.primitive], 
                         type.constancy);
             case STRUCT:
-                return new StructType(type.name);
+                return new StructType(type.name, type.constancy, type.size);
             case FUNCTION:
                 Type returnType = getType(type.type);
-                FunctionType.Argument[] args = 
-                        new FunctionType.Argument[type.arguments.length];
+                List<FunctionType.Argument> args = 
+                        new LinkedList<FunctionType.Argument>();
                 
-                for (int i = 0; i < args.length; ++i)
-                    args[i] = new FunctionType.Argument(
-                            getType(type.arguments[i].type), 
-                            type.arguments[i].name);
+                for (int i = 0; i < type.arguments.length; ++i)
+                    args.add(new FunctionType.Argument(type.arguments[i].name,
+                            getType(type.arguments[i].type), type.arguments[i].position));
                 
-                return new FunctionType(returnType, args);
+                return new FunctionType(returnType, args, type.constancy);
             case ARRAY:
                 Type elementType = getType(type.type);
                 
-                return new ArrayType(elementType, type.length);
+                return new ArrayType(elementType, type.length, type.constancy);
             case POINTER:
                 Type pointerType = getType(type.type);
                 
                 return new PointerType(pointerType, type.constancy);
             default:
-                return null;
+                return new InvalidType();
         }
     }
 
@@ -204,7 +207,6 @@ public class NodeFactory {
         private String name;
         private Integer nodeType;
         private Position position;
-        private VariablesDeclNode.Variable[] vars;
         
         public static class NodeInstanceCreator implements InstanceCreator<GeneralizedNode> {
             @Override
@@ -238,6 +240,7 @@ public class NodeFactory {
         
         private String name;
         private GeneralizedType type;
+        private Position position; 
         
         public static class ArgumentInstanceCreator implements InstanceCreator<GeneralizedArgument> {
             @Override

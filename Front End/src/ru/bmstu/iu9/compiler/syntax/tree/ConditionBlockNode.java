@@ -13,10 +13,10 @@ import com.google.gson.annotations.SerializedName;
  */
 abstract public class ConditionBlockNode extends Node {
     protected ConditionBlockNode(Node.NodeType type) {
-        super(type);
+        super(type, null);
     }
     protected ConditionBlockNode(Node.NodeType type, Node condition, Node block) {
-        super(type);
+        super(type, null);
         this.condition = condition;
         this.block = block;
     }
@@ -27,7 +27,7 @@ abstract public class ConditionBlockNode extends Node {
     public void setBlock(Node block) { this.block = block; }
     
     @SerializedName("node1")
-    private Node condition;
+    protected Node condition;
     @SerializedName("node2")
-    private Node block;
+    protected Node block;
 }

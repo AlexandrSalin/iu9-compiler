@@ -14,10 +14,10 @@ import java.util.List;
  */
 final public class ForNode extends Node {
     public ForNode() {
-        super(Node.NodeType.FOR);
+        super(Node.NodeType.FOR, null);
     }
     public ForNode(Node initialization, Node condition, Node increase, Node block) {
-        super(Node.NodeType.FOR);
+        this();
         this.initialization = initialization;
         this.condition = condition;
         this.increase = increase;

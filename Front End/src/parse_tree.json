@@ -1,157 +1,258 @@
 {
   "nodes": [
     {
-      "name": "abc",
       "node1": {
         "nodes": [
           {
-            "vars": [
-              {
-                "name": "a"
-              },
-              {
-                "name": "b"
-              }
-            ],
+            "name": "b",
+            "position": {
+              "line": 2,
+              "position": 8,
+              "index": 21
+            },
             "type": {
-              "typename": 0,
-              "constancy": false
+              "primitive": 0,
+              "typename": 4,
+              "constancy": false,
+              "size": 4
             },
             "nodeType": 2
           },
           {
-            "vars": [
-              {
-                "name": "c"
-              }
-            ],
+            "name": "a",
+            "position": {
+              "line": 2,
+              "position": 5,
+              "index": 18
+            },
             "type": {
-              "typename": 3,
-              "constancy": false
+              "primitive": 0,
+              "typename": 4,
+              "constancy": false,
+              "size": 4
             },
             "nodeType": 2
           },
           {
-            "vars": [
-              {
-                "name": "d"
-              }
-            ],
+            "name": "c",
+            "position": {
+              "line": 3,
+              "position": 5,
+              "index": 33
+            },
+            "type": {
+              "primitive": 3,
+              "typename": 4,
+              "constancy": false,
+              "size": 8
+            },
+            "nodeType": 2
+          },
+          {
+            "name": "d",
+            "position": {
+              "line": 4,
+              "position": 5,
+              "index": 48
+            },
             "type": {
               "type": {
                 "type": {
-                  "typename": 5,
-                  "constancy": false
+                  "primitive": 5,
+                  "typename": 4,
+                  "constancy": false,
+                  "size": 0
                 },
                 "arguments": [
                   {
-                    "name": "q",
-                    "type": {
-                      "typename": 0,
-                      "constancy": false
-                    }
-                  },
-                  {
                     "name": "w",
                     "type": {
-                      "typename": 0,
-                      "constancy": false
+                      "primitive": 0,
+                      "typename": 4,
+                      "constancy": false,
+                      "size": 4
+                    },
+                    "position": {
+                      "line": 4,
+                      "position": 15,
+                      "index": 58
                     }
                   },
                   {
-                    "name": "e",
+                    "name": "q",
                     "type": {
-                      "typename": 2,
-                      "constancy": false
+                      "primitive": 0,
+                      "typename": 4,
+                      "constancy": false,
+                      "size": 4
+                    },
+                    "position": {
+                      "line": 4,
+                      "position": 12,
+                      "index": 55
                     }
                   },
                   {
                     "name": "r",
                     "type": {
-                      "typename": 2,
-                      "constancy": false
+                      "primitive": 2,
+                      "typename": 4,
+                      "constancy": false,
+                      "size": 4
+                    },
+                    "position": {
+                      "line": 4,
+                      "position": 25,
+                      "index": 68
+                    }
+                  },
+                  {
+                    "name": "e",
+                    "type": {
+                      "primitive": 2,
+                      "typename": 4,
+                      "constancy": false,
+                      "size": 4
+                    },
+                    "position": {
+                      "line": 4,
+                      "position": 22,
+                      "index": 65
                     }
                   }
                 ],
-                "typename": 8,
-                "constancy": false
+                "typename": 2,
+                "constancy": false,
+                "size": 0
               },
-              "typename": 9,
-              "constancy": false
+              "primitive": 7,
+              "typename": 4,
+              "constancy": false,
+              "size": 8
             },
             "nodeType": 2
           }
         ],
         "nodeType": 9
       },
+      "name": "abc",
+      "position": {
+        "line": 1,
+        "position": 1,
+        "index": 0
+      },
       "type": {
         "name": "abc",
-        "typename": 7,
-        "constancy": false
+        "typename": 1,
+        "constancy": false,
+        "size": 0
       },
       "nodeType": 14
     },
     {
-      "name": "foo",
       "node1": {
         "nodes": [
           {
-            "vars": [
-              {
-                "name": "bar"
-              }
-            ],
+            "name": "bar",
+            "position": {
+              "line": 8,
+              "position": 9,
+              "index": 143
+            },
             "type": {
               "name": "abc",
-              "typename": 7,
-              "constancy": false
+              "typename": 1,
+              "constancy": true,
+              "size": 0
             },
             "nodeType": 2
           },
           {
             "operation": 2,
+            "position": {
+              "line": 9,
+              "position": 5,
+              "index": 170
+            },
             "nodeType": 17
           }
         ],
         "nodeType": 9
       },
+      "name": "foo",
+      "position": {
+        "line": 7,
+        "position": 6,
+        "index": 95
+      },
       "type": {
         "type": {
-          "typename": 5,
-          "constancy": false
+          "primitive": 5,
+          "typename": 4,
+          "constancy": false,
+          "size": 0
         },
         "arguments": [
           {
-            "name": "q",
-            "type": {
-              "typename": 0,
-              "constancy": false
-            }
-          },
-          {
             "name": "w",
             "type": {
-              "typename": 0,
-              "constancy": false
+              "primitive": 0,
+              "typename": 4,
+              "constancy": true,
+              "size": 4
+            },
+            "position": {
+              "line": 7,
+              "position": 13,
+              "index": 102
             }
           },
           {
-            "name": "e",
+            "name": "q",
             "type": {
-              "typename": 2,
-              "constancy": false
+              "primitive": 0,
+              "typename": 4,
+              "constancy": true,
+              "size": 4
+            },
+            "position": {
+              "line": 7,
+              "position": 10,
+              "index": 99
             }
           },
           {
             "name": "r",
             "type": {
-              "typename": 2,
-              "constancy": false
+              "primitive": 2,
+              "typename": 4,
+              "constancy": false,
+              "size": 4
+            },
+            "position": {
+              "line": 7,
+              "position": 29,
+              "index": 118
+            }
+          },
+          {
+            "name": "e",
+            "type": {
+              "primitive": 2,
+              "typename": 4,
+              "constancy": false,
+              "size": 4
+            },
+            "position": {
+              "line": 7,
+              "position": 26,
+              "index": 115
             }
           }
         ],
-        "typename": 8,
-        "constancy": false
+        "typename": 2,
+        "constancy": false,
+        "size": 0
       },
       "nodeType": 13
     },
@@ -159,14 +260,17 @@
       "nodes": [
         {
           "node1": {
-            "vars": [
-              {
-                "name": "q"
-              }
-            ],
+            "name": "q",
+            "position": {
+              "line": 13,
+              "position": 5,
+              "index": 195
+            },
             "type": {
-              "typename": 0,
-              "constancy": false
+              "primitive": 0,
+              "typename": 4,
+              "constancy": true,
+              "size": 4
             },
             "nodeType": 2
           },
@@ -174,33 +278,89 @@
             "value": 5,
             "position": {
               "line": 13,
-              "position": 13,
-              "index": 193
+              "position": 9,
+              "index": 199
             },
             "type": {
-              "typename": 0,
-              "constancy": true
+              "primitive": 0,
+              "typename": 4,
+              "constancy": true,
+              "size": 4
             },
             "nodeType": 12
           },
           "operation": 0,
           "position": {
             "line": 13,
-            "position": 11,
-            "index": 191
+            "position": 7,
+            "index": 197
+          },
+          "type": {
+            "primitive": 0,
+            "typename": 4,
+            "constancy": true,
+            "size": 4
           },
           "nodeType": 0
         },
         {
           "node1": {
-            "vars": [
-              {
-                "name": "w"
-              }
-            ],
+            "name": "e",
+            "position": {
+              "line": 14,
+              "position": 17,
+              "index": 229
+            },
             "type": {
-              "typename": 3,
-              "constancy": false
+              "primitive": 3,
+              "typename": 4,
+              "constancy": false,
+              "size": 8
+            },
+            "nodeType": 2
+          },
+          "node2": {
+            "value": 5.0,
+            "position": {
+              "line": 14,
+              "position": 21,
+              "index": 233
+            },
+            "type": {
+              "primitive": 3,
+              "typename": 4,
+              "constancy": true,
+              "size": 8
+            },
+            "nodeType": 12
+          },
+          "operation": 0,
+          "position": {
+            "line": 14,
+            "position": 19,
+            "index": 231
+          },
+          "type": {
+            "primitive": 3,
+            "typename": 4,
+            "constancy": false,
+            "size": 8
+          },
+          "nodeType": 0
+        },
+        {
+          "node1": {
+            "name": "w",
+            "position": {
+              "line": 14,
+              "position": 5,
+              "index": 217
+            },
+            "type": {
+              "primitive": 3,
+              "typename": 4,
+              "constancy": false,
+              "size": 8
             },
             "nodeType": 2
           },
@@ -208,20 +368,28 @@
             "value": 9.9E-5,
             "position": {
               "line": 14,
-              "position": 16,
-              "index": 212
+              "position": 9,
+              "index": 221
             },
             "type": {
-              "typename": 3,
-              "constancy": true
+              "primitive": 3,
+              "typename": 4,
+              "constancy": true,
+              "size": 8
             },
             "nodeType": 12
           },
           "operation": 0,
           "position": {
             "line": 14,
-            "position": 14,
-            "index": 210
+            "position": 7,
+            "index": 219
+          },
+          "type": {
+            "primitive": 3,
+            "typename": 4,
+            "constancy": false,
+            "size": 8
           },
           "nodeType": 0
         }
@@ -229,21 +397,23 @@
       "nodeType": 9
     },
     {
-      "name": "main",
       "node1": {
         "nodes": [
           {
             "nodes": [
               {
                 "node1": {
-                  "vars": [
-                    {
-                      "name": "a"
-                    }
-                  ],
+                  "name": "a",
+                  "position": {
+                    "line": 19,
+                    "position": 9,
+                    "index": 315
+                  },
                   "type": {
-                    "typename": 0,
-                    "constancy": false
+                    "primitive": 0,
+                    "typename": 4,
+                    "constancy": false,
+                    "size": 4
                   },
                   "nodeType": 2
                 },
@@ -251,33 +421,44 @@
                   "value": 0,
                   "position": {
                     "line": 19,
-                    "position": 17,
-                    "index": 284
+                    "position": 13,
+                    "index": 319
                   },
                   "type": {
-                    "typename": 0,
-                    "constancy": true
+                    "primitive": 0,
+                    "typename": 4,
+                    "constancy": true,
+                    "size": 4
                   },
                   "nodeType": 12
                 },
                 "operation": 0,
                 "position": {
                   "line": 19,
-                  "position": 15,
-                  "index": 282
+                  "position": 11,
+                  "index": 317
+                },
+                "type": {
+                  "primitive": 0,
+                  "typename": 4,
+                  "constancy": false,
+                  "size": 4
                 },
                 "nodeType": 0
               },
               {
                 "node1": {
-                  "vars": [
-                    {
-                      "name": "b"
-                    }
-                  ],
+                  "name": "b",
+                  "position": {
+                    "line": 20,
+                    "position": 9,
+                    "index": 335
+                  },
                   "type": {
-                    "typename": 0,
-                    "constancy": false
+                    "primitive": 0,
+                    "typename": 4,
+                    "constancy": true,
+                    "size": 4
                   },
                   "nodeType": 2
                 },
@@ -285,20 +466,28 @@
                   "value": 10,
                   "position": {
                     "line": 20,
-                    "position": 17,
-                    "index": 304
+                    "position": 13,
+                    "index": 339
                   },
                   "type": {
-                    "typename": 0,
-                    "constancy": true
+                    "primitive": 0,
+                    "typename": 4,
+                    "constancy": true,
+                    "size": 4
                   },
                   "nodeType": 12
                 },
                 "operation": 0,
                 "position": {
                   "line": 20,
-                  "position": 15,
-                  "index": 302
+                  "position": 11,
+                  "index": 337
+                },
+                "type": {
+                  "primitive": 0,
+                  "typename": 4,
+                  "constancy": true,
+                  "size": 4
                 },
                 "nodeType": 0
               }
@@ -307,14 +496,17 @@
           },
           {
             "node1": {
-              "vars": [
-                {
-                  "name": "c"
-                }
-              ],
+              "name": "c",
+              "position": {
+                "line": 23,
+                "position": 9,
+                "index": 376
+              },
               "type": {
+                "primitive": 4,
                 "typename": 4,
-                "constancy": false
+                "constancy": false,
+                "size": 1
               },
               "nodeType": 2
             },
@@ -322,20 +514,28 @@
               "value": 97,
               "position": {
                 "line": 23,
-                "position": 18,
-                "index": 340
+                "position": 13,
+                "index": 380
               },
               "type": {
+                "primitive": 4,
                 "typename": 4,
-                "constancy": true
+                "constancy": true,
+                "size": 1
               },
               "nodeType": 12
             },
             "operation": 0,
             "position": {
               "line": 23,
-              "position": 16,
-              "index": 338
+              "position": 11,
+              "index": 378
+            },
+            "type": {
+              "primitive": 4,
+              "typename": 4,
+              "constancy": false,
+              "size": 1
             },
             "nodeType": 0
           },
@@ -345,7 +545,7 @@
               "position": {
                 "line": 24,
                 "position": 5,
-                "index": 350
+                "index": 395
               },
               "nodeType": 11
             },
@@ -356,7 +556,7 @@
                   "position": {
                     "line": 24,
                     "position": 14,
-                    "index": 359
+                    "index": 404
                   },
                   "nodeType": 11
                 },
@@ -364,7 +564,7 @@
                 "position": {
                   "line": 24,
                   "position": 13,
-                  "index": 358
+                  "index": 403
                 },
                 "nodeType": 1
               },
@@ -372,7 +572,7 @@
               "position": {
                 "line": 24,
                 "position": 12,
-                "index": 357
+                "index": 402
               },
               "nodeType": 1
             },
@@ -380,7 +580,7 @@
             "position": {
               "line": 24,
               "position": 10,
-              "index": 355
+              "index": 400
             },
             "nodeType": 0
           },
@@ -390,7 +590,7 @@
               "position": {
                 "line": 25,
                 "position": 5,
-                "index": 367
+                "index": 412
               },
               "nodeType": 11
             },
@@ -399,11 +599,13 @@
               "position": {
                 "line": 25,
                 "position": 11,
-                "index": 373
+                "index": 418
               },
               "type": {
-                "typename": 0,
-                "constancy": true
+                "primitive": 0,
+                "typename": 4,
+                "constancy": true,
+                "size": 4
               },
               "nodeType": 12
             },
@@ -411,21 +613,24 @@
             "position": {
               "line": 25,
               "position": 9,
-              "index": 371
+              "index": 416
             },
             "nodeType": 0
           },
           {
             "node1": {
               "node1": {
-                "vars": [
-                  {
-                    "name": "i"
-                  }
-                ],
+                "name": "i",
+                "position": {
+                  "line": 27,
+                  "position": 13,
+                  "index": 436
+                },
                 "type": {
-                  "typename": 0,
-                  "constancy": false
+                  "primitive": 0,
+                  "typename": 4,
+                  "constancy": false,
+                  "size": 4
                 },
                 "nodeType": 2
               },
@@ -433,20 +638,28 @@
                 "value": 0,
                 "position": {
                   "line": 27,
-                  "position": 21,
-                  "index": 399
+                  "position": 17,
+                  "index": 440
                 },
                 "type": {
-                  "typename": 0,
-                  "constancy": true
+                  "primitive": 0,
+                  "typename": 4,
+                  "constancy": true,
+                  "size": 4
                 },
                 "nodeType": 12
               },
               "operation": 0,
               "position": {
                 "line": 27,
-                "position": 19,
-                "index": 397
+                "position": 15,
+                "index": 438
+              },
+              "type": {
+                "primitive": 0,
+                "typename": 4,
+                "constancy": false,
+                "size": 4
               },
               "nodeType": 0
             },
@@ -456,7 +669,7 @@
                 "position": {
                   "line": 27,
                   "position": 24,
-                  "index": 402
+                  "index": 447
                 },
                 "nodeType": 11
               },
@@ -465,11 +678,13 @@
                 "position": {
                   "line": 27,
                   "position": 29,
-                  "index": 407
+                  "index": 452
                 },
                 "type": {
-                  "typename": 0,
-                  "constancy": true
+                  "primitive": 0,
+                  "typename": 4,
+                  "constancy": true,
+                  "size": 4
                 },
                 "nodeType": 12
               },
@@ -477,7 +692,7 @@
               "position": {
                 "line": 27,
                 "position": 26,
-                "index": 404
+                "index": 449
               },
               "nodeType": 0
             },
@@ -487,7 +702,7 @@
                 "position": {
                   "line": 27,
                   "position": 35,
-                  "index": 413
+                  "index": 458
                 },
                 "nodeType": 11
               },
@@ -495,7 +710,7 @@
               "position": {
                 "line": 27,
                 "position": 33,
-                "index": 411
+                "index": 456
               },
               "nodeType": 1
             },
@@ -510,7 +725,7 @@
                           "position": {
                             "line": 31,
                             "position": 15,
-                            "index": 490
+                            "index": 535
                           },
                           "nodeType": 11
                         },
@@ -518,7 +733,7 @@
                         "position": {
                           "line": 31,
                           "position": 13,
-                          "index": 488
+                          "index": 533
                         },
                         "nodeType": 1
                       }
@@ -531,7 +746,7 @@
                       "position": {
                         "line": 28,
                         "position": 12,
-                        "index": 430
+                        "index": 475
                       },
                       "nodeType": 11
                     },
@@ -540,11 +755,13 @@
                       "position": {
                         "line": 28,
                         "position": 16,
-                        "index": 434
+                        "index": 479
                       },
                       "type": {
-                        "typename": 0,
-                        "constancy": true
+                        "primitive": 0,
+                        "typename": 4,
+                        "constancy": true,
+                        "size": 4
                       },
                       "nodeType": 12
                     },
@@ -552,7 +769,7 @@
                     "position": {
                       "line": 28,
                       "position": 14,
-                      "index": 432
+                      "index": 477
                     },
                     "nodeType": 0
                   },
@@ -564,7 +781,7 @@
                           "position": {
                             "line": 29,
                             "position": 13,
-                            "index": 452
+                            "index": 497
                           },
                           "nodeType": 11
                         },
@@ -572,7 +789,7 @@
                         "position": {
                           "line": 29,
                           "position": 14,
-                          "index": 453
+                          "index": 498
                         },
                         "nodeType": 1
                       }
@@ -593,7 +810,7 @@
                 "position": {
                   "line": 35,
                   "position": 12,
-                  "index": 525
+                  "index": 570
                 },
                 "nodeType": 11
               },
@@ -602,7 +819,7 @@
                 "position": {
                   "line": 35,
                   "position": 16,
-                  "index": 529
+                  "index": 574
                 },
                 "nodeType": 11
               },
@@ -610,25 +827,33 @@
               "position": {
                 "line": 35,
                 "position": 14,
-                "index": 527
+                "index": 572
               },
               "nodeType": 0
             },
             "operation": 11,
             "position": {
               "line": 35,
-              "position": 12,
-              "index": 525
+              "position": 5,
+              "index": 563
             },
             "nodeType": 1
           }
         ],
         "nodeType": 9
       },
+      "name": "main",
+      "position": {
+        "line": 17,
+        "position": 6,
+        "index": 257
+      },
       "type": {
         "type": {
-          "typename": 0,
-          "constancy": false
+          "primitive": 0,
+          "typename": 4,
+          "constancy": false,
+          "size": 4
         },
         "arguments": [
           {
@@ -636,19 +861,31 @@
             "type": {
               "type": {
                 "type": {
+                  "primitive": 4,
                   "typename": 4,
-                  "constancy": false
+                  "constancy": false,
+                  "size": 1
                 },
-                "typename": 9,
-                "constancy": false
+                "primitive": 7,
+                "typename": 4,
+                "constancy": true,
+                "size": 8
               },
-              "typename": 9,
-              "constancy": false
+              "primitive": 7,
+              "typename": 4,
+              "constancy": true,
+              "size": 8
+            },
+            "position": {
+              "line": 17,
+              "position": 11,
+              "index": 262
             }
           }
         ],
-        "typename": 8,
-        "constancy": false
+        "typename": 2,
+        "constancy": false,
+        "size": 0
       },
       "nodeType": 13
     }

@@ -10,175 +10,175 @@ abstract class Statement {
     public enum Operation { 
         MUL, UNARY_MINUS, MINUS, PLUS, PARAM, CALL, RETURN, GOTO, IF_GOTO,
         INDEX, INDIRECT_ASSIGN, ASSIGN, RUN, BARRIER, REF, DEREF, DIV, MOD,
+        MEMBER_SELECT, 
     };
     
     protected Statement(Operation operation) {
         this.operation = operation;
     }
     
-    public Operand operand1() { return null; }
-    public Operand operand2() { return null; }
-    public Operand result() { return null; }
-    public Operation operation() { return this.operation; }
-    
-    protected Operation operation;
+    protected final Operation operation;
 }
 
 
 final class Assignment extends Statement {
-    public Assignment(Operand value, VariableOperand result) {
+    public Assignment(Operand rhv, VariableOperand lhv) {
         super(Operation.ASSIGN);
-        this.result = result;
-        this.value = value;
+        this.lhv = lhv;
+        this.rhv = rhv;
     }
     
-    @Override
-    public Operand operand1() { return this.value; }
-    @Override
-    public Operand result() { return this.result; }
+    public Operand rightHandValue() { return this.rhv; }
+    public Operand leftHandValue() { return this.lhv; }
     
-    private Operand value;
-    private VariableOperand result;
+    private final Operand rhv;
+    private final VariableOperand lhv;
 }
 
 
 final class IndirectAssignment extends Statement {
-    public IndirectAssignment(Operand value, VariableOperand result) {
+    public IndirectAssignment(Operand rhv, VariableOperand lhv) {
         super(Operation.INDIRECT_ASSIGN);
-        this.result = result;
-        this.value = value;
+        this.lhv = lhv;
+        this.rhv = rhv;
     }
     
-    @Override
-    public Operand operand1() { return this.value; }
-    @Override
-    public Operand result() { return this.result; }
+    public Operand rightHandValue() { return this.rhv; }
+    public Operand leftHandValue() { return this.lhv; }
     
-    private Operand value;
-    private VariableOperand result;
+    private final Operand rhv;
+    private final VariableOperand lhv;
 }
 
 
 final class BinaryOperation extends Statement {
-    public BinaryOperation(Operand operand1, Operand operand2, Operand result,
+    public BinaryOperation(Operand leftOperand, Operand rightOperand, Operand lhv,
             Operation operation) {
         super(operation);
-        this.result = result;
-        this.operand1 = operand1;
-        this.operand2 = operand2;
+        this.lhv = lhv;
+        this.leftOperand = leftOperand;
+        this.rightOperand = rightOperand;
     }
     
-    @Override
-    public Operand operand1() { return this.operand1; }
-    @Override
-    public Operand operand2() { return this.operand2; }
-    @Override
-    public Operand result() { return this.result; }
+    public Operand leftOperand() { return this.leftOperand; }
+    public Operand rightOperand() { return this.rightOperand; }
+    public Operand leftHandValue() { return this.lhv; }
     
-    private Operand operand1;
-    private Operand operand2;
-    private Operand result;
+    private final Operand leftOperand;
+    private final Operand rightOperand;
+    private final Operand lhv;
 }
 
 
 final class GoTo extends Statement {
-    public GoTo(int offset) {
+    public GoTo(long index) {
         super(Operation.GOTO);
-        this.offset = new ConstantOperand(new PrimitiveType(PrimitiveType.Typename.INT, true), offset);
+        this.index = new ConstantOperand(
+                new PrimitiveType(PrimitiveType.Typename.INT, true), index);
     }
     
-    @Override
-    public Operand operand1() { return this.offset; }
+    public Operand index() { return this.index; }
     
-    private ConstantOperand offset;
+    private final ConstantOperand index;
 }
 
 
 final class If extends Statement {
-    public If(VariableOperand variable, int offset) {
+    public If(VariableOperand condition, int index) {
         super(Operation.IF_GOTO);
-        this.condition = variable;
-        this.offset = new ConstantOperand(new PrimitiveType(PrimitiveType.Typename.INT, true), offset);
+        this.condition = condition;
+        this.index = new ConstantOperand(new PrimitiveType(PrimitiveType.Typename.INT, true), index);
     }
     
-    @Override
-    public Operand operand1() { return this.condition; }
-    @Override
-    public Operand operand2() { return this.offset; }
+    public Operand condition() { return this.condition; }
+    public Operand index() { return this.index; }
     
-    private VariableOperand condition;
-    private ConstantOperand offset;
+    private final VariableOperand condition;
+    private final ConstantOperand index;
 }
 
 
 final class Call extends Statement {
-    public Call(ConstantOperand function, int argsNumber, VariableOperand result) {
+    public Call(ConstantOperand function, int argsNumber, VariableOperand lhv) {
         super(Operation.CALL);
         this.function = function;
-        this.argsNumber = 
-                new ConstantOperand(new PrimitiveType(PrimitiveType.Typename.INT, true), argsNumber);
-        this.result = result;
+        this.argsNumber = new ConstantOperand(
+                new PrimitiveType(PrimitiveType.Typename.INT, true), argsNumber);
+        this.result = lhv;
     }
         
     public Call(ConstantOperand function, int argsNumber) {
         this(function, argsNumber, null);
     }
     
-    @Override
-    public Operand operand1() { return this.function; }
-    @Override
-    public Operand operand2() { return this.argsNumber; }
-    @Override
-    public Operand result() { return this.result; }
+    public Operand condition() { return this.function; }
+    public Operand argsNumber() { return this.argsNumber; }
+    public Operand leftHandValue() { return this.result; }
     
-    private ConstantOperand function;
-    private ConstantOperand argsNumber;
-    private VariableOperand result;
+    private final ConstantOperand function;
+    private final ConstantOperand argsNumber;
+    private final VariableOperand result;
 }
 
 
 final class Ref extends Statement {
-    public Ref(VariableOperand variable, VariableOperand result) {
+    public Ref(VariableOperand rhv, VariableOperand lhv) {
         super(Operation.REF);
-        this.variable = variable;
-        this.result = result;
+        this.rhv = rhv;
+        this.lhv = lhv;
     }
-    @Override
-    public Operand operand1() { return this.variable; }
-    @Override
-    public Operand result() { return this.result; }
     
-    private VariableOperand variable;
-    private VariableOperand result;
+    public Operand rightHandValue() { return this.rhv; }
+    public Operand leftHandValue() { return this.lhv; }
+    
+    private final VariableOperand rhv;
+    private final VariableOperand lhv;
 }
 
 
 class Deref extends Statement {
-    public Deref(VariableOperand variable, VariableOperand result) {
+    public Deref(VariableOperand rhv, VariableOperand lhv) {
         super(Operation.REF);
-        this.variable = variable;
-        this.result = result;
+        this.rhv = rhv;
+        this.lhv = lhv;
     }
-    @Override
-    public Operand operand1() { return this.variable; }
-    @Override
-    public Operand result() { return this.result; }
     
-    private VariableOperand variable;
-    private VariableOperand result;
+    public Operand rightHandValue() { return this.rhv; }
+    public Operand leftHandValue() { return this.lhv; }
+    
+    private final VariableOperand rhv;
+    private final VariableOperand lhv;
 }
 
 
 final class ArrayIndex extends Statement {
     public ArrayIndex(VariableOperand array, ConstantOperand index, 
-            VariableOperand result) {
+            VariableOperand lhv) {
         super(Operation.INDEX);
         this.array = array;
         this.index = index;
-        this.result = result;
+        this.lhv = lhv;
     }
     
-    private VariableOperand array;
-    private ConstantOperand index;
-    private VariableOperand result;
+    public VariableOperand array() { return this.array; }
+    public ConstantOperand index() { return this.index; }
+    public VariableOperand leftHandValue() { return this.lhv; }
+    
+    private final VariableOperand array;
+    private final ConstantOperand index;
+    private final VariableOperand lhv;
+}
+
+final class MemberSelect extends Statement {
+    public MemberSelect(VariableOperand struct, VariableOperand field) {
+        super(Operation.MEMBER_SELECT);
+        this.field = field;
+        this.struct = struct;
+    }
+    
+    public VariableOperand struct() { return this.struct; }
+    public VariableOperand field() { return this.field; }
+    
+    private final VariableOperand struct;
+    private final VariableOperand field;
 }

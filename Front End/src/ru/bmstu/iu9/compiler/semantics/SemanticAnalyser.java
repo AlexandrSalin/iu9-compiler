@@ -17,7 +17,7 @@ class SemanticAnalyser {
     }
     public static void main(String[] args) {
         NodeFactory tree = new NodeFactory(
-                "C:\\Users\\maggot\\Documents\\NetBeansProjects\\ru.bmstu.iu9.compiler\\Front End\\src\\parse_tree.json");
+                "C:\\Users\\maggot\\Documents\\NetBeansProjects\\ru.bmstu.iu9.compiler\\Front End\\src\\parse_tree.json" );
         
         SemanticAnalyser analyser = new SemanticAnalyser(tree.getTree());
         
@@ -96,13 +96,13 @@ class SemanticAnalyser {
                 
                 
             case VARS_DECL:
-                VariablesDeclNode leaf = (VariablesDeclNode)node;
+                VariableDeclNode leaf = (VariableDeclNode)node;
 
                 SymbolTable newScope = new SymbolTable();
                 newScope.setOpenScope(currentScope);
                 currentScope = newScope;
 
-                for (VariablesDeclNode.Variable var : leaf)                    
+                for (VariableDeclNode.Variable var : leaf)                    
                     currentScope.add(new VariableSymbol(
                             var.name(), 
                             analyseType(var.type())
@@ -197,7 +197,7 @@ class SemanticAnalyser {
                 
                 long size = 0;
                 for(Symbol s : currentScope) {
-                    size += s.type().size() + s.type().getAlignedAddress(size);
+                    size += s.type().size();
                 } 
                 
                 ambientScope.add(new StructSymbol(((StructDeclNode)node).name(),

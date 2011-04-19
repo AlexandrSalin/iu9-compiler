@@ -6,16 +6,17 @@
 package ru.bmstu.iu9.compiler.syntax.tree;
 
 import com.google.gson.annotations.SerializedName;
+import ru.bmstu.iu9.compiler.Position;
 
 /**
  *
  * @author maggot
  */
-final public class NoOperandOperationNode extends Node {
+final public class NoOperandOperationNode extends ExpressionNode {
     public enum Operation { BREAK, CONTINUE, RETURN, BARRIER };
     
-    public NoOperandOperationNode(Operation operation) {
-        super(Node.NodeType.NO_OPERAND_OPERATION);
+    public NoOperandOperationNode(Operation operation, Position position) {
+        super(Node.NodeType.NO_OPERAND_OPERATION, position);
         this.operation = operation.ordinal();
     }
     

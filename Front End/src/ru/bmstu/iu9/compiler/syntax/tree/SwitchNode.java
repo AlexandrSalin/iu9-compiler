@@ -12,28 +12,20 @@ import com.google.gson.annotations.SerializedName;
  *
  * @author maggot
  */
-final public class SwitchNode extends Node {
+final public class SwitchNode extends ConditionBlockNode {
     public SwitchNode() {
-        super(Node.NodeType.SWITCH);
+        super(Node.NodeType.SWITCH, null, new BlockNode());
     }
     public SwitchNode(Node expression, BlockNode cases, BlockNode defaultNode) {
-        super(Node.NodeType.SWITCH);
-        this.expression = expression;
-        this.cases = cases;
+        super(Node.NodeType.SWITCH, expression, cases);
         this.defaultNode = defaultNode;
     }
     
-    public Node expression() { return this.expression; }
-    public void setExpression(Node expression) { this.expression = expression; }
-    public BlockNode cases() { return this.cases; }
-    public void addCase(CaseNode caseNode) { this.cases.addChild(caseNode); }
+    public BlockNode cases() { return (BlockNode)this.block; }
+    public void addCase(CaseNode caseNode) { ((BlockNode)this.block).addChild(caseNode); }
     public BlockNode defaultNode() { return this.defaultNode; }
     public void setDefaultNode(BlockNode defaultNode) { this.defaultNode = defaultNode; }
     
-    @SerializedName("node1")
-    private Node expression;
-    @SerializedName("node2")
-    private BlockNode cases = new BlockNode();
     @SerializedName("node3")
     private BlockNode defaultNode;
 }

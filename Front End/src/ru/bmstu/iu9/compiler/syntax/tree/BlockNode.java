@@ -24,17 +24,17 @@ import java.util.List;
  */
 final public class BlockNode extends Node implements Iterable<Node> {
     public BlockNode() {
-        super(Node.NodeType.BLOCK);
+        super(Node.NodeType.BLOCK, null);
         children = new LinkedList<Node>();
     }
     public BlockNode(Node[] nodes) {
-        super(Node.NodeType.BLOCK);
+        super(Node.NodeType.BLOCK, null);
         children = new LinkedList<Node>(Arrays.asList(nodes));
     }
     
     public void addChild(Node child) { this.children.add(child); }
     public List<Node> children() { return this.children; }
-    public void addChildren(List<Node> children) {
+    public void addChildren(List<? extends Node> children) {
         this.children.addAll(children);
     }
 

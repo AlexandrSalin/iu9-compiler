@@ -41,11 +41,6 @@ public class PrimitiveType extends Type {
     public Typename primitive() { return Typename.values()[this.primitive]; }
     
     @Override
-    public long getAlignedAddress(long rawAddress) {
-        return rawAddress + (this.size - rawAddress % this.size);
-    }
-    
-    @Override
     public boolean equals(Object obj) {
         return super.equals(obj) && 
                this.typename == ((PrimitiveType)obj).typename;

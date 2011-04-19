@@ -54,5 +54,4 @@ public abstract class Type {
     protected boolean constancy;
     
     protected final long size;
-    public abstract long getAlignedAddress(long rawAddress);
 }

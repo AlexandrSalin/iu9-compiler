@@ -113,22 +113,26 @@ public class Parser {
     }
     private Node FunctionDecl() {
         nextToken();
+        Position pos = current.coordinates().starting();
         String name = Identifier();
         FunctionType signature = Signature();
         BlockNode code = Code();
         
-        return new FunctionDeclNode(name, signature, code);
+        return new FunctionDeclNode(name, signature, code, pos);
     }
     
+    
     private Type Type() {
+        boolean constancy = isConstant();
+        
         Type type;
         if (current.type().is(Token.Type.PrimitiveType)) {
-            type = PrimitiveType();
+            type = PrimitiveType(constancy);
         } else if (current.type().is(new Token.Type[] {
             Token.Type.ASTERISK, Token.Type.LEFT_SQUARE_BRACKET,
             Token.Type.STRUCT, Token.Type.FUNC
         })) {
-            type = TypeLit();
+            type = TypeLit(constancy);
         } else {
             LeftBracket();
             type = Type();
@@ -137,25 +141,33 @@ public class Parser {
         
         return type;
     }
-    private Type TypeLit() {
+    private boolean isConstant() {
+        if (current.type().is(Token.Type.CONST)) {
+            nextToken();
+            return true;
+        } else {
+            return false;
+        }
+    }
+    private Type TypeLit(boolean constancy) {
         switch (current.type()) {
             case ASTERISK:
-                return PointerType();
+                return PointerType(constancy);
             case LEFT_SQUARE_BRACKET:
-                return ArrayType();
+                return ArrayType(constancy);
             case FUNC:
-                return FunctionType();
+                return FunctionType(constancy);
             case STRUCT:
-                return StructType();
+                return StructType(constancy);
             default:
                 return new InvalidType();
         }
     }
-    private StructType StructType() {
+    private StructType StructType(boolean constancy) {
         nextToken();
-        return new StructType(Identifier());
+        return new StructType(Identifier(), constancy);
     }
-    private ArrayType ArrayType() {
+    private ArrayType ArrayType(boolean constancy) {
         Integer length = null;
         LeftSquareBracket();
         if (checkTokens(current, Token.Type.CONST_INT, current.coordinates().starting())) {
@@ -164,84 +176,104 @@ public class Parser {
         RightSquareBracket();
         
         if (length == null)
-            return new ArrayType(Type());
+            return new ArrayType(Type(), constancy);
         else
-            return new ArrayType(Type(), length);
+            return new ArrayType(Type(), length, constancy);
     }
-    private PointerType FunctionType() {
+    private PointerType FunctionType(boolean constancy) {
         nextToken();
-        return new PointerType(Signature());
+        return new PointerType(Signature(), constancy);
     }
     private FunctionType Signature() {
-        FunctionType.Argument[] args = Parameters();
+        List<FunctionType.Argument> args = Parameters();
         Type result = Type();
         
         return new FunctionType(result, args);
     }
-    private FunctionType.Argument[] Parameters() {
+    private List<FunctionType.Argument> Parameters() {
         LeftBracket();
-        FunctionType.Argument args[] = ParameterList();
+        List<FunctionType.Argument> args = ParameterList();
         RightBracket();
         
         return args;
     }
-    private FunctionType.Argument[] ParameterList() {
-        List<FunctionType.Argument> args = 
+    private List<FunctionType.Argument> ParameterList() {
+        List<FunctionType.Argument> args = new LinkedList<FunctionType.Argument>();
+        
+        args.addAll(ParameterDecl());
+        while (current.type().is(Token.Type.COMMA)) {
+            nextToken();
+            args.addAll(ParameterDecl());
+        }
+        
+        return args;
+    }
+    private List<FunctionType.Argument> ParameterDecl() {
+        if (current.type().is(Token.Type.IDENTIFIER)) {
+            return IdentifierList();
+        } else {
+            Position pos = current.coordinates().starting();
+            return Arrays.asList(new FunctionType.Argument("", Type(), pos));
+        }
+    }
+    private List<FunctionType.Argument> IdentifierList() {
+        List<FunctionType.Argument> vars = 
                 new LinkedList<FunctionType.Argument>();
         
-        args.addAll(Arrays.asList(ParameterDecl()));
-        while (current.type().is(Token.Type.COMMA)) {
+        Position pos = current.coordinates().starting();
+        String name = Identifier();
+        if (current.type().is(Token.Type.COMMA)) {
             nextToken();
-            args.addAll(Arrays.asList(ParameterDecl()));
+            vars.addAll(IdentifierList());
+            vars.add(new FunctionType.Argument(name, vars.get(0).type(), pos));
+        } else {
+            Type type = Type();
+            vars.add(new FunctionType.Argument(name, type, pos));
         }
         
-        return args.toArray(new FunctionType.Argument[0]);
+        return vars;
     }
-    private FunctionType.Argument[] ParameterDecl() {
-        String[] names = null;
-        if (current.type().is(Token.Type.IDENTIFIER)) {
-            names = IdentifierList();
-        }
-        Type type = Type();
+    private List<VariableDeclNode> FieldsList() {
+        List<VariableDeclNode> vars = new LinkedList<VariableDeclNode>();
         
-        return FunctionType.Argument.getArguments(type, names);
-    }
-    private String[] IdentifierList() {
-        List<String> idents = new LinkedList<String>();
-        
-        idents.add(Identifier());
-        while (current.type().is(Token.Type.COMMA)) {
+        Position pos = current.coordinates().starting();
+        String name = Identifier();
+        if (current.type().is(Token.Type.COMMA)) {
             nextToken();
-            idents.add(Identifier());
+            vars.addAll(FieldsList());
+            vars.add(new VariableDeclNode(name, vars.get(0).type(), pos));
+        } else {
+            Type type = Type();
+            vars.add(new VariableDeclNode(name, type, pos));
         }
         
-        return idents.toArray(new String[0]);
+        return vars;
     }
-    private PointerType PointerType() {
+    private PointerType PointerType(boolean constancy) {
         nextToken();
-        return new PointerType(Type(), false);
+        return new PointerType(Type(), constancy);
     }
-    private PrimitiveType PrimitiveType() {
+    private PrimitiveType PrimitiveType(boolean constancy) {
         PrimitiveType type = null;
         
         switch (current.type()) {
             case INT:
-                type = new PrimitiveType(PrimitiveType.Typename.INT);
+                type = new PrimitiveType(PrimitiveType.Typename.INT, constancy);
                 break;
             case DOUBLE:
-                type = new PrimitiveType(PrimitiveType.Typename.DOUBLE);
+                type = new PrimitiveType(PrimitiveType.Typename.DOUBLE, constancy);
                 break;
             case FLOAT:
-                type = new PrimitiveType(PrimitiveType.Typename.FLOAT);
+                type = new PrimitiveType(PrimitiveType.Typename.FLOAT, constancy);
                 break;
             case BOOL:
-                type = new PrimitiveType(PrimitiveType.Typename.BOOL);
+                type = new PrimitiveType(PrimitiveType.Typename.BOOL, constancy);
                 break;
             case CHAR:
-                type = new PrimitiveType(PrimitiveType.Typename.CHAR);
+                type = new PrimitiveType(PrimitiveType.Typename.CHAR, constancy);
                 break;
             case VOID:
-                type = new PrimitiveType(PrimitiveType.Typename.VOID);
+                type = new PrimitiveType(PrimitiveType.Typename.VOID, constancy);
                 break;
             default:
                 Logger.logUnexpectedToken(current.type(), Token.Type.PrimitiveType, 
@@ -514,52 +546,55 @@ public class Parser {
             nextToken();
     }
     private Node Return() {
+        Position pos = current.coordinates().starting();
         nextToken();
         
         if (current.type().is(Token.Type.FirstOfExpression)) {
-            Position pos = current.coordinates().starting();
             return new UnaryOperationNode(
                     UnaryOperationNode.Operation.RETURN, Expression(), pos);
         } else {            
             return new NoOperandOperationNode(
-                    NoOperandOperationNode.Operation.RETURN);
+                    NoOperandOperationNode.Operation.RETURN, pos);
         }
     }
     private Node Break() {
+        Position pos = current.coordinates().starting();
         if (checkTokens(current, Token.Type.BREAK)) {
             nextToken();
             return new NoOperandOperationNode(
-                    NoOperandOperationNode.Operation.BREAK);
+                    NoOperandOperationNode.Operation.BREAK, pos);
         } else {
-            return new InvalidNode();
+            return new InvalidNode(pos);
         }
     }
     private Node Continue() {
+        Position pos = current.coordinates().starting();
         if (checkTokens(current, Token.Type.CONTINUE)) {
             nextToken();
             return new NoOperandOperationNode(
-                    NoOperandOperationNode.Operation.CONTINUE);
+                    NoOperandOperationNode.Operation.CONTINUE, pos);
         } else {
-            return new InvalidNode();
+            return new InvalidNode(pos);
         }
     }
     private Node Lock() {
+        Position pos = current.coordinates().starting();
         if (checkTokens(current, Token.Type.LOCK)) {
             nextToken();
-            Position pos = current.coordinates().starting();
             return new UnaryOperationNode(
                     UnaryOperationNode.Operation.LOCK, Code(), pos);
         } else {
-            return new InvalidNode();
+            return new InvalidNode(pos);
         }
     }
     private Node Barrier() {
+        Position pos = current.coordinates().starting();
         if (checkTokens(current, Token.Type.BARRIER)) {
             nextToken();
             return new NoOperandOperationNode(
-                    NoOperandOperationNode.Operation.BARRIER);
+                    NoOperandOperationNode.Operation.BARRIER, pos);
         } else {
-            return new InvalidNode();
+            return new InvalidNode(pos);
         }
     }
     
@@ -568,6 +603,7 @@ public class Parser {
         
         while (current.type().is(Token.Type.Assignment)) {
             BinaryOperationNode.Operation operation = null;
+            Position pos = current.coordinates().starting();
             switch (current.type()) {
                 case ASSIGN:
                     operation = BinaryOperationNode.Operation.ASSIGN;
@@ -603,9 +639,8 @@ public class Parser {
                     operation = BinaryOperationNode.Operation.BITWISE_AND_ASSIGN;
                     break;
                 default:
-                    return new InvalidNode();
+                    return new InvalidNode(pos);
             }
-            Position pos = current.coordinates().starting();
             nextToken();
             
             Node right = BoolExpression();
@@ -686,6 +721,7 @@ public class Parser {
         
         while (current.type().is(Token.Type.Equality)) {
             BinaryOperationNode.Operation operation;
+            Position pos = current.coordinates().starting();
             switch (current.type()) {
                 case EQUAL:
                     operation = BinaryOperationNode.Operation.EQUAL;
@@ -694,9 +730,8 @@ public class Parser {
                     operation = BinaryOperationNode.Operation.NOT_EQUAL;
                     break;
                 default:
-                    return new InvalidNode();
+                    return new InvalidNode(pos);
             }
-            Position pos = current.coordinates().starting();
             nextToken();
             Node right = CBoolExpression();
             
@@ -710,6 +745,7 @@ public class Parser {
         
         while (current.type().is(Token.Type.OrderRelation)) {
             BinaryOperationNode.Operation operation;
+            Position pos = current.coordinates().starting();
             switch (current.type()) {
                 case GREATER:
                     operation = BinaryOperationNode.Operation.GREATER;
@@ -724,9 +760,8 @@ public class Parser {
                     operation = BinaryOperationNode.Operation.LESS_OR_EUQAL;
                     break;
                 default:
-                    return new InvalidNode();
+                    return new InvalidNode(pos);
             }
-            Position pos = current.coordinates().starting();
             nextToken();
             
             Node right = DboolExpression();
@@ -740,6 +775,7 @@ public class Parser {
         
         while (current.type().is(Token.Type.BitwiseShift)) {
             BinaryOperationNode.Operation operation;
+            Position pos = current.coordinates().starting();
             switch (current.type()) {
                 case BITWISE_SHIFT_LEFT:
                     operation = BinaryOperationNode.Operation.BITWISE_SHIFT_LEFT;
@@ -748,9 +784,8 @@ public class Parser {
                     operation = BinaryOperationNode.Operation.BITWISE_SHIFT_RIGHT;
                     break;
                 default:
-                    return new InvalidNode();
+                    return new InvalidNode(pos);
             }
-            Position pos = current.coordinates().starting();
             nextToken();
             Node right = AExpression();
             result = new BinaryOperationNode(operation, result, right, pos);
@@ -763,6 +798,7 @@ public class Parser {
         
         while (current.type().is(Token.Type.PlusMinus)) {
             BinaryOperationNode.Operation operation;
+            Position pos = current.coordinates().starting();
             switch (current.type()) {
                 case PLUS:
                     operation = BinaryOperationNode.Operation.PLUS;
@@ -771,9 +807,8 @@ public class Parser {
                     operation = BinaryOperationNode.Operation.MINUS;
                     break;
                 default:
-                    return new InvalidNode();
+                    return new InvalidNode(pos);
             }
-            Position pos = current.coordinates().starting();
             nextToken();
             Node right = BExpression();
             result = new BinaryOperationNode(operation, result, right, pos);
@@ -786,6 +821,7 @@ public class Parser {
         
         while (current.type().is(Token.Type.MulDivMod)) {
             BinaryOperationNode.Operation operation;
+            Position pos = current.coordinates().starting();
             switch (current.type()) {
                 case DIV:
                     operation = BinaryOperationNode.Operation.DIV;
@@ -797,9 +833,8 @@ public class Parser {
                     operation = BinaryOperationNode.Operation.MOD;
                     break;
                 default:
-                    return new InvalidNode();
+                    return new InvalidNode(pos);
             }
-            Position pos = current.coordinates().starting();
             nextToken();
             Node right = CExpression();
             result = new BinaryOperationNode(operation, result, right, pos);
@@ -827,19 +862,19 @@ public class Parser {
         }
     }
     private Node DExpression() {
+        Position pos = current.coordinates().starting();
         if (current.type().is(Token.Type.PlusMinus)) {
             switch (current.type()) {
                 case PLUS:
                     nextToken();
                     return EExpression();
                 case MINUS:
-                    Position pos = current.coordinates().starting();
                     nextToken();
                     return new UnaryOperationNode(
                             UnaryOperationNode.Operation.MINUS, EExpression(), pos);
                 default:
                     nextToken();
-                    return new InvalidNode();
+                    return new InvalidNode(pos);
             }
         } else if (current.type().is(Token.Type.IncDec)) {
             UnaryOperationNode.Operation operation;
@@ -851,9 +886,8 @@ public class Parser {
                     operation = UnaryOperationNode.Operation.PRE_DEC;
                     break;
                 default:
-                    return new InvalidNode();
+                    return new InvalidNode(pos);
             }
-            Position pos = current.coordinates().starting();
             nextToken();
             Node node = EExpression();
 
@@ -877,7 +911,7 @@ public class Parser {
                     operation = UnaryOperationNode.Operation.DEREF;
                     break;
                 default:
-                    return new InvalidNode();
+                    return new InvalidNode(pos);
             }
             nextToken();
             return new UnaryOperationNode(operation, RefDeref(), pos);
@@ -890,6 +924,7 @@ public class Parser {
         
         if (current.type().is(Token.Type.IncDec)) {
             UnaryOperationNode.Operation operation;
+            Position pos = current.coordinates().starting();
             switch (current.type()) {
                 case INC:
                     operation = UnaryOperationNode.Operation.POST_INC;
@@ -898,9 +933,8 @@ public class Parser {
                     operation = UnaryOperationNode.Operation.POST_DEC;
                     break;
                 default:
-                    return new InvalidNode();
+                    return new InvalidNode(pos);
             }
-            Position pos = current.coordinates().starting();
             nextToken();
             node = new UnaryOperationNode(operation, node, pos);
         }
@@ -990,7 +1024,7 @@ public class Parser {
                         new PrimitiveType(PrimitiveType.Typename.BOOL, true), pos);
                 break;
             default:
-                node = new InvalidNode();
+                node = new InvalidNode(pos);
         }
         
         nextToken();
@@ -1003,24 +1037,22 @@ public class Parser {
         
         String structName = Identifier();
         StructDeclNode struct = 
-                new StructDeclNode(structName, new StructType(structName));
+                new StructDeclNode(structName, new StructType(structName, false),
+                pos);
         
         LeftBrace();
         while (current.type().is(Token.Type.IDENTIFIER)) {
-            struct.addDeclaration(FieldDecl());
+            struct.addDeclarations(FieldDecl());
         }
         RightBrace();
         
         return struct;
     }
-    private Node FieldDecl() {
-        Position pos = current.coordinates().starting();
-        
-        String[] fields = IdentifierList();
-        Type type = Type();
+    private List<VariableDeclNode> FieldDecl() {
+        List<VariableDeclNode> fields = FieldsList();
         Semicolon();
         
-        return new VariablesDeclNode(fields, type);
+        return fields;
     }
     
     private boolean Modifier() {
@@ -1074,7 +1106,7 @@ public class Parser {
 
         BinaryOperationNode binOp = 
                 new BinaryOperationNode(BinaryOperationNode.Operation.ASSIGN, posAssign);
-        binOp.setLeftChild(new VariablesDeclNode(name, type));
+        binOp.setLeftChild(new VariableDeclNode(name, type, pos));
         binOp.setRightChild(Expression());
 
         return binOp;
@@ -1087,11 +1119,11 @@ public class Parser {
         if (current.type().is(Token.Type.LEFT_BRACKET)) {
             LeftBracket();
             BlockNode decls = new BlockNode();
-            decls.addChild(VariableSpec());
+            decls.addChildren(VariableSpec());
             Semicolon();
             
             while (current.type().is(Token.Type.IDENTIFIER)) {
-                decls.addChild(VariableSpec());
+                decls.addChildren(VariableSpec());
                 Semicolon();
             }
             
@@ -1099,39 +1131,55 @@ public class Parser {
             
             return decls;
         } else {
-            return VariableSpec();
+            List<? extends Node> nodes = VariableSpec();
+            
+            if (nodes.size() == 1) {
+                return nodes.get(0);
+            } else {
+                BlockNode decls = new BlockNode();
+                decls.addChildren(nodes);
+                return decls;
+            }
         }
     }
-    private Node VariableSpec() {
-        Position pos = current.coordinates().starting();
-        String name = Identifier();
+    private List<? extends Node> VariableSpec() {
+        List<Node> nodes = new LinkedList<Node>();
         
-        if (current.type().is(Token.Type.COMMA)) {
-            List<String> names = new LinkedList<String>();
-            names.add(name);
+        Position declPos = current.coordinates().starting();
+        String name = Identifier();
+        Type type;
+        
+        if (current.type().is(Token.Type.ASSIGN)) {
+            Position pos = current.coordinates().starting();
+            nextToken();
+            Node expr = Expression();
             
-            while (current.type().is(Token.Type.COMMA)) {
+            if (current.type().is(Token.Type.COMMA)) {
                 nextToken();
-                names.add(Identifier());
-            }
-            Type type = Type();
-            return new VariablesDeclNode(names.toArray(new String[0]), type);
-        } else {
-            Type type = Type();
-            if (current.type().is(Token.Type.ASSIGN)) {
-                Position posAssign = current.coordinates().starting();
-                nextToken();
-
-                BinaryOperationNode binOp = 
-                        new BinaryOperationNode(BinaryOperationNode.Operation.ASSIGN, posAssign);
-                binOp.setLeftChild(new VariablesDeclNode(name, type));
-                binOp.setRightChild(Expression());
-
-                return binOp;
+                nodes.addAll(VariableSpec());
+                type = nodes.get(nodes.size() - 1).type();
             } else {
-                return new VariablesDeclNode(name, type);
+                type = Type();
             }
+            BinaryOperationNode binOp = new BinaryOperationNode(
+                        BinaryOperationNode.Operation.ASSIGN, pos);
+            binOp.setLeftChild(new VariableDeclNode(name, type, declPos));
+            binOp.setRightChild(expr);
+            binOp.setType(type);
+
+            nodes.add(binOp);
+        } else if (current.type().is(Token.Type.COMMA)) {
+            nextToken();
+            nodes.addAll(VariableSpec());
+            type = nodes.get(nodes.size() - 1).type();
+            
+            nodes.add(new VariableDeclNode(name, type, declPos));
+        } else {
+            type = Type();
+            return Arrays.asList(new VariableDeclNode(name, type, declPos));
         }
+        
+        return nodes;
     }
     
     private void LeftSquareBracket() {
