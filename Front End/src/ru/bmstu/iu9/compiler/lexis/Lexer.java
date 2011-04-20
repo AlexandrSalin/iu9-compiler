@@ -27,7 +27,7 @@ public class Lexer {
         }
     }
     
-    public void toJson(String filename) {
+    public void toJson(String filename) { 
         PrintWriter writer = null;
         
         try {
