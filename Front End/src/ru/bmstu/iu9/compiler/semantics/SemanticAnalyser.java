@@ -1,5 +1,9 @@
 package ru.bmstu.iu9.compiler.semantics;
 
+import com.google.gson.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.*;
 import ru.bmstu.iu9.compiler.*;
 import ru.bmstu.iu9.compiler.syntax.tree.*;
 
@@ -8,318 +12,776 @@ import ru.bmstu.iu9.compiler.syntax.tree.*;
  * @author maggot
  */
 class SemanticAnalyser {
-    public SemanticAnalyser(Node parseTree) {
+    public SemanticAnalyser(BlockNode<BaseNode> parseTree) {
         this.parseTree = parseTree;
     }
     
     public void Analyse() {
+        resolveNames(parseTree);
+        resolveTypes(parseTree);
         processNode(parseTree);
     }
     public static void main(String[] args) {
-        NodeFactory tree = new NodeFactory(
-                "C:\\Users\\maggot\\Documents\\NetBeansProjects\\ru.bmstu.iu9.compiler\\Front End\\src\\parse_tree.json" );
+        BufferedReader reader = null;
         
-        SemanticAnalyser analyser = new SemanticAnalyser(tree.getTree());
-        
-        analyser.Analyse();
+        try {
+            Gson gson = 
+                    new GsonBuilder().
+                        registerTypeHierarchyAdapter(
+                            BaseNode.class, 
+                            new BaseNode.BaseNodeAdapter()).
+                        registerTypeHierarchyAdapter(
+                            BaseType.class, 
+                            new BaseType.TypeAdapter()).
+                        create();
+            
+            reader = new BufferedReader(
+                        new FileReader("C:\\Users\\maggot\\Documents\\NetBeansProjects\\ru.bmstu.iu9.compiler\\Front End\\src\\parse_tree.json"));
+            
+            BlockNode<BaseNode> tree = gson.fromJson(reader, BlockNode.class);
+            SemanticAnalyser analyser = new SemanticAnalyser(tree);
+            analyser.Analyse();
+            
+            return;
+        } catch(java.io.IOException ex) {
+//            ex.printStackTrace();
+        } finally {
+            try {
+                reader.close();
+            } catch(java.io.IOException ex) {
+//                ex.printStackTrace();
+            }
+        }
     }
     
-    private void processNode(Node node) {
+    
+    
+    private void resolveNames(BlockNode<BaseNode> tree) {
+        for(BaseNode node : tree) {
+            switch(node.nodeType()) {
+                case STRUCT_DECL:
+                {
+                    StructDeclNode s = (StructDeclNode)node;
+                    context.global().add(
+                        new StructSymbol(
+                            s.name, 
+                            context.global(), 
+                            new SymbolTable()
+                        ));
+                    
+                    break;
+                }
+                case FUNCTION_DECL:
+                {
+                    FunctionDeclNode f = (FunctionDeclNode)node;
+                    context.global().add(
+                        new FunctionSymbol(
+                            f.name, 
+                            context.global(), 
+                            new SymbolTable()
+                        ));
+                    break;
+                }
+                default:
+                {
+                    break;
+                }
+            }
+        }
+    }
+    
+    private void resolveTypes(BlockNode<BaseNode> tree) {
+        for(BaseNode node : tree) {
+            switch(node.nodeType()) {
+                case STRUCT_DECL:
+                {
+                    StructDeclNode struct = (StructDeclNode)node;
+                    StructSymbol symbol = 
+                        (StructSymbol)context.global().get(struct.name);
+                    assert symbol == null;
+                    
+                    SymbolTable scope = symbol.scope;
+                    
+
+                    for(VariableDeclNode decl : struct.declarations) {
+                        processType(decl.type);
+                        scope.add(
+                            new VariableSymbol(
+                                decl.name, 
+                                decl.type.realType()
+                            ));
+                        decl.setRealType(decl.type.realType());
+                    }
+                    
+                    long size = 0;
+                    for(Symbol s : scope) {
+                        size += s.type().size;
+                    }
+                    
+                    StructType realType = 
+                            new StructType(struct.name, true, size);
+
+                    symbol.setType(realType);
+                    
+                    break;
+                }
+                case FUNCTION_DECL:
+                {
+                    FunctionDeclNode func = (FunctionDeclNode)node;
+                    FunctionSymbol symbol = 
+                        (FunctionSymbol)context.global().get(func.name);
+                    assert symbol == null;
+                    
+                    SymbolTable scope = symbol.scope;
+                    FunctionTypeNode type = (FunctionTypeNode)func.type;
+
+                    for(FunctionTypeNode.ArgumentNode arg : type.arguments) {
+                        processType(arg.type);
+                        arg.setRealType(arg.type.realType());
+                        scope.add(new VariableSymbol(arg.name, arg.realType()));
+                    }
+                    processType(type.returnValue);
+
+                    List<FunctionType.Argument> arguments = 
+                            new LinkedList<FunctionType.Argument>();
+
+                    for(FunctionTypeNode.ArgumentNode arg : type.arguments) {
+                        arguments.add(arg.toArgument());
+                    }
+                    
+                    FunctionType realType = 
+                        new FunctionType(
+                            type.returnValue.realType(),
+                            arguments,
+                            type.constancy);
+
+                    symbol.setType(realType);
+                    type.setRealType(realType);
+
+                    break;
+                }
+                default:
+                {
+                    break;
+                }
+            }
+        }
+    }
+    
+    private void processType(BaseTypeNode type) {
+        switch(type.type()) {
+            case ARRAY:
+            {
+                ArrayTypeNode a = (ArrayTypeNode)type;
+
+                processType(a.element);
+                if(a.length != null) {
+                    processNode(a.length);
+
+                    a.setRealType(
+                        new ArrayType(
+                            a.element.realType(),
+                            a.length.value,
+                            a.constancy)
+                        );
+                } else {
+                    a.setRealType(
+                        new ArrayType(
+                            a.element.realType(),
+                            a.constancy)
+                        );
+                }
+
+                break;
+            }
+            case PRIMITIVE_TYPE:
+            {
+                PrimitiveTypeNode p = (PrimitiveTypeNode)type;
+
+                switch(p.primitive()) {
+                    case POINTER:
+                    {
+                        PointerTypeNode pointer = (PointerTypeNode)p;
+                        processType(pointer.pointerType);
+
+                        p.setRealType(
+                            new PointerType(
+                                pointer.pointerType.realType(), 
+                                pointer.constancy)
+                            );
+                        break;
+                    }
+                    case INT:
+                    {
+                        p.setRealType(
+                            new PrimitiveType(
+                                PrimitiveType.Type.INT, 
+                                p.constancy)
+                            );
+                        break;
+                    }
+                    case DOUBLE:
+                    {
+                        p.setRealType(
+                            new PrimitiveType(
+                                PrimitiveType.Type.DOUBLE, 
+                                p.constancy)
+                            );
+                        break;
+                    }
+                    case FLOAT:
+                    {
+                        p.setRealType(
+                            new PrimitiveType(
+                                PrimitiveType.Type.FLOAT, 
+                                p.constancy)
+                            );
+                        break;
+                    }
+                    case CHAR:
+                    {
+                        p.setRealType(
+                            new PrimitiveType(
+                                PrimitiveType.Type.CHAR, 
+                                p.constancy)
+                            );
+                        break;
+                    }
+                    case VOID:
+                    {
+                        p.setRealType(
+                            new PrimitiveType(
+                                PrimitiveType.Type.VOID, 
+                                p.constancy)
+                            );
+                        break;
+                    }
+                    case BOOL:
+                    {
+                        p.setRealType(
+                            new PrimitiveType(
+                                PrimitiveType.Type.BOOL, 
+                                p.constancy)
+                            );
+                        break;
+                    }
+                    case LONG:
+                    {
+                        p.setRealType(
+                            new PrimitiveType(
+                                PrimitiveType.Type.LONG, 
+                                p.constancy)
+                            );
+                        break;
+                    }
+                }
+
+                break;
+            }
+            case STRUCT:
+            {
+                StructTypeNode s = (StructTypeNode)type;
+                StructSymbol struct = (StructSymbol)context.global().get(s.name);
+                assert struct == null;
+
+                s.setRealType(struct.type);
+
+                break;
+            }
+            case FUNCTION:
+            {
+                FunctionTypeNode f = (FunctionTypeNode)type;
+//                SymbolTable scope = 
+//                    ((FunctionSymbol)context.get(f.name)).scope;
+                
+                for(FunctionTypeNode.ArgumentNode arg : f.arguments) {
+                    processType(arg.type);
+                    arg.setRealType(arg.type.realType());
+//                    scope.add(new VariableSymbol(arg.name, arg.realType()));
+                }
+                processType(f.returnValue);
+
+                List<FunctionType.Argument> arguments = 
+                        new LinkedList<FunctionType.Argument>();
+
+                for(FunctionTypeNode.ArgumentNode arg : f.arguments) {
+                    arguments.add(arg.toArgument());
+                }
+
+                f.setRealType(
+                    new FunctionType(
+                        f.returnValue.realType(),
+                        arguments,
+                        f.constancy)
+                    );
+
+                break;
+            }
+            case INVALID:
+            {
+                type.setRealType(new InvalidType());
+                break;
+            }
+        }
+    }
+    
+    
+    
+    
+    
+    
+    
+    private void processNode(BaseNode node) {
         switch (node.nodeType()) {
             case BINARY_OPERATION:
+            {
                 BinaryOperationNode bNode = (BinaryOperationNode)node;
                 
                 processNode(bNode.leftChild());
                 processNode(bNode.rightChild());
                 
-                checkTypes(bNode.leftChild().type(), bNode.rightChild().type(),
-                        bNode.position());
-                if (bNode.operation().is(BinaryOperationNode.Operation.Bitwise)) {
-                    checkTypes(bNode.type(), PrimitiveType.Typename.INT, bNode.position());
+                TypeChecker.check(
+                        bNode.leftChild().realType(), 
+                        bNode.rightChild().realType(),
+                        bNode.dInfo);
+                
+                if (bNode.operation().is(
+                        BinaryOperationNode.Operation.Bitwise)) {
+                    
+                    TypeChecker.check(
+                        bNode.realType(), 
+                        PrimitiveType.Type.INT, 
+                        bNode.dInfo);
                 }
                 
-                if (bNode.operation().is(BinaryOperationNode.Operation.Comparison)) {
-                    node.setType(new PrimitiveType(PrimitiveType.Typename.BOOL, true));
+                if (bNode.operation().is(
+                        BinaryOperationNode.Operation.Comparison)) {
+                    
+                    bNode.setRealType(
+                        new PrimitiveType(
+                            PrimitiveType.Type.BOOL, 
+                            true)
+                        );
                 } else {
-                    node.setType(((BinaryOperationNode)node).leftChild().type());
+                    bNode.setRealType(bNode.leftChild().realType());
                 }
                 break;
                 
-                
+            }
             case UNARY_OPERATION:
+            {
                 UnaryOperationNode uNode = ((UnaryOperationNode)node);
                 
-                processNode(uNode.child());
+                processNode(uNode.node);
                 switch (uNode.operation()) {
                     case POST_INC:
                     case POST_DEC:
                     case PRE_INC:
                     case PRE_DEC:
-                        checkTypes(uNode.child().type(), 
-                                new PrimitiveType.Typename[] {
-                                    PrimitiveType.Typename.INT, PrimitiveType.Typename.CHAR
-                                }, uNode.position());
+                        TypeChecker.check(
+                                uNode.node.realType(), 
+                                new PrimitiveType.Type[] {
+                                    PrimitiveType.Type.INT, 
+                                    PrimitiveType.Type.CHAR
+                                }, 
+                                uNode.dInfo);
                         
-                        node.setType(uNode.child().type());
+                        uNode.setRealType(uNode.node.realType());
                         break;
                     case MINUS:
                     case PLUS:
-                        checkTypes(uNode.child().type(),
-                                new PrimitiveType.Typename[] {
-                                    PrimitiveType.Typename.INT, 
-                                    PrimitiveType.Typename.DOUBLE,
-                                    PrimitiveType.Typename.FLOAT
-                                }, uNode.position());
+                        TypeChecker.check(uNode.node.realType(),
+                                new PrimitiveType.Type[] {
+                                    PrimitiveType.Type.INT, 
+                                    PrimitiveType.Type.DOUBLE,
+                                    PrimitiveType.Type.FLOAT
+                                }, uNode.dInfo);
                         
-                        node.setType(uNode.child().type());
+                        uNode.setRealType(uNode.node.realType());
                         break;
                     case DEREF:
-                        checkTypes(uNode.child().type(), Type.Typename.POINTER, 
-                                uNode.position());
+                        TypeChecker.check(
+                                uNode.node.realType(), 
+                                PrimitiveType.Type.POINTER, 
+                                uNode.dInfo);
                         
-                        node.setType(((PointerType)uNode.child().type()).type());
+                        uNode.setRealType(
+                            ((PointerType)uNode.node.realType()).pointerType);
                         break;
                     case CAST:
+                        uNode.setRealType(
+                            ((CastNode)uNode).castingType.realType());
                         break;
                     case REF:
-                        node.setType(new PointerType(uNode.child().type(), true));
-                        break;
-                    case RETURN:
-                        checkTypes(uNode.child().type(), returnType, uNode.position());
-                        
-                        node.setType(((UnaryOperationNode)node).child().type());
-                        break;
-                    case LOCK:
+                        uNode.setRealType(
+                            new PointerType(uNode.node.realType(), false));
                         break;
                 }
                 break;
                 
-                
-            case VARS_DECL:
+            }
+            case VAR_DECL:
+            {
                 VariableDeclNode leaf = (VariableDeclNode)node;
+                processNode(leaf.type);
+                BaseType t = leaf.type.realType();
+                
+                VariableSymbol symbol = new VariableSymbol(leaf.name, t);
+                context.add(symbol);
+                
+                leaf.setRealType(t);
 
-                SymbolTable newScope = new SymbolTable();
-                newScope.setOpenScope(currentScope);
-                currentScope = newScope;
+                if(leaf.value != null) {
+                    processNode(leaf.value);
 
-                for (VariableDeclNode.Variable var : leaf)                    
-                    currentScope.add(new VariableSymbol(
-                            var.name(), 
-                            analyseType(var.type())
-                        ));
+                    TypeChecker.check(t, leaf.value.realType(), leaf.dInfo);
+                }
+                
                 break;
+            }
             case FOR:
+            {
                 ForNode forNode = (ForNode)node;
                 
-                processNode(forNode.initialization());
-                processNode(forNode.condition());
-                processNode(forNode.increase());
-                processNode(forNode.block());
+                context.pushScope();
+                processNode(forNode.initialization);
+                processNode(forNode.expression);
+                processNode(forNode.step);
+                processNode(forNode.block);
+                context.popScope();
                 
-                checkTypes(forNode.condition().type(), PrimitiveType.Typename.BOOL,
-                        ((ExpressionNode)forNode.condition()).position());
+                TypeChecker.check(
+                        forNode.expression.realType(), 
+                        PrimitiveType.Type.BOOL,
+                        ((ExpressionNode)forNode.expression).dInfo);
                 break;
+            }
             case IF:
+            {
                 IfNode ifNode = (IfNode)node;
                 
-                processNode(ifNode.expression());
-                processNode(ifNode.block());
-                processNode(ifNode.elseBlock());
+                context.pushScope();
+                processNode(ifNode.condition);
+                processNode(ifNode.block);
+                context.popScope();
+                if(ifNode.elseNode != null)
+                    processNode(ifNode.elseNode);
                 
-                checkTypes(ifNode.expression().type(), PrimitiveType.Typename.BOOL, 
-                        ((ExpressionNode)ifNode.expression()).position());
+                TypeChecker.check(
+                        ifNode.condition.realType(), 
+                        PrimitiveType.Type.BOOL, 
+                        ((ExpressionNode)ifNode.condition).dInfo);
                 break;
+            }
             case SWITCH:
+            {
                 SwitchNode switchNode = ((SwitchNode)node);
                         
-                processNode(switchNode.expression());
-                processNode(switchNode.cases());
-                processNode(switchNode.defaultNode());
+                context.pushScope();
+                processNode(switchNode.expression);
+                processNode(switchNode.cases);
+                if(switchNode.defaultNode != null)
+                    processNode(switchNode.defaultNode);
+                context.popScope();
                 
-                for (Node caseNode : ((SwitchNode)node).cases()) {
-                    checkTypes(switchNode.expression().type(), caseNode.type(), 
-                            ((ExpressionNode)switchNode.expression()).position());
+                for (CaseNode caseNode : ((SwitchNode)node).cases) {
+                    TypeChecker.check(
+                            switchNode.expression.realType(), 
+                            caseNode.expression.realType(), 
+                            ((ExpressionNode)switchNode.expression).dInfo);
                 }
                 break;
+            }
             case CASE:
-                processNode(((CaseNode)node).expression());
-                processNode(((CaseNode)node).block());
+            {
+                context.pushScope();
+                processNode(((CaseNode)node).expression);
+                processNode(((CaseNode)node).block);
+                context.popScope();
                 break;
+            }
             case WHILE:
-            case DO_WHILE:
-                ConditionBlockNode cbNode = (ConditionBlockNode)node;
+            {
+                WhileNode cbNode = (WhileNode)node;
                 
-                processNode(cbNode.expression());
-                processNode(cbNode.block());
+                context.pushScope();
+                processNode(cbNode.expression);
+                processNode(cbNode.block);
+                context.popScope();
                 
-                checkTypes(cbNode.expression().type(), PrimitiveType.Typename.BOOL,
-                        ((ExpressionNode)cbNode.expression()).position());
+                TypeChecker.check(
+                        cbNode.expression.realType(), 
+                        PrimitiveType.Type.BOOL,
+                        ((ExpressionNode)cbNode.expression).dInfo);
                 break;
+            }
+            case DO_WHILE:
+            {
+                DoWhileNode cbNode = (DoWhileNode)node;
+                
+                context.pushScope();
+                processNode(cbNode.block);
+                processNode(cbNode.expression);
+                context.popScope();
+                
+                TypeChecker.check(
+                        cbNode.expression.realType(), 
+                        PrimitiveType.Type.BOOL,
+                        ((ExpressionNode)cbNode.expression).dInfo);
+                break;
+            }
             case BLOCK:
-                for(Node child : (BlockNode)node) {
+            {
+//                context.pushScope();
+                for(BaseNode child : (BlockNode<BaseNode>)node) {
+                    processNode(child);
+                }
+//                context.popScope();
+                break;
+            }
+            case BLOCK_DECL:
+            {
+                context.pushScope();
+                for(DeclNode child : (BlockDeclNode<?>)node) {
                     processNode(child);
                 }
                 break;
+            }
             case VARIABLE:
+            {
                 VariableLeaf var = (VariableLeaf)node;
-                Symbol symbol = currentScope.get(var.name());
+                Symbol symbol = context.get(var.name);
                 
                 if (symbol != null) {
-                    node.setType(symbol.type());
+                    var.setRealType(symbol.type());
                 } else {
-                    Logger.logUndeclaredVarialbe(var.name(), var.position());
+                    Logger.logUndeclaredVarialbe(var.name, var.dInfo.position);
                 }
                 break;
+            }
             case CONSTANT:
+            {
+                ConstantLeaf c = (ConstantLeaf)node;
+                
+                switch(c.constantType()) {
+                    case INT:
+                        c.setRealType(
+                            new PrimitiveType(
+                                PrimitiveType.Type.INT, 
+                                true)
+                            );
+                        break;
+                    case DOUBLE:
+                        c.setRealType(
+                            new PrimitiveType(
+                                PrimitiveType.Type.DOUBLE, 
+                                true)
+                            );
+                        break;
+                    case BOOL:
+                        c.setRealType(
+                            new PrimitiveType(
+                                PrimitiveType.Type.BOOL, 
+                                true)
+                            );
+                        break;
+                    case CHAR:
+                        c.setRealType(
+                            new PrimitiveType(
+                                PrimitiveType.Type.CHAR, 
+                                true)
+                            );
+                        break;
+                }
+                
                 break;
+            }
             case FUNCTION_DECL:
+            {
                 FunctionDeclNode function = (FunctionDeclNode)node;
                 
-                ambientScope = currentScope;
-                currentScope = new SymbolTable();
-                                
-                this.returnType = ((FunctionType)function.type()).returnType();
-                ambientScope.add(new FunctionSymbol(function.name(), 
-                        function.type(), ambientScope, currentScope));
-                for (FunctionType.Argument arg : ((FunctionType)function.type()).argumentsIterator()) {
-                    currentScope.add(new VariableSymbol(arg.name(), arg.type()));
+                context.enterFunction(function);
+              
+                processNode(function.block);
+
+                context.leaveFunction();
+                break;
+            }
+            case RETURN:
+            {
+                ReturnNode ret = (ReturnNode)node;
+                
+                if(ret.returnExpr != null) {
+                    processNode(ret.returnExpr);
+                    TypeChecker.check(
+                            ret.returnExpr.realType(), 
+                            context.returnValue(), 
+                            ret.dInfo);
+                } else {
+                    TypeChecker.check(
+                            PrimitiveType.Type.VOID, 
+                            context.returnValue(), 
+                            ret.dInfo);
                 }
                 
-                processNode(((FunctionDeclNode)node).block());
-                // restore symbol table
-                currentScope = ambientScope;
                 break;
-            case STRUCT_DECL:
-                ambientScope = currentScope;
-                currentScope = new SymbolTable();
-                
-                processNode(((StructDeclNode)node).declarations());
-                
-                long size = 0;
-                for(Symbol s : currentScope) {
-                    size += s.type().size();
-                } 
-                
-                ambientScope.add(new StructSymbol(((StructDeclNode)node).name(),
-                        new StructType(((StructDeclNode)node).name(), size),
-                        ambientScope, currentScope));
-                // restore symbol table
-                currentScope = ambientScope;
-                break;
-            case INVALID:
-                break;
+            }
             case CALL:
+            {
                 CallNode call = (CallNode)node;
                 
-                processNode(call.function());
-                processNode(call.arguments());
+                processNode(call.function);
+                processNode(call.arguments);
                 
-                if (checkTypes(call.function().type(), Type.Typename.FUNCTION, call.position())) {
-                    FunctionType func = (FunctionType)((CallNode)node).function().type();
+                if (TypeChecker.check(
+                        call.function.realType(), 
+                        BaseType.Type.FUNCTION, 
+                        call.dInfo)) {
                     
-                    if (func.arguments().length == ((CallNode)node).arguments().children().size()) {
-                        for (int i = 0; i < func.arguments().length; ++i) {
-                            checkTypes(
-                                    func.arguments()[i].type(), 
-                                    call.arguments().children().get(i).type(), 
-                                    call.position());
+                    FunctionType func = (FunctionType)call.function.realType();
+                    
+                    if (func.arguments().size() == call.arguments.children().size()) {
+                        for (int i = 0; i < func.arguments().size(); ++i) {
+                            TypeChecker.check(
+                                    func.arguments().get(i).type, 
+                                    call.arguments.children().get(i).realType(), 
+                                    call.dInfo);
                         }
                     }
                 }
                 
-                node.setType(((FunctionType)((CallNode)node).function().type()).returnType());
-            case NO_OPERAND_OPERATION:
+                call.setRealType(
+                    ((FunctionType)call.function.realType()).returnValue);
+                break;
+            }
+            case ELSE:
+            {
+                ElseNode n = (ElseNode)node;
+                
+                context.pushScope();
+                processNode(n.block);
+                context.popScope();
+                
+                break;
+            }
+            case DEFAULT:
+            {
+                DefaultNode n = (DefaultNode)node;
+                
+                processNode(n.block);
+                
+                break;
+            }
+            case RUN:
+            {
+                RunNode n = (RunNode)node;
+                
+                processNode(n.expression);
+                TypeChecker.check(
+                        n.expression.realType(), 
+                        BaseType.Type.FUNCTION, 
+                        n.dInfo);
+                
+                break;
+            }
+            case INVALID:
+            {
+                break;
+            }
+            case LOCK:
+            {
+                LockNode n = (LockNode)node;
+                
+                processNode(n.block);
+                
+                break;
+            }
+            case TYPE:
+            {
+                processType((BaseTypeNode)node);
+                break;
+            }
+            /*
+            case ARGUMENT:
+            {
+                FunctionTypeNode.ArgumentNode a = 
+                        (FunctionTypeNode.ArgumentNode)node;
+                
+                processNode(a.type);
+                a.setRealType(a.type.realType());
+                
+                context.add(new VariableSymbol(a.name, a.realType()));
+                
+                break;
+            }
+            */
+            case BREAK:
+            case CONTINUE:
+            case BARRIER:
                 break;
         }
-    }
+    }    
     
-    private Type analyseType(Type type) {
-        switch (type.typename()) {
-            case PRIMITIVE_TYPE:
-                switch (((PrimitiveType)type).primitive()) {
-                    case POINTER:
-                        PointerType pointer = (PointerType)type;
-                        pointer.setType(analyseType(pointer.type()));
-                        return pointer;
-                    default:
-                        return type;
-                }
-            case STRUCT:
-                Symbol struct = currentScope.get(((StructType)type).name());
-                if (struct != null && struct instanceof StructSymbol) {
-                    return struct.type();
-                } else {
-                    Logger.logUndeclaredType(((StructType)type).name(), null);
-                    return new InvalidType();
-                }
-            case FUNCTION:
-                FunctionType function = (FunctionType)type;
-                
-                function.setReturnType(analyseType(function.returnType()));
-                for (FunctionType.Argument arg : function.argumentsIterator()) {
-                    arg.setType(analyseType(arg.type()));
-                }
-                return function;
-            case ARRAY:
-                ArrayType array = (ArrayType)type;
-                array.setElementType(analyseType(array.elementType()));
-                return array;
-            default:
-                return type;
-        }
-    }
     
-    private boolean checkTypes(Type found, Type required, Position position) {
-        boolean result;
-        if (result = (found == null || !found.equals(required)))
-            Logger.logIncompatibleTypes(found.toString(), required.toString(), position);
-        return !result;
+    private BlockNode<BaseNode> parseTree;
+    private Context context = new Context();
+}
+
+
+final class Context {
+    public Context() {
+        scopes = new Stack<SymbolTable>();
+        global = new SymbolTable();
+        scopes.add(global);
     }
-    private boolean checkTypes(Type found, Type.Typename required, Position position) {
-        boolean result;
-        if (result = (found == null || !found.typename().is(required)))
-            Logger.logIncompatibleTypes(found.toString(), required.name(), position);
-        return !result;
-    }
-    private boolean checkTypes(Type found, PrimitiveType.Typename required, Position position) {
-        boolean result;
-        if (result = (found == null || !(found instanceof PrimitiveType) || 
-                !(((PrimitiveType)found).primitive() == required)))
-            Logger.logIncompatibleTypes(found.toString(), required.name(), position);
-        return !result;
-    }
-    private boolean checkTypes(Type found, Type.Typename[] required, Position position) {
-        boolean result = (found == null || !found.typename().is(required));
-        if (result) {
-            StringBuilder str = new StringBuilder();
-            for (int i = 0; i < required.length; ++i) {
-                str.append(required[i]);
-                str.append(" or ");
-            }
-            str.delete(str.length() - 4, str.length());
-            Logger.logIncompatibleTypes(found.toString(), str.toString(), position);
-        }
+    public void enterFunction(FunctionDeclNode function) {
+        this.function = (FunctionTypeNode)function.type;
+        FunctionSymbol symbol = (FunctionSymbol)get(function.name);
+        assert symbol == null;
         
-        return !result;
+        global = scopes.peek();
+        scopes.add(symbol.scope);
+        this.inFunction = true;
     }
-    private boolean checkTypes(Type found, PrimitiveType.Typename[] required, Position position) {
-        boolean result = (found == null || !(found instanceof PrimitiveType) ||
-                !((PrimitiveType)found).primitive().is(required));
-        if (result) {
-            StringBuilder str = new StringBuilder();
-            for (int i = 0; i < required.length; ++i) {
-                str.append(required[i]);
-                str.append(" or ");
-            }
-            str.delete(str.length() - 4, str.length());
-            Logger.logIncompatibleTypes(found.toString(), str.toString(), position);
-        }
+    public void leaveFunction() {
+        assert !this.inFunction;
         
-        return !result;
+        scopes.clear();
+        scopes.add(global);
+        this.inFunction = false;
     }
+    public BaseType returnValue() {
+        return this.inFunction ? 
+            ((FunctionType)function.realType()).returnValue : 
+            null;
+    }
+
     
-    private Node parseTree;
-    private Type returnType;
-    private SymbolTable currentScope = new SymbolTable();
-    private SymbolTable ambientScope;
+    
+    public void add(Symbol symbol) {
+        this.scopes.peek().add(symbol);
+    }
+    public Symbol get(String name) {
+        return this.scopes.peek().get(name);
+    }
+    public void pushScope() {
+        SymbolTable tmp = new SymbolTable();
+        tmp.setOpenScope(this.scopes.peek());
+        
+        this.scopes.push(tmp);
+    }
+    public SymbolTable popScope() {
+        return this.scopes.pop();
+    }
+    public SymbolTable peekScope() {
+        return this.scopes.peek();
+    }
+    public SymbolTable global() {
+        return this.global;
+    }
+
+    private SymbolTable global;
+    private FunctionTypeNode function;
+    private Stack<SymbolTable> scopes;
+    private boolean inFunction;
 }

@@ -5,7 +5,7 @@
 
 package ru.bmstu.iu9.compiler.syntax.tree;
 
-import com.google.gson.annotations.SerializedName;
+import ru.bmstu.iu9.compiler.DebugInfo;
 import ru.bmstu.iu9.compiler.Position;
 
 /**
@@ -14,12 +14,18 @@ import ru.bmstu.iu9.compiler.Position;
  */
 final public class VariableLeaf extends Leaf {
     public VariableLeaf(String name, Position position) {
-        super(Node.NodeType.VARIABLE, position);
+        super(BaseNode.NodeType.VARIABLE, position);
+        this.name = name;
+    }
+    public VariableLeaf(String name, DebugInfo dInfo) {
+        super(BaseNode.NodeType.VARIABLE, dInfo);
         this.name = name;
     }
     
-    public String name() { return this.name; }
-    
-    @SerializedName("name")
-    private final String name;
+    @Override
+    public String toString() {
+        return this.realType + " " + name;
+    }
+
+    public final String name;
 }

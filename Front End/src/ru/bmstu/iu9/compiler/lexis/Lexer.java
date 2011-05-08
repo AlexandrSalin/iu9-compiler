@@ -83,7 +83,7 @@ class Scanner implements Iterable<Token> {
         return new Iterator<Token>() {
                 @Override
                 public boolean hasNext() {
-                    return !skipWhitespaces();
+                    return !skipWhitespacesAndComments();
                 }
                 @Override
                 public Token next() {
@@ -105,7 +105,7 @@ class Scanner implements Iterable<Token> {
     }
     
     private Token nextToken() {
-        if (skipWhitespaces()) {
+        if (skipWhitespacesAndComments()) {
             return null;
         }
         
@@ -486,6 +486,8 @@ class Scanner implements Iterable<Token> {
                         case 'l':
                             if (keyword.equals("lock"))
                                 type = Token.Type.LOCK;
+                            else if (keyword.equals("long"))
+                                type = Token.Type.LONG;
                             break;
                         case 't':
                             if (keyword.equals("true"))
@@ -520,10 +522,33 @@ class Scanner implements Iterable<Token> {
         }
     }
     
-    private boolean skipWhitespaces() {
+    private boolean skipWhitespacesAndComments() {
         while (iterator.hasNext() && 
                 Character.isWhitespace(iterator.current().value())) {
             iterator.next();
+        }
+        if(iterator.current().value() == '/' && iterator.hasNext()) {
+            CodePoint c;
+            if(iterator.hasNext()) {
+                c = iterator.watchNext();
+                if(c.value() == '/') {
+                    iterator.advance(2);
+                    while (iterator.hasNext() && 
+                           iterator.current().value() != '\n') {
+
+                        iterator.next();
+                    }
+                } else if(c.value() == '*') {
+                    iterator.advance(2);
+                    while (iterator.hasNext()) {
+                        int ch = iterator.current().value();
+                        iterator.next();
+                        if(ch == '*' && iterator.current().value() == '/')
+                            break;
+                    }
+                    iterator.advance(1);
+                }
+            }
         }
         return !iterator.hasNext();
     }

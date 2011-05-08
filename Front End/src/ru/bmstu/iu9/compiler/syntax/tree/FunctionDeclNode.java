@@ -5,27 +5,33 @@
 
 package ru.bmstu.iu9.compiler.syntax.tree;
 
-import com.google.gson.annotations.SerializedName;
+import ru.bmstu.iu9.compiler.DebugInfo;
 import ru.bmstu.iu9.compiler.Position;
-import ru.bmstu.iu9.compiler.Type;
 
 /**
  *
  * @author maggot
  */
 final public class FunctionDeclNode extends DeclNode {
-    public FunctionDeclNode(String name, Type type, Position position) {
-        super(NodeType.FUNCTION_DECL, name, type, position);
-    }
-    public FunctionDeclNode(String name, Type type, BlockNode block,
+    public FunctionDeclNode(
+            String name, 
+            BaseTypeNode type, 
+            BlockNode<Statement> block,
             Position position) {
-        this(name, type, position);
+        
+        super(NodeType.FUNCTION_DECL, name, type, position);
+        this.block = block;
+    }
+    public FunctionDeclNode(
+            String name, 
+            BaseTypeNode type, 
+            BlockNode<Statement> block,
+            DebugInfo dInfo) {
+        
+        super(NodeType.FUNCTION_DECL, name, type, dInfo);
         this.block = block;
     }
     
-    public BlockNode block() { return this.block; }
-    public void setBlock(BlockNode block) { this.block = block; }
 
-    @SerializedName("node1")
-    private BlockNode block;
+    public final BlockNode<Statement> block;
 }

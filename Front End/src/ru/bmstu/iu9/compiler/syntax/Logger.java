@@ -6,7 +6,7 @@
 package ru.bmstu.iu9.compiler.syntax;
 
 import ru.bmstu.iu9.compiler.Position;
-import ru.bmstu.iu9.compiler.Type;
+import ru.bmstu.iu9.compiler.BaseType;
 import ru.bmstu.iu9.compiler.lexis.token.Token;
 import java.util.logging.Level;
 

@@ -1,11 +1,6 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package ru.bmstu.iu9.compiler.syntax.tree;
 
-import com.google.gson.annotations.SerializedName;
+import ru.bmstu.iu9.compiler.DebugInfo;
 import ru.bmstu.iu9.compiler.Position;
 
 /**
@@ -18,9 +13,9 @@ final public class BinaryOperationNode extends ExpressionNode {
         BITWISE_SHIFT_RIGHT, BITWISE_SHIFT_LEFT, GREATER, GREATER_OR_EQUAL, 
         LESS, LESS_OR_EUQAL, NOT_EQUAL, EQUAL, BITWISE_AND, BITWISE_XOR,
         BITWISE_OR, BOOL_AND, BOOL_OR, BITWISE_AND_ASSIGN, BITWISE_XOR_ASSIGN, 
-        BITWISE_SHIFT_RIGHT_ASSIGN, BITWISE_SHIFT_LEFT_ASSIGN, BITWISE_OR_ASSIGN, 
-        MOD_ASSIGN, DIV_ASSIGN, MUL_ASSIGN, MINUS_ASSIGN, PLUS_ASSIGN,
-        MEMBER_SELECT, ARRAY_ELEMENT, 
+        BITWISE_SHIFT_RIGHT_ASSIGN, BITWISE_SHIFT_LEFT_ASSIGN, 
+        BITWISE_OR_ASSIGN, MOD_ASSIGN, DIV_ASSIGN, MUL_ASSIGN, MINUS_ASSIGN, 
+        PLUS_ASSIGN, MEMBER_SELECT, ARRAY_ELEMENT, 
         
         Bitwise(new Operation[] {
             BITWISE_SHIFT_RIGHT, BITWISE_SHIFT_LEFT, BITWISE_AND, BITWISE_XOR,
@@ -47,26 +42,49 @@ final public class BinaryOperationNode extends ExpressionNode {
     };
     
     public BinaryOperationNode(Operation operation, Position position) {
-        super(Node.NodeType.BINARY_OPERATION, position);
+        super(BaseNode.NodeType.BINARY_OPERATION, position);
         this.operation = operation.ordinal();
     }
-    public BinaryOperationNode(Operation operation, Node left, Node right,
+    public BinaryOperationNode(
+            Operation operation, 
+            ExpressionNode left, 
+            ExpressionNode right,
             Position position) {
-        this(operation, position);
+        
+        super(BaseNode.NodeType.BINARY_OPERATION, position);
+        this.operation = operation.ordinal();
+        this.left = left;
+        this.right = right;
+    }
+    public BinaryOperationNode(
+            Operation operation, 
+            ExpressionNode left, 
+            ExpressionNode right,
+            DebugInfo dInfo) {
+        
+        super(BaseNode.NodeType.BINARY_OPERATION, dInfo);
+        this.operation = operation.ordinal();
         this.left = left;
         this.right = right;
     }
     
-    public Operation operation() { return Operation.values()[this.operation]; }
-    public void setLeftChild(Node child) { this.left = child; }
-    public void setRightChild(Node child) { this.right = child; }
-    public Node leftChild() { return this.left; }
-    public Node rightChild() { return this.right; }
+    public Operation operation() { 
+        return Operation.values()[this.operation]; 
+    }
+    public void setLeftChild(ExpressionNode child) { 
+        this.left = child; 
+    }
+    public void setRightChild(ExpressionNode child) {
+        this.right = child;
+    }
+    public ExpressionNode leftChild() {
+        return this.left;
+    }
+    public ExpressionNode rightChild() {
+        return this.right; 
+    }
     
-    @SerializedName("node1")
-    private Node left;
-    @SerializedName("node2")
-    private Node right;
-    @SerializedName("operation")
-    private int operation;
+    private ExpressionNode left;
+    private ExpressionNode right;
+    public final int operation;
 }

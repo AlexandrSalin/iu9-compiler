@@ -1,19 +1,25 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package ru.bmstu.iu9.compiler.syntax.tree;
+
+import ru.bmstu.iu9.compiler.DebugInfo;
+import ru.bmstu.iu9.compiler.Position;
 
 /**
  *
  * @author maggot
  */
-final public class WhileNode extends ConditionBlockNode {
-    public WhileNode() {
-        super(Node.NodeType.WHILE);
+final public class WhileNode extends IterationStructureNode {
+    public WhileNode(
+            ExpressionNode expression, 
+            BlockNode<Statement> block,
+            Position position) {
+        
+        super(BaseNode.NodeType.WHILE, expression, block, position);
     }
-    public WhileNode(Node condition, Node block) {
-        super(Node.NodeType.WHILE, condition, block);
+    public WhileNode(
+            ExpressionNode expression, 
+            BlockNode<Statement> block,
+            DebugInfo dInfo) {
+        
+        super(BaseNode.NodeType.WHILE, expression, block, dInfo);
     }
 }

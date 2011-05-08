@@ -5,15 +5,9 @@
 
 package ru.bmstu.iu9.compiler.syntax.tree;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
-import com.google.gson.annotations.SerializedName;
+import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -22,35 +16,64 @@ import java.util.List;
  *
  * @author maggot
  */
-final public class BlockNode extends Node implements Iterable<Node> {
+public class BlockNode<T> 
+        extends BaseNode implements Iterable<T>, Statement {
+    
     public BlockNode() {
-        super(Node.NodeType.BLOCK, null);
-        children = new LinkedList<Node>();
+        super(BaseNode.NodeType.BLOCK);
+        this.children = new LinkedList<T>();
     }
-    public BlockNode(Node[] nodes) {
-        super(Node.NodeType.BLOCK, null);
-        children = new LinkedList<Node>(Arrays.asList(nodes));
+    public BlockNode(List<T> block) {
+        super(BaseNode.NodeType.BLOCK);
+        this.children = block;
+    }
+    public BlockNode(T element) {
+        super(BaseNode.NodeType.BLOCK);
+        this.children = new LinkedList<T>();
+        this.children.add(element);
+    }
+    protected BlockNode(BaseNode.NodeType type) {
+        super(type);
+        this.children = new LinkedList<T>();
+    }
+    protected BlockNode(BaseNode.NodeType type, List<T> block) {
+        super(type);
+        this.children = block;
     }
     
-    public void addChild(Node child) { this.children.add(child); }
-    public List<Node> children() { return this.children; }
-    public void addChildren(List<? extends Node> children) {
+    public void addChild(T child) { this.children.add(child); }
+    public List<T> children() { return this.children; }
+    public void addChildren(List<T> children) {
         this.children.addAll(children);
     }
 
     @Override
-    public Iterator<Node> iterator() {
+    public Iterator<T> iterator() {
         return this.children.iterator();
     }
     
-    @SerializedName("nodes")
-    List<Node> children;
+    @Override
+    public String toString() {
+        return children.toString();
+    }
     
-    public static class BlockNodeSerializer implements JsonSerializer<BlockNode> {
+    private final List<T> children;
+    
+    
+    public static class BlockNodeAdapter 
+            implements JsonSerializer<BlockNode> {
+        
         @Override
-        public JsonElement serialize(BlockNode src, Type typeOfSrc, JsonSerializationContext context) {
+        public JsonElement serialize(
+                BlockNode src, 
+                Type type, 
+                JsonSerializationContext context) {
+            
             JsonObject result = new JsonObject();
-            result.add("nodes", context.serialize(src.children, new TypeToken<List<Object>>(){}.getType()));
+            result.add("children", context.serialize(
+                    src.children, 
+                    new TypeToken<List<Object>>(){}.getType())
+                );
             result.add("nodeType", new JsonPrimitive(src.nodeType));
             
             return result;

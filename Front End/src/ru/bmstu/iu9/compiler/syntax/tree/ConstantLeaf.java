@@ -5,26 +5,28 @@
 
 package ru.bmstu.iu9.compiler.syntax.tree;
 
-import com.google.gson.annotations.SerializedName;
+import ru.bmstu.iu9.compiler.DebugInfo;
 import ru.bmstu.iu9.compiler.Position;
-import ru.bmstu.iu9.compiler.Type;
 
 /**
  *
  * @author maggot
  */
-final public class ConstantLeaf extends Leaf {
-    public ConstantLeaf(Object value, Position position) {
-        super(Node.NodeType.CONSTANT, position);
-        this.value = value;
+abstract public class ConstantLeaf extends Leaf {
+    public enum ConstantType { INT, CHAR, DOUBLE, BOOL };
+    
+    protected ConstantLeaf(ConstantType type, Position position) {
+        super(BaseNode.NodeType.CONSTANT, position);
+        this.constantType = type.ordinal();
     }
-    public ConstantLeaf(Object value, Type type, Position position) {
-        super(Node.NodeType.CONSTANT, type, position);
-        this.value = value;
+    protected ConstantLeaf(ConstantType type, DebugInfo dInfo) {
+        super(BaseNode.NodeType.CONSTANT, dInfo);
+        this.constantType = type.ordinal();
     }
     
-    public Object value() { return this.value; }
+    public ConstantType constantType() {
+        return ConstantType.values()[this.constantType];
+    }
     
-    @SerializedName("value")
-    private final Object value;
+    public final int constantType;
 }

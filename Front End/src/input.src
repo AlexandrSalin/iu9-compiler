@@ -1,2 +1,45 @@
-for
-struct
+var bar const struct abc;
+
+struct abc {
+    a, b int;
+    c double;
+    d func(q, w int, e, r float) void;
+};
+
+func foo(q, w const int, e, r float) void {
+    var bar const struct abc;
+    return;
+}
+
+var (
+    q = 5 const int;
+    w = 9.9e-5, e = 5.0 double;
+);
+
+func main(args const * const * char) int {
+    // comment 1 2 3 
+    var (
+        a = 0 int;
+        b = 10 const int;
+        );
+
+    /*
+        test 
+        multiline 
+        comment 
+    */
+
+    var c = 'a' char;
+    args = &&c;
+    bar = 0;
+
+    for(var i = 0 int; i <= 10; ++i) {
+        if(i > 0) {
+            a++;
+        } else {
+            --b;
+        }
+    }
+
+    return a + b;
+}

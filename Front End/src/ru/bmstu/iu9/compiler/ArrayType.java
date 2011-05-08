@@ -4,35 +4,30 @@ package ru.bmstu.iu9.compiler;
  *
  * @author maggot
  */
-public final class ArrayType extends Type {
-    public ArrayType(Type elementType, int length, boolean constancy) {
-        super(Typename.ARRAY, constancy, elementType.size * length);
-        this.type = elementType;
+public final class ArrayType extends BaseType {
+    public ArrayType(BaseType element, int length, boolean constancy) {
+        super(Type.ARRAY, constancy, element.size * length);
+        this.element = element;
         this.length = length;
     }
-    public ArrayType(Type elementType, boolean constancy) {
-        super(Typename.ARRAY, constancy, 0);
-        this.type = elementType;
+    public ArrayType(BaseType element, boolean constancy) {
+        super(Type.ARRAY, constancy, 0);
+        this.element = element;
         this.length = null;
-    }
-    
-    public Integer length() { return this.length; }
-    public Type elementType() { return this.type; }
-    public void setElementType(Type type) {
-        this.type = type;
     }
     
     @Override
     public boolean equals(Object obj) {
         return super.equals(obj) &&
-                ((ArrayType)obj).length() == this.length &&
-                type.equals(((ArrayType)obj).elementType());
+                ((ArrayType)obj).length == this.length &&
+                element.equals(((ArrayType)obj).element);
     }
     @Override
     public String toString() {
-        return "(" + super.toString() + " OF " + type.toString() + ")[" + length.toString() + "]";
+        return "(" + super.toString() + " OF " + element.toString() + 
+                ")[" + length.toString() + "]";
     }
     
-    private Integer length;
-    private Type type;
+    public final Integer length;
+    public final BaseType element;
 }

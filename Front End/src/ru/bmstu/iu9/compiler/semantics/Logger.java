@@ -5,8 +5,7 @@
 
 package ru.bmstu.iu9.compiler.semantics;
 
-import ru.bmstu.iu9.compiler.Position;
-import ru.bmstu.iu9.compiler.Type;
+import ru.bmstu.iu9.compiler.*;
 import java.util.logging.Level;
 
 /**

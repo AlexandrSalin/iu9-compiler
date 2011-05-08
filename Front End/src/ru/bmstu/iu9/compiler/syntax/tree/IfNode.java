@@ -1,28 +1,34 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package ru.bmstu.iu9.compiler.syntax.tree;
 
-import com.google.gson.annotations.SerializedName;
+import ru.bmstu.iu9.compiler.DebugInfo;
+import ru.bmstu.iu9.compiler.Position;
 
 /**
  *
  * @author maggot
  */
-final public class IfNode extends ConditionBlockNode {
-    public IfNode() {
-        super(Node.NodeType.IF);
+final public class IfNode extends ConditionalNode implements Statement {
+    public IfNode(
+            ExpressionNode condition, 
+            BlockNode<Statement> block,
+            ElseNode elseNode,
+            Position position) {
+        
+        super(BaseNode.NodeType.IF, block, position);
+        this.condition = condition;
+        this.elseNode = elseNode;
     }
-    public IfNode(Node condition, Node block, Node elseBlock) {
-        super(Node.NodeType.IF, condition, block);
-        this.elseBlock = elseBlock;
+    public IfNode(
+            ExpressionNode condition, 
+            BlockNode<Statement> block,
+            ElseNode elseNode,
+            DebugInfo dInfo) {
+        
+        super(BaseNode.NodeType.IF, block, dInfo);
+        this.condition = condition;
+        this.elseNode = elseNode;
     }
-
-    public Node elseBlock() { return this.elseBlock; }
-    public void setElseBlock(Node elseBlock) { this.elseBlock = elseBlock; }
-
-    @SerializedName("node3")
-    private Node elseBlock;
+    
+    public final ExpressionNode condition;
+    public final ElseNode elseNode;
 }

@@ -22,7 +22,7 @@ public abstract class Token {
         LEFT_BRACE, RIGHT_BRACE, LEFT_SQUARE_BRACKET,
         RIGHT_SQUARE_BRACKET, LEFT_BRACKET, RIGHT_BRACKET, COLON, SEMICOLON,
 
-        INT, FLOAT, DOUBLE, CHAR, VOID, STRUCT, BOOL, 
+        INT, FLOAT, DOUBLE, CHAR, VOID, STRUCT, BOOL, LONG,
         CONTINUE, RETURN, BREAK, ELSE, DEFAULT, CASE, SWITCH, IF, DO, WHILE, 
         RUN, BARRIER, LOCK, TRUE, FALSE, FUNC, VAR, CONST, FOR,
 
@@ -30,7 +30,7 @@ public abstract class Token {
 
 
         PrimitiveType(new Type[] {
-            INT, FLOAT, DOUBLE, CHAR, VOID, BOOL
+            INT, FLOAT, DOUBLE, CHAR, VOID, BOOL, LONG
         }),
         Constant(new Type[] {
             CONST_DOUBLE, CONST_INT, CONST_CHAR, TRUE, FALSE

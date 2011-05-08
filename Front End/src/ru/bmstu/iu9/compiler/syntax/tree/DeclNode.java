@@ -5,22 +5,43 @@
 
 package ru.bmstu.iu9.compiler.syntax.tree;
 
-import com.google.gson.annotations.SerializedName;
+import ru.bmstu.iu9.compiler.BaseType;
+import ru.bmstu.iu9.compiler.DebugInfo;
 import ru.bmstu.iu9.compiler.Position;
-import ru.bmstu.iu9.compiler.Type;
 
 /**
  *
  * @author maggot
  */
-abstract public class DeclNode extends Node {
-    protected DeclNode(NodeType nodeType, String name, Type type, Position position) {
-        super(type, nodeType, position);
+abstract public class DeclNode extends BaseNode implements Statement {
+    protected DeclNode(
+            NodeType nodeType, 
+            String name, 
+            BaseTypeNode type,
+            Position position) {
+        
+        super(nodeType);
         this.name = name;
+        this.type = type;
+        this.dInfo = new DebugInfo(position);
+    }
+    protected DeclNode(
+            NodeType nodeType, 
+            String name, 
+            BaseTypeNode type,
+            DebugInfo dInfo) {
+        
+        super(nodeType);
+        this.name = name;
+        this.type = type;
+        this.dInfo = dInfo;
     }
     
-    public String name() { return this.name; }
+    public BaseType realType() { return this.realType; }
+    public void setRealType(BaseType type) { this.realType = type; }
     
-    @SerializedName("name")
-    protected final String name; 
+    protected BaseType realType;
+    public final DebugInfo dInfo;    
+    public final String name;
+    public final BaseTypeNode type;
 }

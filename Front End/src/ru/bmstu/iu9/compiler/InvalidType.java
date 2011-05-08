@@ -4,8 +4,8 @@ package ru.bmstu.iu9.compiler;
  *
  * @author maggot
  */
-final public class InvalidType extends Type {
+final public class InvalidType extends BaseType {
     public InvalidType() {
-        super(Typename.INVALID, -1);
+        super(Type.INVALID, -1);
     }
 }

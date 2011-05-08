@@ -1,23 +1,30 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package ru.bmstu.iu9.compiler.syntax.tree;
 
 import ru.bmstu.iu9.compiler.Position;
-import ru.bmstu.iu9.compiler.Type;
+import ru.bmstu.iu9.compiler.BaseType;
+import ru.bmstu.iu9.compiler.DebugInfo;
 
 /**
  *
  * @author maggot
  */
-abstract public class ExpressionNode extends Node {
-    protected ExpressionNode(Node.NodeType nodeType, Position position) {
-        super(nodeType, position);
-        this.position = position;
+public class ExpressionNode extends BaseNode implements Statement {
+    public static ExpressionNode InvalidNode(Position position) {
+        return new ExpressionNode(NodeType.INVALID, position);
     }
-    protected ExpressionNode(Node.NodeType nodeType, Type type, Position position) {
-        super(type, nodeType, position);
+    
+    protected ExpressionNode(BaseNode.NodeType nodeType, Position position) {
+        super(nodeType);
+        this.dInfo = new DebugInfo(position);
     }
+    protected ExpressionNode(BaseNode.NodeType nodeType, DebugInfo dInfo) {
+        super(nodeType);
+        this.dInfo = dInfo;
+    }
+    
+    public BaseType realType() { return this.realType; }
+    public void setRealType(BaseType type) { this.realType = type; }
+    
+    protected BaseType realType;
+    public final DebugInfo dInfo;
 }

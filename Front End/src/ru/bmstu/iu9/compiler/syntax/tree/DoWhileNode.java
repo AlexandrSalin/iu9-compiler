@@ -1,20 +1,25 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package ru.bmstu.iu9.compiler.syntax.tree;
+
+import ru.bmstu.iu9.compiler.DebugInfo;
+import ru.bmstu.iu9.compiler.Position;
 
 /**
  *
  * @author maggot
  */
-public class DoWhileNode extends ConditionBlockNode {
-    public DoWhileNode() {
-        super(Node.NodeType.DO_WHILE);
+public class DoWhileNode extends IterationStructureNode {
+    public DoWhileNode(
+            ExpressionNode expression, 
+            BlockNode<Statement> block,
+            Position position) {
+        
+        super(BaseNode.NodeType.DO_WHILE, expression, block, position);
     }
-    public DoWhileNode(Node condition, Node block) {
-        super(Node.NodeType.DO_WHILE, condition, block);
+    public DoWhileNode(
+            ExpressionNode expression, 
+            BlockNode<Statement> block,
+            DebugInfo dInfo) {
+        
+        super(BaseNode.NodeType.DO_WHILE, expression, block, dInfo);
     }
 }
-

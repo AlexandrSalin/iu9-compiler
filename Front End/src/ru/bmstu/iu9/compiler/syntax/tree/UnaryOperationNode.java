@@ -5,43 +5,47 @@
 
 package ru.bmstu.iu9.compiler.syntax.tree;
 
-import com.google.gson.annotations.SerializedName;
+import ru.bmstu.iu9.compiler.DebugInfo;
 import ru.bmstu.iu9.compiler.Position;
-import ru.bmstu.iu9.compiler.Type;
 
 /**
  *
  * @author maggot
  */
-final public class UnaryOperationNode extends ExpressionNode {
-    public enum Operation { POST_INC, POST_DEC, MINUS, PLUS, REF, DEREF, CAST,
-        PRE_DEC, PRE_INC, RUN, LOCK, RETURN };
+public class UnaryOperationNode extends ExpressionNode {
+    public enum Operation { 
+        POST_INC, POST_DEC, MINUS, PLUS, REF, DEREF, PRE_DEC, PRE_INC, CAST
+    };
     
-    public UnaryOperationNode(Operation operation, Position position) {
-        super(Node.NodeType.UNARY_OPERATION, position);
+    /*public Unary(Operation operation, Position position) {
+        super(BaseNode.NodeType.UNARY_OPERATION, position);
         this.operation = operation.ordinal();
-    }
-    public UnaryOperationNode(Operation operation, Type type, Position position) {
-        super(Node.NodeType.UNARY_OPERATION, type, position);
+    }*/
+    public UnaryOperationNode(
+            Operation operation, 
+            ExpressionNode node, 
+            Position position) {
+        
+        super(BaseNode.NodeType.UNARY_OPERATION, position);
         this.operation = operation.ordinal();
+        this.node = node;
     }
-    public UnaryOperationNode(Operation operation, Node child, 
-            Position position) {
-        this(operation, position);
-        this.child = child;
-    }
-    public UnaryOperationNode(Operation operation, Type type, Node child, 
-            Position position) {
-        this(operation, type, position);
-        this.child = child;
+    public UnaryOperationNode(
+            Operation operation, 
+            ExpressionNode node, 
+            DebugInfo dInfo) {
+        
+        super(BaseNode.NodeType.UNARY_OPERATION, dInfo);
+        this.operation = operation.ordinal();
+        this.node = node;
     }
     
     public Operation operation() { return Operation.values()[this.operation]; }
-    public Node child() { return this.child; }
-    public void setChild(Node child) { this.child = child; }
+/*    public ExpressionNode node() { return this.node; }
+    public void setChild(ExpressionNode node) { this.node = node; }*/
     
-    @SerializedName("node1")
-    private Node child;
-    @SerializedName("operation")
-    private int operation;
+//    @SerializedName("node1")
+    public final ExpressionNode node;
+//    @SerializedName("operation")
+    public final int operation;
 }

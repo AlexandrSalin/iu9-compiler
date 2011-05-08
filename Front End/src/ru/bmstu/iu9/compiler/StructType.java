@@ -4,27 +4,25 @@ package ru.bmstu.iu9.compiler;
  *
  * @author maggot
  */
-public final class StructType extends Type {
+public final class StructType extends BaseType {
     public StructType(String name, boolean constancy, long size) {
-        super(Typename.STRUCT, constancy, size);
+        super(Type.STRUCT, constancy, size);
         this.name = name;
     }
     public StructType(String name, boolean constancy) {
-        super(Typename.STRUCT, constancy, 0);
+        super(Type.STRUCT, constancy, 0);
         this.name = name;
     }
-    
-    public String name() { return this.name; }
     
     @Override
     public boolean equals(Object obj) {
         return super.equals(obj) &&
-                this.name.equals(((StructType)obj).name());
+                this.name.equals(((StructType)obj).name);
     }
     @Override
     public String toString() {        
         return super.toString() + " " + name;
     }
     
-    private final String name;
+    public final String name;
 }

@@ -36,6 +36,11 @@ class CodePoint implements Cloneable {
         return new CodePoint(this.value, (Position)this.position.clone());
     } 
     
+    @Override
+    public String toString() {
+        return "'" + Character.toChars(value)[0] + "' at " + position;
+    }
+    
     private int value;
     private Position position;
 }
@@ -73,16 +78,29 @@ class Program implements Iterable<CodePoint> {
         public CodePoint next() {
             if(program.codePointAt(index) == '\n')
             {
-                line++;
+                ++line;
                 position = 0;
             }
-            position++;
+            ++position;
             index = program.offsetByCodePoints(index, 1);
             
             current.setValue(program.codePointAt(index));
             current.setPosition(new Position(line, position, index));
 
             return current;
+        }
+        public CodePoint watchNext() {
+            int l = line, p = position;
+            if(program.codePointAt(index) == '\n')
+            {
+                ++l;
+                p = 0;
+            }
+            ++p;
+            
+            int i = program.offsetByCodePoints(index, 1);
+            
+            return new CodePoint(program.codePointAt(i), new Position(l, p, i));
         }
         @Override
         public void remove() {
@@ -115,6 +133,11 @@ class Program implements Iterable<CodePoint> {
             current.setPosition(new Position(line, position, index));
             
             return current;
+        }
+        
+        @Override
+        public String toString() {
+            return current.toString();
         }
     
         private int index = 0;
