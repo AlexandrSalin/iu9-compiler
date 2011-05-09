@@ -17,5 +17,10 @@ final public class LockNode extends ControlStructureNode implements Statement {
         this.block = block;        
     }
     
+    @Override
+    public BaseNode getNode() {
+        return this;
+    }
+    
     public final BlockNode<Statement> block;
 }

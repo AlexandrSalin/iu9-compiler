@@ -22,4 +22,9 @@ final public class WhileNode extends IterationStructureNode {
         
         super(BaseNode.NodeType.WHILE, expression, block, dInfo);
     }
+    
+    @Override
+    public BaseNode getNode() {
+        return this;
+    }
 }

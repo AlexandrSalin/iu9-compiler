@@ -1,3 +1,13 @@
+func q() void {
+    var a = true bool;
+    if(a) {
+        var b int;
+    } else {
+        var c double;
+    }
+    return;
+}
+
 var bar const struct abc;
 
 struct abc {

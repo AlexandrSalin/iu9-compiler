@@ -35,8 +35,13 @@ public class VariableDeclNode extends DeclNode implements Statement {
     
     @Override
     public String toString() {
-        return this.realType + " " + this.name + 
+        return this.realType + " " + this.name + " " +
                 (value == null ? "" : value.toString());
+    }
+    
+    @Override
+    public BaseNode getNode() {
+        return this;
     }
     
     public final ExpressionNode value;

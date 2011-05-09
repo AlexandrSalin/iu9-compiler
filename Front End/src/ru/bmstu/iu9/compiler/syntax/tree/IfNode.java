@@ -29,6 +29,11 @@ final public class IfNode extends ConditionalNode implements Statement {
         this.elseNode = elseNode;
     }
     
+    @Override
+    public BaseNode getNode() {
+        return this;
+    }
+    
     public final ExpressionNode condition;
     public final ElseNode elseNode;
 }

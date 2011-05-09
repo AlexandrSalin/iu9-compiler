@@ -57,6 +57,11 @@ public class BlockNode<T>
         return children.toString();
     }
     
+    @Override
+    public BaseNode getNode() {
+        return this;
+    }
+    
     private final List<T> children;
     
     

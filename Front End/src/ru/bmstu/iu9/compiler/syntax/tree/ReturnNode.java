@@ -25,5 +25,10 @@ final public class ReturnNode extends JmpNode implements Statement {
         this.returnExpr = expression;
     }
     
+    @Override
+    public BaseNode getNode() {
+        return this;
+    }
+    
     public final ExpressionNode returnExpr;
 }

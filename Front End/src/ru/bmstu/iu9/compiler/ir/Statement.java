@@ -8,21 +8,20 @@ import ru.bmstu.iu9.compiler.*;
  */
 abstract class Statement {
     public enum Operation { 
-        MUL, UNARY_MINUS, MINUS, PLUS, PARAM, CALL, RETURN, GOTO, IF_GOTO,
-        INDEX, INDIRECT_ASSIGN, ASSIGN, RUN, BARRIER, REF, DEREF, DIV, MOD,
-        MEMBER_SELECT, 
+        PARAM, CALL, RETURN, GOTO, IF_GOTO, RUN, BARRIER, BINATY_OPERATION, 
+        UNARY_OPERATION, ASSIGN, INDIRECT_ASSIGN, MEMBER_SELECT, INDEX
     };
     
     protected Statement(Operation operation) {
-        this.operation = operation;
+        this.baseOperation = operation;
     }
     
-    protected final Operation operation;
+    protected final Operation baseOperation;
 }
 
 
 final class AssignmentStatement extends Statement {
-    public AssignmentStatement(Operand rhv, VariableOperand lhv) {
+    public AssignmentStatement(VariableOperand lhv, Operand rhv) {
         super(Operation.ASSIGN);
         this.lhv = lhv;
         this.rhv = rhv;
@@ -33,6 +32,11 @@ final class AssignmentStatement extends Statement {
     }
     public Operand leftHandValue() { 
         return this.lhv; 
+    }
+    
+    @Override
+    public String toString() {
+        return lhv + " = " + rhv;
     }
     
     private final Operand rhv;
@@ -54,83 +58,90 @@ final class IndirectAssignmentStatement extends Statement {
         return this.lhv;
     }
     
+    @Override
+    public String toString() {
+        return "*" + lhv + " = " + rhv;
+    }
+    
     private final Operand rhv;
     private final VariableOperand lhv;
 }
 
 
 final class BinaryOperationStatement extends Statement {
+    public enum Operation {
+        MUL, MINUS, PLUS, INDEX, DIV, MOD, BITWISE_SHIFT_RIGHT, 
+        BITWISE_SHIFT_LEFT, GREATER, GREATER_OR_EQUAL, LESS, LESS_OR_EUQAL, 
+        NOT_EQUAL, EQUAL, BITWISE_AND, BITWISE_XOR, BITWISE_OR, BOOL_AND, 
+        BOOL_OR
+    };
     public BinaryOperationStatement(
             Operand leftOperand, 
             Operand rightOperand, 
             Operand lhv,
             Operation operation) {
         
-        super(operation);
+        super(Statement.Operation.BINATY_OPERATION);
         this.lhv = lhv;
         this.leftOperand = leftOperand;
         this.rightOperand = rightOperand;
+        this.operation = operation;
     }
     
-    public Operand leftOperand() { 
-        return this.leftOperand; 
-    }
-    public Operand rightOperand() { 
-        return this.rightOperand; 
-    }
-    public Operand leftHandValue() { 
-        return this.lhv; 
-    }
-    
-    private final Operand leftOperand;
-    private final Operand rightOperand;
-    private final Operand lhv;
+    public final Operand leftOperand;
+    public final Operand rightOperand;
+    public final Operand lhv;
+    public final Operation operation;
 }
 
 
+class Label {
+    public Label() { }
+    
+    public void setIndex(long index) {
+        this.index = index;
+    }
+    public long index() {
+        return this.index;
+    }
+    
+    private long index;
+}
+
 final class GoToStatement extends Statement {
-    public GoToStatement(long index) {
+    public GoToStatement(Label label) {
         super(Operation.GOTO);
-        this.index = 
-            new ConstantOperand(
-                new PrimitiveType(PrimitiveType.Type.INT, true), 
-                index
-            );
+        this.label = label;
     }
     
-    public Operand index() { 
-        return this.index; 
-    }
-    
-    private final ConstantOperand index;
+    public final Label label;
 }
 
 
 final class IfStatement extends Statement {
-    public IfStatement(VariableOperand condition, int index) {
+    public IfStatement(
+            VariableOperand condition, 
+            Label labelTrue,
+            Label labelFalse) {
+        
         super(Operation.IF_GOTO);
         this.condition = condition;
-        this.index = 
-            new ConstantOperand(
-                new PrimitiveType(PrimitiveType.Type.INT, true), 
-                index
-            );
+        this.labelTrue = labelTrue;
+        this.labelFalse = labelFalse;
     }
     
-    public Operand condition() { 
-        return this.condition;
-    }
-    public Operand index() {
-        return this.index; 
-    }
-    
-    private final VariableOperand condition;
-    private final ConstantOperand index;
+    public final VariableOperand condition;
+    public final Label labelTrue;
+    public final Label labelFalse;
 }
 
 
 final class CallStatement extends Statement {
-    public CallStatement(ConstantOperand function, int argsNumber, VariableOperand lhv) {
+    public CallStatement(
+            ConstantOperand function, 
+            int argsNumber, 
+            VariableOperand lhv) {
+        
         super(Operation.CALL);
         this.function = function;
         this.argsNumber = 
@@ -145,65 +156,37 @@ final class CallStatement extends Statement {
         this(function, argsNumber, null);
     }
     
-    public Operand condition() { 
-        return this.function; 
-    }
-    public Operand argsNumber() { 
-        return this.argsNumber; 
-    }
-    public Operand leftHandValue() { 
-        return this.result; 
-    }
-    
-    private final ConstantOperand function;
-    private final ConstantOperand argsNumber;
-    private final VariableOperand result;
+    public final ConstantOperand function;
+    public final ConstantOperand argsNumber;
+    public final VariableOperand result;
 }
 
-
-final class RefStatement extends Statement {
-    public RefStatement(VariableOperand rhv, VariableOperand lhv) {
-        super(Operation.REF);
-        this.rhv = rhv;
+final class UnaryOperationStatement extends Statement {
+    public enum Operation {
+        POST_INC, POST_DEC, MINUS, PLUS, REF, DEREF, PRE_DEC, PRE_INC, CAST
+    };
+    public UnaryOperationStatement(
+            VariableOperand lhv, 
+            VariableOperand rhv,
+            Operation operation) {
+        
+        super(Statement.Operation.UNARY_OPERATION);
         this.lhv = lhv;
-    }
-    
-    public Operand rightHandValue() { 
-        return this.rhv; 
-    }
-    public Operand leftHandValue() { 
-        return this.lhv;
-    }
-    
-    private final VariableOperand rhv;
-    private final VariableOperand lhv;
-}
-
-
-class DerefStatement extends Statement {
-    public DerefStatement(VariableOperand rhv, VariableOperand lhv) {
-        super(Operation.REF);
         this.rhv = rhv;
-        this.lhv = lhv;
+        this.operation = operation;
     }
     
-    public Operand rightHandValue() { 
-        return this.rhv; 
-    }
-    public Operand leftHandValue() {
-        return this.lhv; 
-    }
-    
-    private final VariableOperand rhv;
-    private final VariableOperand lhv;
+    public final VariableOperand rhv;
+    public final VariableOperand lhv;
+    public final Operation operation;
 }
-
 
 final class ArrayIndexStatement extends Statement {
     public ArrayIndexStatement(
+            VariableOperand lhv,
             VariableOperand array, 
-            ConstantOperand index, 
-            VariableOperand lhv) {
+            ConstantOperand index
+            ) {
         
         super(Operation.INDEX);
         this.array = array;
@@ -211,35 +194,34 @@ final class ArrayIndexStatement extends Statement {
         this.lhv = lhv;
     }
     
-    public VariableOperand array() { 
-        return this.array;
+    @Override
+    public String toString() {
+        return lhv + " = " + array + "[" + index + "]";
     }
-    public ConstantOperand index() {
-        return this.index; 
-    }
-    public VariableOperand leftHandValue() { 
-        return this.lhv;
-    }
-    
-    private final VariableOperand array;
-    private final ConstantOperand index;
-    private final VariableOperand lhv;
+
+    public final VariableOperand array;
+    public final ConstantOperand index;
+    public final VariableOperand lhv;
 }
 
 final class MemberSelectStatement extends Statement {
-    public MemberSelectStatement(VariableOperand struct, VariableOperand field) {
+    public MemberSelectStatement(
+            VariableOperand lhv,
+            VariableOperand struct, 
+            VariableOperand field) {
+        
         super(Operation.MEMBER_SELECT);
         this.field = field;
         this.struct = struct;
+        this.lhv = lhv;
     }
     
-    public VariableOperand struct() {
-        return this.struct;
-    }
-    public VariableOperand field() { 
-        return this.field;
+    @Override
+    public String toString() {
+        return lhv + " = " + struct + "." + field;
     }
     
-    private final VariableOperand struct;
-    private final VariableOperand field;
+    public final VariableOperand struct;
+    public final VariableOperand field;
+    public final VariableOperand lhv;
 }

@@ -61,7 +61,6 @@ abstract public class BaseType {
     
     public static class TypeAdapter implements JsonDeserializer<BaseType> {
 
-        @Override
         public BaseType deserialize(
                 JsonElement src, 
                 java.lang.reflect.Type type, 
@@ -71,7 +70,7 @@ abstract public class BaseType {
             BaseType result = null;
             
             BaseType.Type typeType = 
-                    BaseType.Type.values()[context.deserialize(object.get("typeType"), Integer.class)];
+                    BaseType.Type.values()[(Integer)context.deserialize(object.get("typeType"), Integer.class)];
             
             boolean constancy = context.deserialize(object.get("constancy"), Boolean.class);
             
@@ -125,7 +124,7 @@ abstract public class BaseType {
                     primitive = object.getAsJsonPrimitive("primitive");
                     assert primitive == null;
                     PrimitiveType.Type t = PrimitiveType.Type.values()[
-                            context.deserialize(primitive, Integer.class)];
+                            (Integer)context.deserialize(primitive, Integer.class)];
                     
                     switch(t) {
                         case POINTER:

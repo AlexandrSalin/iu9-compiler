@@ -22,6 +22,11 @@ public class ExpressionNode extends BaseNode implements Statement {
         this.dInfo = dInfo;
     }
     
+    @Override
+    public BaseNode getNode() {
+        return this;
+    }
+    
     public BaseType realType() { return this.realType; }
     public void setRealType(BaseType type) { this.realType = type; }
     

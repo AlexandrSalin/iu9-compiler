@@ -9,7 +9,15 @@ import ru.bmstu.iu9.compiler.Position;
 import java.util.logging.Level;
 
 /**
- *
+ * Класс, используемый {@link ru.bmstu.iu9.compiler.lexis.Lexer Lexer} для решистрации сообщений об ошибках.
+ * Пример использования Logger:
+ * <code>
+ * Position pos = new Position(1, 2, 3);
+ * String message = "Invalid character";
+ * 
+ * Logger.log(message, pos);
+ * Logger.logUnknownCharacter(new Position(5, 6, 7));
+ * </code>
  * @author maggot
  */
 abstract class Logger {

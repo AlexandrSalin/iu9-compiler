@@ -24,8 +24,8 @@ public final class ArrayType extends BaseType {
     }
     @Override
     public String toString() {
-        return "(" + super.toString() + " OF " + element.toString() + 
-                ")[" + length.toString() + "]";
+        return "ARRAY OF " + element.toString() + 
+                "[" + length.toString() + "]";
     }
     
     public final Integer length;

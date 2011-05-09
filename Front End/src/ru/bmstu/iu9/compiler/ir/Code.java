@@ -21,9 +21,18 @@ class Code implements Iterable<Statement> {
         return this.statements.toArray(new Statement[0]); 
     }
     
+    public int nextIndex() {
+        return statements.size();
+    }
+    
     @Override
     public ListIterator<Statement> iterator() {
         return this.statements.listIterator();
+    }
+    
+    @Override
+    public String toString() {
+        return this.statements.toString();
     }
     
     private List<Statement> statements;

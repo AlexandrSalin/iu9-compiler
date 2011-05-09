@@ -15,7 +15,7 @@ abstract class VariableOperand extends Operand {
 
     @Override
     public BaseType type() { 
-        return this.table.get(number).type(); 
+        return this.table.get(number).type; 
     }
 
     protected final VariablesTable table;
@@ -30,17 +30,22 @@ class NamedVariableOperand extends VariableOperand {
         
         super(table, table.add(new NamedVariable(name, type)));
     }
-    private NamedVariableOperand(VariablesTable table, long number) {
+    public NamedVariableOperand(VariablesTable table, long number) {
         super(table, number);
     }
 
     public String name() { 
-        return ((NamedVariable)this.table.get(number)).name();
+        return ((NamedVariable)this.table.get(number)).name;
     }
 
     @Override
     public Object clone() {
         return new NamedVariableOperand(this.table, this.number);
+    }
+    
+    @Override
+    public String toString() {
+        return name();
     }
 }
 
@@ -55,6 +60,11 @@ class TmpVariableOperand extends VariableOperand {
     @Override
     public Object clone() {
         return new TmpVariableOperand(this.table, this.number);
+    }
+    
+    @Override
+    public String toString() {
+        return "tmp" + number;
     }
 }
 
@@ -77,6 +87,11 @@ class ConstantOperand extends Operand {
     @Override
     public Object clone() {
         return new ConstantOperand(this.type, this.value);
+    }
+    
+    @Override
+    public String toString() {
+        return value.toString();
     }
     
     private Object value;

@@ -39,7 +39,7 @@ public class BaseNode {
 
             BaseNode.NodeType nodeType = 
                 BaseNode.NodeType.values()[
-                    context.deserialize(object.get("nodeType"), Integer.class)
+                    (Integer)context.deserialize(object.get("nodeType"), Integer.class)
                 ];
             
             JsonObject obj = null;

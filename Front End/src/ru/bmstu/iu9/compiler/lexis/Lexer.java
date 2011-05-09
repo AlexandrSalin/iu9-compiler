@@ -13,20 +13,34 @@ import java.io.PrintWriter;
 import ru.bmstu.iu9.compiler.lexis.Program.CodePointIterator;
 
 /**
- *
- * @author maggot
+ * Класс, осуществляющий разбиение текста программы на последовательность
+ * {@link ru.bmstu.iu9.compiler.lexis.token.Token Token}ов и их сериализацию в формат json.
+ * @author anton.bobukh
  */
 public class Lexer {
+    /**
+     * Создает объект Lexer, который будет работать с указанным текстом программы.
+     * @param program анализируемый текст программы
+     */
     public Lexer(String program) {
         this.scanner = new Scanner(program);
     }
     
+    /**
+     * Осуществляет заполнение списка {@link ru.bmstu.iu9.compiler.lexis.token.Token Token}ов 
+     * с использованием {@link ru.bmstu.iu9.compiler.lexis.Scanner Scanner}а.
+     */
     public void run() {
         for (Token token : scanner) {
             tokens.add(token);
         }
     }
     
+    /**
+     * Сериализует полученный по исходному тексту программы список {@link ru.bmstu.iu9.compiler.lexis.token.Token Token}ов 
+     * в файл с указанным именем в формате json.
+     * @param filename имя файла, в который будет происходить сериализация
+     */
     public void toJson(String filename) { 
         PrintWriter writer = null;
         
@@ -67,17 +81,80 @@ public class Lexer {
         }
     }
     
+    /**
+     * {@link ru.bmstu.iu9.compiler.lexis.Scanner Scanner}, осущевствляющий итерирование по {@link ru.bmstu.iu9.compiler.lexis.token.Token Token}ам
+     */
     private Scanner scanner;
+    /**
+     * Список уже полученных {@link ru.bmstu.iu9.compiler.lexis.token.Token Token}ов
+     */
     private List<Token> tokens = new LinkedList<Token>();
 }
 
 
-class Scanner implements Iterable<Token> { 
+/**
+ * Это основной класс, используемый {@link ru.bmstu.iu9.compiler.lexis.Lexer Lerex}.
+ * Scanner осуществляет итерацию по лексемам текста программы, при этом 
+ * возвращая {@link ru.bmstu.iu9.compiler.lexis.token.Token Token}, 
+ * соответствующий текущей лексеме.</br>
+ * Пример использования Scanner:
+ * <pre>
+ * Scanner scanner = new Scanner(
+ *     "func foo(i, j int) int {" +
+ *     "   var a, b int;" + 
+ *     "   a = i + j;" +
+ *     "   b = i - j;" +
+ *     "   return a ^ b;"
+ *     "}"
+ * );
+ * List<Token> tokens = new LinkedList<Token>();
+ * 
+ * for(Token token : scanner) {
+ *     tokens.add(token);
+ * }
+ * </pre>
+ * @see ru.bmstu.iu9.compiler.lexis.Program
+ * @see ru.bmstu.iu9.compiler.lexis.token.Token
+ * @see ru.bmstu.iu9.compiler.lexis.Lexer
+ * @author anton.bobukh
+ */
+class Scanner implements Iterable<Token> {
+    /**
+     * Создает объект Scanner, который будет итерировать по лексемам указанного 
+     * текста программы.
+     * @param program текст программы, по лексемам которого будет производиться
+     * итерирование
+     */
     public Scanner(String program) {
         this.program = new Program(program);
         this.iterator = this.program.iterator();
     }
     
+    /**
+     * Создает анонимный класс-итератор.
+     * 
+     * Создает анонимный класс-итератор, методы которого определены следующим
+     * образом:
+     * <dl>
+     * <dt>hasNext</dt>
+     * <dd>
+     * Пропускает все пробельные символы и переносы строки, а также комментарии.
+     * Возвращает true, если конец текста программы не достигнут, false в 
+     * противном случае.
+     * </dd>
+     * <dt>next</dt>
+     * <dd>
+     * Возвращает следующий {@link ru.bmstu.iu9.compiler.lexis.token.Token Token}. 
+     * При этом проверка достижения конца программы осуществляется вызовом 
+     * метода hasNext.
+     * </dd>
+     * <dt>remove</dt>
+     * <dd>
+     * @throws UnsupportedOperationException
+     * </dd>
+     * </dl>
+     * @return 
+     */
     @Override
     public Iterator<Token> iterator() {
         return new Iterator<Token>() {
@@ -96,6 +173,10 @@ class Scanner implements Iterable<Token> {
             };
     }
     
+    /**
+     * Пропускает все символы, пока не дойдет до пробельного символа или символа
+     * ';'.
+     */
     private void errorRecovery() {
         while (iterator.hasNext() && 
                 (!Character.isWhitespace(iterator.current().value()) ||
@@ -104,6 +185,17 @@ class Scanner implements Iterable<Token> {
         }
     }
     
+    /**
+     * Выделяет следующую лексему в тексте программы.
+     * 
+     * В случае, когда ни одна возможная лексема на начинается с символа, 
+     * стоящего на текущей рассмариваемой позиции в тексте программы, ошибка 
+     * фиксируется в логах, и возвращается null. Так же null возвращается, когда
+     * достигнут конец текста программы.
+     * 
+     * @return {@link ru.bmstu.iu9.compiler.lexis.token.Token Token}, 
+     * соответствующий следующей лексеме в тексте программы
+     */
     private Token nextToken() {
         if (skipWhitespacesAndComments()) {
             return null;
@@ -522,6 +614,12 @@ class Scanner implements Iterable<Token> {
         }
     }
     
+    /**
+     * Пропускает все пробельные символы и переносы строк, а также комментарии в
+     * тексте программы.
+     * @return true, если в тексте программы еще остались символы, false в 
+     * противном случае
+     */
     private boolean skipWhitespacesAndComments() {
         while (iterator.hasNext() && 
                 Character.isWhitespace(iterator.current().value())) {

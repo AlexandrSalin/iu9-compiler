@@ -11,7 +11,7 @@ import ru.bmstu.iu9.compiler.syntax.tree.*;
  *
  * @author maggot
  */
-class SemanticAnalyser {
+public class SemanticAnalyser {
     public SemanticAnalyser(BlockNode<BaseNode> parseTree) {
         this.parseTree = parseTree;
     }
@@ -340,31 +340,73 @@ class SemanticAnalyser {
                 processNode(bNode.leftChild());
                 processNode(bNode.rightChild());
                 
-                TypeChecker.check(
-                        bNode.leftChild().realType(), 
-                        bNode.rightChild().realType(),
-                        bNode.dInfo);
-                
-                if (bNode.operation().is(
-                        BinaryOperationNode.Operation.Bitwise)) {
-                    
-                    TypeChecker.check(
-                        bNode.realType(), 
-                        PrimitiveType.Type.INT, 
-                        bNode.dInfo);
+                switch(bNode.operation()) {
+                    case ARRAY_ELEMENT:
+                    {
+                        TypeChecker.check(
+                                bNode.leftChild().realType(), 
+                                BaseType.Type.ARRAY, 
+                                bNode.dInfo);
+                        
+                        ArrayType array = 
+                                (ArrayType)bNode.leftChild().realType();
+                        bNode.setRealType(array.element);
+                        
+                        break;
+                    }
+                    case MEMBER_SELECT:
+                    {
+                        TypeChecker.check(
+                                bNode.leftChild().realType(), 
+                                BaseType.Type.STRUCT, 
+                                bNode.dInfo);
+                        
+                        VariableLeaf fieldName = (VariableLeaf)bNode.rightChild();
+                        
+                        String name = 
+                            ((StructType)bNode.leftChild().realType()).name;
+                        
+                        StructSymbol struct = (StructSymbol) context.get(name);
+                        assert struct != null;
+                        
+                        Symbol field = struct.scope.get(fieldName.name);
+                        assert field != null;
+                        
+                        bNode.setRealType(field.type);
+                        
+                        break;
+                    }
+                    default:
+                    {
+                        TypeChecker.check(
+                                bNode.leftChild().realType(), 
+                                bNode.rightChild().realType(),
+                                bNode.dInfo);
+
+                        if (bNode.operation().is(
+                                BinaryOperationNode.Operation.Bitwise)) {
+
+                            TypeChecker.check(
+                                bNode.realType(), 
+                                PrimitiveType.Type.INT, 
+                                bNode.dInfo);
+                        }
+
+                        if (bNode.operation().is(
+                                BinaryOperationNode.Operation.Comparison)) {
+
+                            bNode.setRealType(
+                                new PrimitiveType(
+                                    PrimitiveType.Type.BOOL, 
+                                    true)
+                                );
+                        } else {
+                            bNode.setRealType(bNode.leftChild().realType());
+                        }
+                        break;
+                    }
                 }
                 
-                if (bNode.operation().is(
-                        BinaryOperationNode.Operation.Comparison)) {
-                    
-                    bNode.setRealType(
-                        new PrimitiveType(
-                            PrimitiveType.Type.BOOL, 
-                            true)
-                        );
-                } else {
-                    bNode.setRealType(bNode.leftChild().realType());
-                }
                 break;
                 
             }
@@ -720,8 +762,11 @@ class SemanticAnalyser {
             case BARRIER:
                 break;
         }
-    }    
+    }
     
+    public BlockNode<BaseNode> tree() {
+        return this.parseTree;
+    }    
     
     private BlockNode<BaseNode> parseTree;
     private Context context = new Context();

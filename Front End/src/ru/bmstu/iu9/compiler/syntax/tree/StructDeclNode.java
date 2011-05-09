@@ -32,6 +32,11 @@ final public class StructDeclNode extends DeclNode implements Statement {
         this.declarations = declarations;
     }
     
+    @Override
+    public BaseNode getNode() {
+        return this;
+    }
+    
       
     public final BlockNode<VariableDeclNode> declarations;
 }

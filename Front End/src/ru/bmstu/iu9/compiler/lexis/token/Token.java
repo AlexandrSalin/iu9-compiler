@@ -41,8 +41,9 @@ public abstract class Token {
             BITWISE_SHIFT_RIGHT_ASSIGN, BITWISE_AND_ASSIGN, BITWISE_OR_ASSIGN, 
             BITWISE_XOR_ASSIGN
         }),
-        Modifier(new Type[] { 
-            CONST, VAR 
+        Type(new Type[] { 
+            PrimitiveType, LEFT_BRACKET, ASTERISK, LEFT_SQUARE_BRACKET,
+            STRUCT, FUNC 
         }),
         FirstOfExpression(new Type[] {
             LEFT_BRACKET, PLUS, MINUS, AMPERSAND, ASTERISK, INC, DEC, Constant, 

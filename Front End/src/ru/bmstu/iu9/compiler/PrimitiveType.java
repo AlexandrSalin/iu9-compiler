@@ -47,7 +47,7 @@ public class PrimitiveType extends BaseType {
     }
     @Override
     public String toString() {
-        return ((constancy) ? "CONST " : "") + this.type().toString();
+        return ((constancy) ? "CONST " : "") + this.primitive().toString();
     }
     
     private final int primitive;

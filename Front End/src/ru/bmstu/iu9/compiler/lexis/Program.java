@@ -4,8 +4,13 @@ import ru.bmstu.iu9.compiler.Position;
 import java.util.Iterator;
 
 /**
- *
- * @author maggot
+ * Класс, представляющий кодовую точку в тексте программы.
+ * Кодовая точка состоит из:
+ * <ul>
+ * <li>Символа</li>
+ * <li>Позиции символа в тексте программы</li>
+ * </ul>
+ * @author anton.bobukh
  */
 class CodePoint implements Cloneable {
     /**
@@ -22,14 +27,22 @@ class CodePoint implements Cloneable {
      * Метод, предоставляющий доступ к значению кодовой точки
      * @return Значение кодовой точки
      */
-    public int value() { return value; }
+    public int value() { 
+        return value;
+    }
     /**
      * Метод, предоставляющий доступ к координатам кодовой точки
      * @return Координаты кодовой точки
      */
-    public Position position() { return position; }
-    public void setValue(int newValue) { value = newValue; }
-    public void setPosition(Position newPosition) { position = newPosition; }
+    public Position position() {
+        return position; 
+    }
+    public void setValue(int newValue) {
+        value = newValue;
+    }
+    public void setPosition(Position newPosition) { 
+        position = newPosition; 
+    }
     
     @Override
     public Object clone() {

@@ -34,6 +34,11 @@ final public class SwitchNode
         this.defaultNode = defaultNode;
     }
     
+    @Override
+    public BaseNode getNode() {
+        return this;
+    }
+    
    
     public final ExpressionNode expression;
     public final BlockNode<CaseNode> cases;

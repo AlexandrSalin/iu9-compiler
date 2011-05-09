@@ -30,6 +30,11 @@ final public class FunctionTypeNode extends BaseTypeNode {
         }
         
         @Override
+        public BaseNode getNode() {
+            return this;
+        }
+        
+        @Override
         public String toString() {
             return this.type + " " + this.name;
         }

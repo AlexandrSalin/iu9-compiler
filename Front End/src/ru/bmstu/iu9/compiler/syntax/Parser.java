@@ -98,7 +98,7 @@ public class Parser {
         nextToken();
         while (current.type().is(
                 new Token.Type[] { 
-                    Token.Type.Modifier, Token.Type.FUNC, Token.Type.STRUCT
+                    Token.Type.VAR, Token.Type.FUNC, Token.Type.STRUCT
                 }
               )) {
             
@@ -228,10 +228,12 @@ public class Parser {
     private List<FunctionTypeNode.ArgumentNode> ParameterDecl() {
         if (current.type().is(Token.Type.IDENTIFIER)) {
             return IdentifierList();
-        } else {
+        } else if (current.type().is(Token.Type.Type)) {
             Position pos = current.coordinates().starting();
             return Arrays.asList(
                     new FunctionTypeNode.ArgumentNode("", Type(), pos));
+        } else {
+            return new LinkedList<FunctionTypeNode.ArgumentNode>();
         }
     }
     private List<FunctionTypeNode.ArgumentNode> IdentifierList() {
@@ -347,9 +349,9 @@ public class Parser {
             return "";
         }
     }
-    private BlockNode Code() {
+    private BlockNode<Statement> Code() {
         LeftBrace();
-        BlockNode block = Block();
+        BlockNode<Statement> block = Block();
         RightBrace();
         
         return block;
@@ -363,14 +365,14 @@ public class Parser {
             new Token.Type[] {
                 Token.Type.FirstOfControlStructure, 
                 Token.Type.FirstOfExpression,
-                Token.Type.Modifier
+                Token.Type.VAR
             })
         ) {
             
             if (current.type().is(
                 new Token.Type[] {
                     Token.Type.FirstOfControlStructure, 
-                    Token.Type.Modifier
+                    Token.Type.VAR
                 })
             ) {
                 switch (current.type()) {
@@ -435,7 +437,7 @@ public class Parser {
         nextToken();
         LeftBracket();
 
-        if (current.type().is(Token.Type.Modifier)) {
+        if (current.type().is(Token.Type.VAR)) {
             init = VariableDecl();
         } else if (current.type().is(Token.Type.FirstOfExpression)) {
             init = new BlockNode<ExpressionNode>();
@@ -524,7 +526,8 @@ public class Parser {
             if (current.type().is(Token.Type.IF)) {
                 elseNode = new ElseNode(new BlockNode<Statement>(If()), elsepos);
             } else {
-                elseNode = new ElseNode(Code(), elsepos);
+                BlockNode<Statement> code = Code();
+                elseNode = new ElseNode(code, elsepos);
             }
         }
         return new IfNode(expr, block, elseNode, pos);
@@ -923,7 +926,7 @@ public class Parser {
     private ExpressionNode CExpression() {
         if (current.type() == Token.Type.LEFT_BRACKET) {
             nextToken();
-            if (current.type().is(Token.Type.Modifier)) {
+            if (current.type().is(Token.Type.VAR)) {
                 BaseTypeNode type = Type();
                 RightBracket();
                 Position pos = current.coordinates().starting();
