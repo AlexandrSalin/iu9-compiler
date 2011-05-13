@@ -32,7 +32,6 @@ final public class FunctionDeclNode extends DeclNode {
         this.block = block;
     }
     
-    @Override
     public BaseNode getNode() {
         return this;
     }

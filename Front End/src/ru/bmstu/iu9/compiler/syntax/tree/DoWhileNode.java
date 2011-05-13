@@ -23,7 +23,6 @@ public class DoWhileNode extends IterationStructureNode {
         super(BaseNode.NodeType.DO_WHILE, expression, block, dInfo);
     }
     
-    @Override
     public BaseNode getNode() {
         return this;
     }

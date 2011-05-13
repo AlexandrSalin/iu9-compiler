@@ -1,8 +1,8 @@
 package ru.bmstu.iu9.compiler.lexis.token;
 
+import com.google.gson.*;
 import java.util.BitSet;
-import ru.bmstu.iu9.compiler.Fragment;
-import ru.bmstu.iu9.compiler.Position;
+import ru.bmstu.iu9.compiler.*;
 
 /**
  *
@@ -90,9 +90,6 @@ public abstract class Token {
         }
         public boolean is(Type type) {
             return this.value.intersects(type.value);
-        }     
-
-        public static void main(String[] args) {
         }
 
         private BitSet value = new BitSet(80);
@@ -107,10 +104,75 @@ public abstract class Token {
         this.type = type.ordinal();
     }
     
-    public Type type() { return Type.values()[this.type]; }
-    public Fragment coordinates() { return this.coordinates; }
-    public Object value() { return null; }
+    public Type type() { 
+        return Type.values()[this.type];
+    }
+    public Fragment coordinates() { 
+        return this.coordinates; 
+    }
     
     private final int type;
     private final Fragment coordinates;
+    
+    public static class TokenAdapter implements JsonDeserializer<Token> {
+
+        @Override
+        public Token deserialize(
+                JsonElement src, 
+                java.lang.reflect.Type type, 
+                JsonDeserializationContext context) throws JsonParseException {
+            
+            JsonObject object = src.getAsJsonObject();
+            
+            Type t = Type.values()[
+                (Integer)context.deserialize(object.get("type"), Integer.class)];
+            
+            Fragment coordinates = 
+                (Fragment)context.deserialize(
+                    object.get("coordinates"), 
+                    Fragment.class
+                );
+            
+            switch(t) {
+                case CONST_INT:
+                {
+                    int value = 
+                        (Integer)context.deserialize(
+                            object.get("value"), 
+                            Integer.class
+                        );
+                    return new IntegerConstantToken(coordinates, value);
+                }
+                case CONST_DOUBLE:
+                {
+                    double value = 
+                        (Double)context.deserialize(
+                            object.get("value"), 
+                            Double.class
+                        );
+                    return new DoubleConstantToken(coordinates, value);
+                }
+                case CONST_CHAR:
+                {
+                    int value = 
+                        (Integer)context.deserialize(
+                            object.get("value"), 
+                            Integer.class
+                        );
+                    return new CharConstantToken(coordinates, value);
+                }
+                case IDENTIFIER:
+                {
+                    String name = 
+                        (String)context.deserialize(
+                            object.get("name"), 
+                            String.class
+                        );
+                    return new IdentifierToken(coordinates, name);
+                }
+                default:
+                    return new SpecialToken(coordinates, t);
+            }
+        }
+    }
 }

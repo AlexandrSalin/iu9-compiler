@@ -28,7 +28,7 @@ public class BaseNode {
     
 
     public static class BaseNodeAdapter implements JsonDeserializer<BaseNode> {
-        @Override
+
         public BaseNode deserialize(
                 JsonElement json, 
                 Type typeOfNode,
@@ -56,7 +56,7 @@ public class BaseNode {
                     assert primitive == null;
                     BaseTypeNode.Type TYPE = 
                         BaseTypeNode.Type.values()[
-                            context.deserialize(primitive, Integer.class)
+                            (Integer)context.deserialize(primitive, Integer.class)
                         ];
                     
                     primitive = object.getAsJsonPrimitive("constancy");
@@ -134,7 +134,7 @@ public class BaseNode {
                             assert primitive == null;
                             PrimitiveTypeNode.Type t = 
                                 PrimitiveTypeNode.Type.values()[
-                                    context.deserialize(primitive, Integer.class)
+                                    (Integer)context.deserialize(primitive, Integer.class)
                                 ];
                             switch(t) {
                                 case POINTER:
@@ -196,7 +196,7 @@ public class BaseNode {
                     assert primitive == null;
                     BinaryOperationNode.Operation operation = 
                             BinaryOperationNode.Operation.values()[
-                                context.deserialize(primitive, Integer.class)
+                                (Integer)context.deserialize(primitive, Integer.class)
                             ];
                     
                     result = 
@@ -217,7 +217,7 @@ public class BaseNode {
                     primitive = object.getAsJsonPrimitive("operation");
                     assert primitive == null;
                     UnaryOperationNode.Operation uoperation = 
-                            UnaryOperationNode.Operation.values()[context.deserialize(primitive, Integer.class)];
+                            UnaryOperationNode.Operation.values()[(Integer)context.deserialize(primitive, Integer.class)];
                     
                     switch(uoperation) {
                         case CAST:
@@ -476,7 +476,7 @@ public class BaseNode {
                     assert primitive == null;
                     ConstantLeaf.ConstantType type = 
                         ConstantLeaf.ConstantType.values()[
-                            context.deserialize(primitive, Integer.class)
+                            (Integer)context.deserialize(primitive, Integer.class)
                         ];
                     
                     primitive = object.getAsJsonPrimitive("value");

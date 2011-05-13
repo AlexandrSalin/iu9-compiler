@@ -3,27 +3,58 @@ package ru.bmstu.iu9.compiler.lexis;
 import ru.bmstu.iu9.compiler.lexis.token.*;
 import ru.bmstu.iu9.compiler.Fragment;
 import com.google.gson.*;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.util.LinkedList;
-import java.util.List;
+import java.io.*;
+import java.util.*;
 import java.util.regex.*;
-import java.util.Iterator;
-import java.io.PrintWriter;
 import ru.bmstu.iu9.compiler.lexis.Program.CodePointIterator;
 
 /**
- * Класс, осуществляющий разбиение текста программы на последовательность
- * {@link ru.bmstu.iu9.compiler.lexis.token.Token Token}ов и их сериализацию в формат json.
+ * Класс Lexer осуществляет лексический анализ текста программы и генерирует
+ * последовательность {@link ru.bmstu.iu9.compiler.lexis.token.Token Token}ов,
+ * соответствующих встетившимся лексемам.
+ * Сгенерированные токены могут быть сериализованы в файл в формате json.
+ * <br/>
+ * Пример использования класса Lexer:
+ * <pre>
+ * Lexer lexer = new Lexer("program.src");
+ * lexer.run();
+ * lexer.toJson("tokens.json");
+ * </pre>
+ * 
  * @author anton.bobukh
+ * @see ru.bmstu.iu9.compiler.lexis.Scanner
  */
 public class Lexer {
     /**
-     * Создает объект Lexer, который будет работать с указанным текстом программы.
-     * @param program анализируемый текст программы
+     * Создает объект Lexer.
+     * 
+     * Создает объект Lexer, который будет осуществлять лексический анализ 
+     * текста программы, размещенного в файле с указанным именем.
+     * 
+     * @param filename имя файла с текстом программы
      */
-    public Lexer(String program) {
-        this.scanner = new Scanner(program);
+    public Lexer(String filename) {
+        BufferedReader reader = null;
+        
+        try {
+            reader = new BufferedReader(new FileReader(filename));
+            String line;
+            StringBuilder str = new StringBuilder();
+            
+            while((line = reader.readLine()) != null) {
+                str.append(line);
+                str.append('\n');
+            }
+            this.scanner = new Scanner(str.toString());
+        } catch(java.io.IOException ex) {
+//            ex.printStackTrace();
+        } finally {
+            try {
+                reader.close();
+            } catch(java.io.IOException ex) {
+//                ex.printStackTrace();
+            }
+        }
     }
     
     /**
@@ -37,9 +68,14 @@ public class Lexer {
     }
     
     /**
-     * Сериализует полученный по исходному тексту программы список {@link ru.bmstu.iu9.compiler.lexis.token.Token Token}ов 
+     * Сериализует массив {@link ru.bmstu.iu9.compiler.lexis.token.Token Token}ов
+     * в файл в формате json.
+     * 
+     * Сериализует сгенерированный в процессе лексического анализа текста 
+     * программы массив {@link ru.bmstu.iu9.compiler.lexis.token.Token Token}ов 
      * в файл с указанным именем в формате json.
-     * @param filename имя файла, в который будет происходить сериализация
+     * 
+     * @param filename имя файла, в который будет производиться сериализация
      */
     public void toJson(String filename) { 
         PrintWriter writer = null;
@@ -57,32 +93,16 @@ public class Lexer {
     }
     
     public static void main(String[] args) {
-        BufferedReader reader = null; // JW9tj3vg5Uv4
-        
-        try {
-            reader = new BufferedReader(
-                        new FileReader(
-                    "C:\\Users\\maggot\\Documents\\NetBeansProjects\\ru.bmstu.iu9.compiler\\Front End\\src\\input.src"));
-            char[] cbuf = new char[10000];
-            int count = reader.read(cbuf);
-
-            Lexer lex = new Lexer(String.copyValueOf(cbuf, 0, count));
-            lex.run();
-            lex.toJson(
-                    "C:\\Users\\maggot\\Documents\\NetBeansProjects\\ru.bmstu.iu9.compiler\\Front End\\src\\output.json");
-        } catch(java.io.IOException ex) {
-//            ex.printStackTrace();
-        } finally {
-            try {
-                reader.close();
-            } catch(java.io.IOException ex) {
-//                ex.printStackTrace();
-            }
-        }
+        Lexer lex = 
+            new Lexer("C:\\Users\\maggot\\Documents\\NetBeansProjects\\ru.bmstu.iu9.compiler\\Front End\\src\\input.src");
+        lex.run();
+        lex.toJson(
+                "C:\\Users\\maggot\\Documents\\NetBeansProjects\\ru.bmstu.iu9.compiler\\Front End\\src\\output.json");
     }
     
     /**
-     * {@link ru.bmstu.iu9.compiler.lexis.Scanner Scanner}, осущевствляющий итерирование по {@link ru.bmstu.iu9.compiler.lexis.token.Token Token}ам
+     * {@link ru.bmstu.iu9.compiler.lexis.Scanner Scanner}, осущевствляющий 
+     * итерирование по {@link ru.bmstu.iu9.compiler.lexis.token.Token Token}ам
      */
     private Scanner scanner;
     /**
@@ -97,7 +117,7 @@ public class Lexer {
  * Scanner осуществляет итерацию по лексемам текста программы, при этом 
  * возвращая {@link ru.bmstu.iu9.compiler.lexis.token.Token Token}, 
  * соответствующий текущей лексеме.</br>
- * Пример использования Scanner:
+ * Пример использования класса Scanner:
  * <pre>
  * Scanner scanner = new Scanner(
  *     "func foo(i, j int) int {" +
@@ -113,6 +133,7 @@ public class Lexer {
  *     tokens.add(token);
  * }
  * </pre>
+ * 
  * @see ru.bmstu.iu9.compiler.lexis.Program
  * @see ru.bmstu.iu9.compiler.lexis.token.Token
  * @see ru.bmstu.iu9.compiler.lexis.Lexer
@@ -120,8 +141,11 @@ public class Lexer {
  */
 class Scanner implements Iterable<Token> {
     /**
+     * Создает объект Scanner.
+     * 
      * Создает объект Scanner, который будет итерировать по лексемам указанного 
      * текста программы.
+     * 
      * @param program текст программы, по лексемам которого будет производиться
      * итерирование
      */
@@ -131,10 +155,10 @@ class Scanner implements Iterable<Token> {
     }
     
     /**
-     * Создает анонимный класс-итератор.
+     * Создает анонимный класс-итератор по {@link ru.bmstu.iu9.compiler.lexis.token.Token Token}ам.
      * 
-     * Создает анонимный класс-итератор, методы которого определены следующим
-     * образом:
+     * Создает анонимный класс-итератор по {@link ru.bmstu.iu9.compiler.lexis.token.Token Token}ам, 
+     * методы которого определены следующим образом:
      * <dl>
      * <dt>hasNext</dt>
      * <dd>
@@ -153,7 +177,8 @@ class Scanner implements Iterable<Token> {
      * @throws UnsupportedOperationException
      * </dd>
      * </dl>
-     * @return 
+     * 
+     * @return Итератор по {@link ru.bmstu.iu9.compiler.lexis.token.Token Token}ам
      */
     @Override
     public Iterator<Token> iterator() {
@@ -194,7 +219,7 @@ class Scanner implements Iterable<Token> {
      * достигнут конец текста программы.
      * 
      * @return {@link ru.bmstu.iu9.compiler.lexis.token.Token Token}, 
-     * соответствующий следующей лексеме в тексте программы
+     *         соответствующий следующей лексеме в тексте программы
      */
     private Token nextToken() {
         if (skipWhitespacesAndComments()) {
@@ -617,8 +642,9 @@ class Scanner implements Iterable<Token> {
     /**
      * Пропускает все пробельные символы и переносы строк, а также комментарии в
      * тексте программы.
+     * 
      * @return true, если в тексте программы еще остались символы, false в 
-     * противном случае
+     *         противном случае
      */
     private boolean skipWhitespacesAndComments() {
         while (iterator.hasNext() && 

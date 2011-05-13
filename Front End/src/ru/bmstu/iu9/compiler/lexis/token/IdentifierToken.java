@@ -18,8 +18,9 @@ public final class IdentifierToken extends Token {
         this.value = name;
     }
     
-    @Override
-    public String value() { return this.value; }
+    public String value() { 
+        return this.value;
+    }
     
     @SerializedName("name")
     private String value;

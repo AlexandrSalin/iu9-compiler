@@ -15,7 +15,6 @@ final public class ContinueNode extends JmpNode implements Statement {
         super(BaseNode.NodeType.CONTINUE, dInfo);
     }
     
-    @Override
     public BaseNode getNode() {
         return this;
     }

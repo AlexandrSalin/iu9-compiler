@@ -14,6 +14,10 @@ public final class StructType extends BaseType {
         this.name = name;
     }
     
+    public void setSize(long size) {
+        this.size = size;
+    }
+    
     @Override
     public boolean equals(Object obj) {
         return super.equals(obj) &&
@@ -21,7 +25,7 @@ public final class StructType extends BaseType {
     }
     @Override
     public String toString() {        
-        return super.toString() + " " + name;
+        return "STRUCT " + name;
     }
     
     public final String name;

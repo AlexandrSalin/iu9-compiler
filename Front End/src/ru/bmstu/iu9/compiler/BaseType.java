@@ -39,6 +39,14 @@ abstract public class BaseType {
         this.size = size;
     }
     
+    public boolean is(Type type) {
+        return this.type().is(type);
+    }
+    
+    public boolean is(PrimitiveType.Type type) {
+        return this.type().is(Type.PRIMITIVE_TYPE);
+    }
+    
     public Type type() {
         return Type.values()[this.type];
     }
@@ -54,9 +62,13 @@ abstract public class BaseType {
                 Type.values()[this.type].toString();
     }*/
     
+    public long size() {
+        return this.size;
+    }
+    
     private final int type;
     public boolean constancy;
-    public final long size;
+    protected long size;
     
     
     public static class TypeAdapter implements JsonDeserializer<BaseType> {

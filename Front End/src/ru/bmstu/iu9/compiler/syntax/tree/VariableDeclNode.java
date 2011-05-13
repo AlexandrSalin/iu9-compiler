@@ -39,7 +39,6 @@ public class VariableDeclNode extends DeclNode implements Statement {
                 (value == null ? "" : value.toString());
     }
     
-    @Override
     public BaseNode getNode() {
         return this;
     }

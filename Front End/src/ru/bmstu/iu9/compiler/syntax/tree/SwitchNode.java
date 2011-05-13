@@ -34,7 +34,6 @@ final public class SwitchNode
         this.defaultNode = defaultNode;
     }
     
-    @Override
     public BaseNode getNode() {
         return this;
     }

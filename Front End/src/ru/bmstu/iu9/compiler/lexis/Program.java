@@ -5,16 +5,20 @@ import java.util.Iterator;
 
 /**
  * Класс, представляющий кодовую точку в тексте программы.
+ * 
+ * 
  * Кодовая точка состоит из:
  * <ul>
  * <li>Символа</li>
  * <li>Позиции символа в тексте программы</li>
  * </ul>
+ * 
  * @author anton.bobukh
  */
 class CodePoint implements Cloneable {
     /**
-     * Кодовая точка, используемая при итерировании по тексту программы
+     * Создает объект CodePoint.
+     * 
      * @param CPValue кодовая точка
      * @param CPPosition позиция кодовой точки в программе
      */
@@ -24,14 +28,16 @@ class CodePoint implements Cloneable {
     }
     
     /**
-     * Метод, предоставляющий доступ к значению кодовой точки
+     * Метод, предоставляющий доступ к значению кодовой точки.
+     * 
      * @return Значение кодовой точки
      */
     public int value() { 
         return value;
     }
     /**
-     * Метод, предоставляющий доступ к координатам кодовой точки
+     * Метод, предоставляющий доступ к координатам кодовой точки.
+     * 
      * @return Координаты кодовой точки
      */
     public Position position() {
@@ -58,19 +64,50 @@ class CodePoint implements Cloneable {
     private Position position;
 }
 
+/**
+ * Класс Program предоставляет возможность итерирования по тексту программы.
+ * При этом каждый символ представляется {@link ru.bmstu.iu9.compiler.lexis.CodePoint CodePoint}ом.
+ * После перехода на новую строку счетчик строк автоматически инкрементируется,
+ * а счетчик позиции в строке сбрасывает в 1.
+ * <br/>
+ * <pre>
+ * Program program = new Program(
+ *     "func foo(i, j int) int {" +
+ *     "   var a, b int;" + 
+ *     "   a = i + j;" +
+ *     "   b = i - j;" +
+ *     "   return a ^ b;"
+ *     "}"
+ * );
+ * 
+ * List<CodePoint> codePoints = new LinkedList<CodePoint>();
+ * 
+ * for(CodePoint codePoint : program) {
+ *     codePoints.add(codePoint);
+ * }
+ * </pre>
+ * 
+ * @author anton.bobukh
+ * @see ru.bmstu.iu9.compiler.lexis.CodePoint
+ */
 class Program implements Iterable<CodePoint> {
     /**
-     * Текст программы с возможностью итерирования по кодовым точкам
+     * Создает объект Program. При этом в конец программы будет приписан
+     * терминальный символ, который будет использоваться как флаг конца текста
+     * программы при итерировании.
+     * 
      * @param program Текст программы
-     * @param terminator Терминальный символ, расположенный в конце текста 
-     * программы
+     * @param terminator Терминальный символ
      */
     public Program(String program, int terminator) {
         this.terminator = terminator;
         this.program = program + Character.toChars(this.terminator).toString();
     }
     /**
-     * Текст программы с возможностью итерирования по кодовым точкам
+     * Создает объект Program. При этом в конец программы будет приписан
+     * терминальный символ по цмолчанию '$', который будет использоваться как 
+     * флаг конца текста программы при итерировании.
+     * 
      * @param program Текст программы
      */
     public Program(String program) {
@@ -78,16 +115,43 @@ class Program implements Iterable<CodePoint> {
         this.program = program + '$';
     }
     
+    /**
+     * Класс CodePointIterator осуществляет итерирование по тексту программы.
+     */
     public class CodePointIterator implements Iterator<CodePoint> {
+        /**
+         * Создает объект CodePointIterator, при этом текущим становится первый 
+         * символ текста программы в позиции <1, 1, 0>.
+         */
         public CodePointIterator() {
             current = new CodePoint(program.codePointAt(0), 
                     new Position(1, 1, 0));
         }
-        @Override
+
+        /**
+         * Проверяет, есть ли еще непросмотренные символы в тексте программы. 
+         * 
+         * Проверяет, есть ли еще непросмотренные символы в тексте программы.
+         * Проверка осуществляется путем сравнения символа в текущей позиции 
+         * с терминальным символом.
+         * 
+         * @return true, если еще не все символы были просмотрены, false 
+         *         в противном случае
+         */
         public boolean hasNext() {
             return program.codePointAt(index) != terminator;
         }
-        @Override
+
+        /**
+         * Переходит к следующему символу в тексте программы.
+         * 
+         * Переходит к следующему символу в тексте программы. При этом в случае 
+         * перехода на новую строку счетчик строк инкрементируется, а счетчик
+         * позиции в строке сбрасывает в 1.
+         * 
+         * @return {@link ru.bmstu.iu9.compiler.lexis.CodePoint CodePoint},
+         *         соответствующий символу в новой позиции
+         */
         public CodePoint next() {
             if(program.codePointAt(index) == '\n')
             {
@@ -102,6 +166,16 @@ class Program implements Iterable<CodePoint> {
 
             return current;
         }
+        
+        /**
+         * Просматривает следующий сомвол в тексте программы. 
+         * 
+         * Просматривает следующий сомвол в тексте программы. При этом перехода
+         * к нему не осуществляется.
+         * 
+         * @return {@link ru.bmstu.iu9.compiler.lexis.CodePoint CodePoint},
+         *         соответствующий символу в следующей позиции
+         */
         public CodePoint watchNext() {
             int l = line, p = position;
             if(program.codePointAt(index) == '\n')
@@ -115,21 +189,35 @@ class Program implements Iterable<CodePoint> {
             
             return new CodePoint(program.codePointAt(i), new Position(l, p, i));
         }
-        @Override
+
+        /**
+         * Операция не поддерживается.
+         */
         public void remove() {
             throw new UnsupportedOperationException();
         }
+        
         /**
-         * Возвращает кодовую точку в текущей позиции
-         * @return Текущая кодовая точка
+         * Возвращает {@link ru.bmstu.iu9.compiler.lexis.CodePoint CodePoint}
+         * в текущей позиции.
+         * 
+         * @return {@link ru.bmstu.iu9.compiler.lexis.CodePoint CodePoint},
+         *         соответствующий текущему символу
          */
         public CodePoint current() {
             return current;
         }
+        
         /**
-         * Пропускает count кодовых точек в тексте программы
-         * @param count Колечество кодовых точек, которое необходимо пропустить
-         * @return Кодовая точка в полученной позиции
+         * Пропускает count символов в тексте программы. 
+         * 
+         * Пропускает count символов в тексте программы. При каждом 
+         * переходе на новую строку счетчик строк инкрементируется, а счетчик
+         * позиции в строке сбрасывает в 1.
+         * 
+         * @param count Колечество символов, которое необходимо пропустить
+         * @return {@link ru.bmstu.iu9.compiler.lexis.CodePoint CodePoint},
+         *         соответствующий символу в новой позиции
          */
         public CodePoint advance(int count) {
             while (count > 0 && hasNext()) {
@@ -159,7 +247,12 @@ class Program implements Iterable<CodePoint> {
         private final CodePoint current;
     }
     
-    @Override
+    /**
+     * Создает итератор по {@link ru.bmstu.iu9.compiler.lexis.CodePoint CodePoint}ам
+     * текста программы.
+     * 
+     * @return Итератор по {@link ru.bmstu.iu9.compiler.lexis.CodePoint CodePoint}ам
+     */
     public CodePointIterator iterator() {
         return new CodePointIterator();
     }

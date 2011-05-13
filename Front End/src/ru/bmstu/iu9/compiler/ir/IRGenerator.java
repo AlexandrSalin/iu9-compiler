@@ -64,6 +64,10 @@ public class IRGenerator {
     
     private Operand generate(BaseNode node) {
         switch(node.nodeType()) {
+            case RETURN:
+            {
+                break;
+            }
             case FUNCTION_DECL:
             {
                 FunctionDeclNode f = (FunctionDeclNode)node;
@@ -480,9 +484,12 @@ public class IRGenerator {
             labelFalse.setIndex(code.nextIndex());
             
             generate(node.elseNode);
+            endOfBlock.setIndex(code.nextIndex());
         } else {
             labelFalse.setIndex(code.nextIndex());
         }
+        
+        code.addStatement(new ReturnStatement());
     }
     
     private Operand binaryOperationStatement(

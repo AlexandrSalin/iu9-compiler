@@ -131,7 +131,7 @@ final class FunctionSymbol extends SymbolWithScope {
     
     @Override
     public String toString() {
-        return type.toString();
+        return type == null ? "" : type.toString();
     }
 }
 
@@ -157,6 +157,6 @@ final class StructSymbol extends SymbolWithScope {
     
     @Override
     public String toString() {
-        return type.toString();
+        return type == null ? "" : type.toString();
     }
 }

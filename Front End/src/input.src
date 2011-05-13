@@ -1,5 +1,20 @@
 func q() void {
-    var a = true bool;
+    var (
+        a = true bool;
+        d [5][5][6] int;
+    );
+    
+    d[0][1][2] = 5;
+
+    var t struct abc;
+/*
+    t.a = 5;
+    t.b = 10;
+    t.c = 1.2;
+    t.d = &foo;
+*/
+    t.e.b.a = 5;
+
     if(a) {
         var b int;
     } else {
@@ -10,10 +25,15 @@ func q() void {
 
 var bar const struct abc;
 
+struct def {
+    a int;
+    b **struct abc;
+};
 struct abc {
     a, b int;
     c double;
     d func(q, w int, e, r float) void;
+    e *struct def;
 };
 
 func foo(q, w const int, e, r float) void {
@@ -41,7 +61,21 @@ func main(args const * const * char) int {
 
     var c = 'a' char;
     args = &&c;
-    bar = 0;
+//    bar = 0;
+
+    if(c == 'b') {
+        return 1;
+    } else {
+//        return 0;
+    }
+
+    do {
+        return 2;
+    } while(a <= b);
+
+    if(a > b) {
+        return -1;
+    }
 
     for(var i = 0 int; i <= 10; ++i) {
         if(i > 0) {
@@ -50,6 +84,4 @@ func main(args const * const * char) int {
             --b;
         }
     }
-
-    return a + b;
 }

@@ -17,8 +17,9 @@ public final class DoubleConstantToken extends ConstantToken {
         this.value = value;
     }
     
-    @Override
-    public Double value() { return this.value; }
+    public Double value() { 
+        return this.value;
+    }
     
     private double value;
 }

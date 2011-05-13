@@ -59,7 +59,7 @@ public final class FunctionType extends BaseType {
     }
     @Override
     public String toString() {
-        return super.toString() + " (" + arguments + ") " + returnValue;
+        return "FUNC (" + arguments + ") " + returnValue;
     }
     
     public List<Argument> arguments() {

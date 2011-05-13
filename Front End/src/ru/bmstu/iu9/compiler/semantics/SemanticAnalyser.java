@@ -15,13 +15,7 @@ public class SemanticAnalyser {
     public SemanticAnalyser(BlockNode<BaseNode> parseTree) {
         this.parseTree = parseTree;
     }
-    
-    public void Analyse() {
-        resolveNames(parseTree);
-        resolveTypes(parseTree);
-        processNode(parseTree);
-    }
-    public static void main(String[] args) {
+    public SemanticAnalyser(String filename) {
         BufferedReader reader = null;
         
         try {
@@ -35,14 +29,9 @@ public class SemanticAnalyser {
                             new BaseType.TypeAdapter()).
                         create();
             
-            reader = new BufferedReader(
-                        new FileReader("C:\\Users\\maggot\\Documents\\NetBeansProjects\\ru.bmstu.iu9.compiler\\Front End\\src\\parse_tree.json"));
+            reader = new BufferedReader(new FileReader(filename));
             
-            BlockNode<BaseNode> tree = gson.fromJson(reader, BlockNode.class);
-            SemanticAnalyser analyser = new SemanticAnalyser(tree);
-            analyser.Analyse();
-            
-            return;
+            this.parseTree = gson.fromJson(reader, BlockNode.class);
         } catch(java.io.IOException ex) {
 //            ex.printStackTrace();
         } finally {
@@ -54,6 +43,20 @@ public class SemanticAnalyser {
         }
     }
     
+    public void Analyse() {
+        resolveNames(parseTree);
+        resolveTypes(parseTree);
+        processNode(parseTree);
+    }
+    
+    public static void main(String[] args) {
+        SemanticAnalyser analyser = 
+            new SemanticAnalyser("C:\\Users\\maggot\\Documents\\NetBeansProjects\\ru.bmstu.iu9.compiler\\Front End\\src\\parse_tree.json");
+        analyser.Analyse();
+
+        return;
+    }
+    
     
     
     private void resolveNames(BlockNode<BaseNode> tree) {
@@ -61,10 +64,15 @@ public class SemanticAnalyser {
             switch(node.nodeType()) {
                 case STRUCT_DECL:
                 {
-                    StructDeclNode s = (StructDeclNode)node;
+                    StructDeclNode struct = (StructDeclNode)node;
+                    
+                    StructType realType = 
+                            new StructType(struct.name, true);
+                    
                     context.global().add(
                         new StructSymbol(
-                            s.name, 
+                            struct.name, 
+                            realType,
                             context.global(), 
                             new SymbolTable()
                         ));
@@ -115,13 +123,10 @@ public class SemanticAnalyser {
                     
                     long size = 0;
                     for(Symbol s : scope) {
-                        size += s.type().size;
+                        size += s.type().size();
                     }
                     
-                    StructType realType = 
-                            new StructType(struct.name, true, size);
-
-                    symbol.setType(realType);
+                    ((StructType)symbol.type).setSize(size);
                     
                     break;
                 }
@@ -291,13 +296,10 @@ public class SemanticAnalyser {
             case FUNCTION:
             {
                 FunctionTypeNode f = (FunctionTypeNode)type;
-//                SymbolTable scope = 
-//                    ((FunctionSymbol)context.get(f.name)).scope;
                 
                 for(FunctionTypeNode.ArgumentNode arg : f.arguments) {
                     processType(arg.type);
                     arg.setRealType(arg.type.realType());
-//                    scope.add(new VariableSymbol(arg.name, arg.realType()));
                 }
                 processType(f.returnValue);
 
@@ -337,12 +339,12 @@ public class SemanticAnalyser {
             {
                 BinaryOperationNode bNode = (BinaryOperationNode)node;
                 
-                processNode(bNode.leftChild());
-                processNode(bNode.rightChild());
-                
                 switch(bNode.operation()) {
                     case ARRAY_ELEMENT:
                     {
+                        processNode(bNode.leftChild());
+                        processNode(bNode.rightChild());
+                
                         TypeChecker.check(
                                 bNode.leftChild().realType(), 
                                 BaseType.Type.ARRAY, 
@@ -356,28 +358,59 @@ public class SemanticAnalyser {
                     }
                     case MEMBER_SELECT:
                     {
-                        TypeChecker.check(
-                                bNode.leftChild().realType(), 
+                        processNode(bNode.leftChild());
+                        
+                        BaseType type = bNode.leftChild().realType();
+                        
+                        while(type.is(PrimitiveType.Type.POINTER)) {
+                            
+                            type = ((PointerType)type).pointerType;
+                        }
+                        
+                        if(TypeChecker.check(
+                                type, 
                                 BaseType.Type.STRUCT, 
-                                bNode.dInfo);
-                        
-                        VariableLeaf fieldName = (VariableLeaf)bNode.rightChild();
-                        
-                        String name = 
-                            ((StructType)bNode.leftChild().realType()).name;
-                        
-                        StructSymbol struct = (StructSymbol) context.get(name);
-                        assert struct != null;
-                        
-                        Symbol field = struct.scope.get(fieldName.name);
-                        assert field != null;
-                        
-                        bNode.setRealType(field.type);
+                                bNode.dInfo)
+                        ) {
+                            
+                            context.enterStruct((StructType)type);
+
+                            processNode(bNode.rightChild());
+
+                            VariableLeaf fieldName = 
+                                (VariableLeaf)bNode.rightChild();
+
+                            String name = ((StructType)type).name;
+
+                            StructSymbol struct = 
+                                (StructSymbol) context.get(name);
+                            assert struct != null;
+
+                            Symbol field = struct.scope.get(fieldName.name);
+                            if (field == null) {
+                                Logger.logUndeclaredVarialbe(
+                                        fieldName.name, 
+                                        bNode.rightChild().dInfo.position);
+                                bNode.setRealType(new InvalidType());
+                            } else {
+                                bNode.setRealType(field.type);
+                            }
+
+                            context.leaveStruct();
+                        } else {
+                            Logger.logIncompatibleTypes(
+                                    type.toString(), 
+                                    BaseType.Type.STRUCT.toString(), 
+                                    bNode.dInfo.position);
+                        }
                         
                         break;
                     }
                     default:
                     {
+                        processNode(bNode.leftChild());
+                        processNode(bNode.rightChild());
+                        
                         TypeChecker.check(
                                 bNode.leftChild().realType(), 
                                 bNode.rightChild().realType(),
@@ -506,8 +539,17 @@ public class SemanticAnalyser {
                 processNode(ifNode.condition);
                 processNode(ifNode.block);
                 context.popScope();
-                if(ifNode.elseNode != null)
+                
+                if(ifNode.elseNode != null) {
+                    boolean returns = context.returns;
+                    context.returns = false;
+                    
                     processNode(ifNode.elseNode);
+                    
+                    context.returns = context.returns && returns;
+                } else {
+                    context.returns = false;
+                }
                 
                 TypeChecker.check(
                         ifNode.condition.realType(), 
@@ -559,6 +601,8 @@ public class SemanticAnalyser {
             }
             case DO_WHILE:
             {
+                context.returns = false;
+                
                 DoWhileNode cbNode = (DoWhileNode)node;
                 
                 context.pushScope();
@@ -574,11 +618,9 @@ public class SemanticAnalyser {
             }
             case BLOCK:
             {
-//                context.pushScope();
                 for(BaseNode child : (BlockNode<BaseNode>)node) {
                     processNode(child);
                 }
-//                context.popScope();
                 break;
             }
             case BLOCK_DECL:
@@ -644,7 +686,20 @@ public class SemanticAnalyser {
                 
                 context.enterFunction(function);
               
-                processNode(function.block);
+                boolean returns = context.returns = false;
+                
+                for(Statement child : function.block) {
+                    processNode(child.getNode());
+                    returns = returns || context.returns;
+                }
+                
+                if(!(context.returnValue().is(PrimitiveType.Type.VOID)) &&
+                   !returns) {
+                    
+                    Logger.log(
+                        "Not all paths return value", 
+                        function.dInfo.position);
+                }
 
                 context.leaveFunction();
                 break;
@@ -652,6 +707,8 @@ public class SemanticAnalyser {
             case RETURN:
             {
                 ReturnNode ret = (ReturnNode)node;
+                
+                context.returns = true;
                 
                 if(ret.returnExpr != null) {
                     processNode(ret.returnExpr);
@@ -682,7 +739,9 @@ public class SemanticAnalyser {
                     
                     FunctionType func = (FunctionType)call.function.realType();
                     
-                    if (func.arguments().size() == call.arguments.children().size()) {
+                    if (func.arguments().size() == 
+                            call.arguments.children().size()) {
+                        
                         for (int i = 0; i < func.arguments().size(); ++i) {
                             TypeChecker.check(
                                     func.arguments().get(i).type, 
@@ -700,9 +759,11 @@ public class SemanticAnalyser {
             {
                 ElseNode n = (ElseNode)node;
                 
-                context.pushScope();
-                processNode(n.block);
-                context.popScope();
+                if(n.block != null) {
+                    context.pushScope();
+                    processNode(n.block);
+                    context.popScope();
+                }
                 
                 break;
             }
@@ -743,20 +804,6 @@ public class SemanticAnalyser {
                 processType((BaseTypeNode)node);
                 break;
             }
-            /*
-            case ARGUMENT:
-            {
-                FunctionTypeNode.ArgumentNode a = 
-                        (FunctionTypeNode.ArgumentNode)node;
-                
-                processNode(a.type);
-                a.setRealType(a.type.realType());
-                
-                context.add(new VariableSymbol(a.name, a.realType()));
-                
-                break;
-            }
-            */
             case BREAK:
             case CONTINUE:
             case BARRIER:
@@ -800,6 +847,14 @@ final class Context {
             ((FunctionType)function.realType()).returnValue : 
             null;
     }
+    
+    
+    public void enterStruct(StructType type) {
+        scopes.add(((StructSymbol)get(type.name)).scope);
+    }
+    public void leaveStruct() {
+        popScope();
+    }
 
     
     
@@ -829,4 +884,6 @@ final class Context {
     private FunctionTypeNode function;
     private Stack<SymbolTable> scopes;
     private boolean inFunction;
+    
+    public boolean returns = false;
 }

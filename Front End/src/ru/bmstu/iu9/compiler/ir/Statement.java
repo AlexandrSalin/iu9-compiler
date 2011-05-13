@@ -19,6 +19,16 @@ abstract class Statement {
     protected final Operation baseOperation;
 }
 
+final class ReturnStatement extends Statement {
+    public ReturnStatement() {
+        super(Operation.RETURN);
+    }
+    
+    @Override
+    public String toString() {
+        return "return";
+    }
+}
 
 final class AssignmentStatement extends Statement {
     public AssignmentStatement(VariableOperand lhv, Operand rhv) {
@@ -105,13 +115,23 @@ class Label {
         return this.index;
     }
     
-    private long index;
+    @Override
+    public String toString() {
+        return index == null ? "" : index.toString();
+    }
+    
+    private Long index;
 }
 
 final class GoToStatement extends Statement {
     public GoToStatement(Label label) {
         super(Operation.GOTO);
         this.label = label;
+    }
+    
+    @Override
+    public String toString() {
+        return "goto " + label;
     }
     
     public final Label label;
@@ -128,6 +148,11 @@ final class IfStatement extends Statement {
         this.condition = condition;
         this.labelTrue = labelTrue;
         this.labelFalse = labelFalse;
+    }
+    
+    @Override
+    public String toString() {
+        return "if " + condition + " ? " + labelTrue + " : " + labelFalse;
     }
     
     public final VariableOperand condition;

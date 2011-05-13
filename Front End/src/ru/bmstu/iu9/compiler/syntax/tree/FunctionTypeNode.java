@@ -29,7 +29,6 @@ final public class FunctionTypeNode extends BaseTypeNode {
             return new FunctionType.Argument(this.name, this.realType);
         }
         
-        @Override
         public BaseNode getNode() {
             return this;
         }

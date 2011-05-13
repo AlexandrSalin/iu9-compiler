@@ -1,65 +1,133 @@
 package ru.bmstu.iu9.compiler.syntax;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import java.io.PrintWriter;
-import java.util.Arrays;
-import ru.bmstu.iu9.compiler.lexis.token.Token;
+import com.google.gson.*;
+import java.io.*;
 import ru.bmstu.iu9.compiler.*;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+import ru.bmstu.iu9.compiler.lexis.token.*;
 import ru.bmstu.iu9.compiler.syntax.tree.*;
 
 /**
- *
- * @author maggot
+ * Класс Parser осуществляет синтаксический анализ текста программы на основании 
+ * последовательности {@link ru.bmstu.iu9.compiler.lexis.token.Token Token}ов,
+ * сгенерированных {@link ru.bmstu.iu9.compiler.lexis.Lexer Lexer}ом и 
+ * построение дерева синтаксического анализа.
+ * В последствии это дерево может быть сериализовано в файл в формате json.
+ * <br/>
+ * Пример использования класса Parser:
+ * <pre>
+ * Lexer lexer = new Lexer("program.src");
+ * lexer.run();
+ * lexer.toJson("tokens.json");
+ * 
+ * Parser parser = new Parser("tokens.src");
+ * parser.process();
+ * parser.toJson("parser_tree.json");
+ * </pre>
+ * 
+ * @author anton.bobukh
+ * @see ru.bmstu.iu9.compiler.lexis.Lexer
+ * @see ru.bmstu.iu9.compiler.lexis.token.Token
  */
 public class Parser {
+    /**
+     * Создает объект Parser.
+     * 
+     * Создает объект Parser, который будет производить синтаксический анализ
+     * текста программы, представленного последовательностью 
+     * {@link ru.bmstu.iu9.compiler.lexis.token.Token Token}ов.
+     * 
+     * @param tokens массив {@link ru.bmstu.iu9.compiler.lexis.token.Token Token}ов, 
+     *               сгенерированный лексическим анализатором
+     */
     public Parser(final Token[] tokens) {
+        createIterator(tokens);
+    }
+    /**
+     * Создает объект Parser.
+     * 
+     * Создает объект Parser, который будет производить синтаксический анализ
+     * текста программы, представленного последовательностью 
+     * {@link ru.bmstu.iu9.compiler.lexis.token.Token Token}ов.
+     * 
+     * @param filename имя файла, в который был сериализован массив 
+     *                 {@link ru.bmstu.iu9.compiler.lexis.token.Token Token}ов, 
+     *                 сгенерированный лексическим анализатором
+     */
+    public Parser(String filename) {
+        BufferedReader reader = null;
+        
+        try {
+            Gson gson = 
+                new GsonBuilder().
+                    registerTypeHierarchyAdapter(
+                        Token.class, 
+                        new Token.TokenAdapter()
+                    ).
+                    create();
+            
+            reader = new BufferedReader(new FileReader(filename));
+            Token[] tokens = gson.fromJson(reader, Token[].class);
+            createIterator(tokens);
+        } catch(java.io.IOException ex) {
+//            ex.printStackTrace();
+        } finally {
+            try {
+                reader.close();
+            } catch(java.io.IOException ex) {
+//                ex.printStackTrace();
+            }
+        }
+    }
+    
+    /**
+     * Создает анонимный класс-итератор по массиву 
+     * {@link ru.bmstu.iu9.compiler.lexis.token.Token Token}ов.
+     * 
+     * @param tokens массив {@link ru.bmstu.iu9.compiler.lexis.token.Token Token}ов,
+     *               по которому будет производиться итерирование
+     */
+    private void createIterator(final Token[] tokens) {
         token = new Iterator<Token>() {
-            @Override
             public boolean hasNext() {
                 return counter < container.length;
             }
 
-            @Override
             public Token next() {
-                ++counter;
-                return container[counter];
+                return container[counter++];
             }
 
-            @Override
             public void remove() {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
             
+            private int counter = 0;
+            private Token[] container;
+            
             {
                 container = tokens;
             }
-            
-            private int counter = -1;
-            private Token[] container;
         };
     }
-    public Parser(String filename) {
-        tokener = new TokenFactory(filename);
-        token = tokener.iterator();
-    }
     
+    /**
+     * Сериализует дерево синтаксического разбора в файл в формате json.
+     * 
+     * Сериализует сгенерированное в процессе синтаксического анализа дерево
+     * синтаксического разбора в файл с указанным именем в формате json.
+     * 
+     * @param filename имя файла, в который будет производиться сериализация
+     */
     public void toJson(String filename) {
         PrintWriter writer = null;
         
         try {
             Gson gson = new GsonBuilder().
-                    setPrettyPrinting().
-                    registerTypeHierarchyAdapter(
-                        BlockNode.class, 
-                        new BlockNode.BlockNodeAdapter()).
-                    /*registerTypeHierarchyAdapter(
-                        BaseTypeNode.class, 
-                        new BaseTypeNode.TypeNodeSerializer()).*/
-                    create();
+                setPrettyPrinting().
+                registerTypeHierarchyAdapter(
+                    BlockNode.class, 
+                    new BlockNode.BlockNodeAdapter()).
+                create();
             writer = new PrintWriter(filename);
             gson.toJson(parseTree, writer);
         } catch(java.io.IOException ex) {
@@ -79,17 +147,25 @@ public class Parser {
             "C:\\Users\\maggot\\Documents\\NetBeansProjects\\ru.bmstu.iu9.compiler\\Front End\\src\\parse_tree.json");
     }
     
+    /**
+     * Осуществляет синтаксический анализ и построение дерева синтаксического
+     * разбора.
+     * 
+     * @return Корневой узел дерева синтаксического разбора
+     */
     public BlockNode process() {
         Program();
         return parseTree;
     }
     
+    /**
+     * Переходит к следующему {@link ru.bmstu.iu9.compiler.lexis.token.Token Token}у.
+     */
     private void nextToken() {
         if (token.hasNext())
             current = token.next();
     }
     
-    private TokenFactory tokener;
     private Iterator<Token> token;
     private Token current;
     private BlockNode<Statement> parseTree = new BlockNode<Statement>();
@@ -342,7 +418,7 @@ public class Parser {
     
     private String Identifier() {
         if (checkTokens(current, Token.Type.IDENTIFIER)) {
-            String identifier = (String)current.value();
+            String identifier = ((IdentifierToken)current).value();
             nextToken();
             return identifier;
         } else {
@@ -1084,13 +1160,25 @@ public class Parser {
         Position pos = current.coordinates().starting();
         switch (current.type()) {
             case CONST_CHAR:
-                node = new CharConstantLeaf((int)current.value(), pos);
+                node = 
+                    new CharConstantLeaf(
+                        ((CharConstantToken)current).value(), 
+                        pos
+                    );
                 break;
             case CONST_DOUBLE:
-                node = new DoubleConstantLeaf((double)current.value(), pos);
+                node = 
+                    new DoubleConstantLeaf(
+                        ((DoubleConstantToken)current).value(), 
+                        pos
+                    );
                 break;
             case CONST_INT:
-                node = new IntegerConstantLeaf((int)current.value(), pos);
+                node = 
+                    new IntegerConstantLeaf(
+                        ((IntegerConstantToken)current).value(), 
+                        pos
+                    );
                 break;
             case TRUE:
                 node = new BoolConstantLeaf(Boolean.TRUE, pos);

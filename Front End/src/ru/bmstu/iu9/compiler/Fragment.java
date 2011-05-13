@@ -24,10 +24,17 @@ public final class Fragment {
     private Position starting;
     private Position ending;
     
-    public static class FragmentInstanceCreator implements InstanceCreator<Fragment> {
+    public static class FragmentInstanceCreator 
+        implements InstanceCreator<Fragment> {
+        
         @Override
         public Fragment createInstance(java.lang.reflect.Type type) {
             return new Fragment();
         }
+    }
+    
+    @Override
+    public String toString() {
+        return "from " + starting + " to " + ending;
     }
 }

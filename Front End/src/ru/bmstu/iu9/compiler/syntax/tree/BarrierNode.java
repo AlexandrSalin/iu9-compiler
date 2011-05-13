@@ -15,7 +15,6 @@ final public class BarrierNode extends ControlStructureNode implements Statement
         super(BaseNode.NodeType.BARRIER, dInfo);
     }
 
-    @Override
     public BaseNode getNode() {
         return this;
     }

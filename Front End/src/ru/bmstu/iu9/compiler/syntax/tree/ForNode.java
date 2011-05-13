@@ -31,7 +31,6 @@ final public class ForNode extends IterationStructureNode {
         this.step = step;
     }
     
-    @Override
     public BaseNode getNode() {
         return this;
     }

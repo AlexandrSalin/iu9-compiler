@@ -38,6 +38,11 @@ public class PrimitiveType extends BaseType {
         this.primitive = primitive.ordinal();
     }
     
+    @Override
+    public boolean is(PrimitiveType.Type type) {
+        return super.is(type) && this.primitive().is(type);
+    }
+    
     public Type primitive() { return Type.values()[this.primitive]; }
     
     @Override

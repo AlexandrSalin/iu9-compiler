@@ -15,7 +15,6 @@ final public class BreakNode extends JmpNode implements Statement {
         super(BaseNode.NodeType.BREAK, dInfo);
     }
     
-    @Override
     public BaseNode getNode() {
         return this;
     }

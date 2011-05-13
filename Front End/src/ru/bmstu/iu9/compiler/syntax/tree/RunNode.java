@@ -17,7 +17,6 @@ public class RunNode extends ControlStructureNode implements Statement {
         this.expression = expression;
     }
     
-    @Override
     public BaseNode getNode() {
         return this;
     }

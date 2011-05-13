@@ -17,8 +17,9 @@ public final class IntegerConstantToken extends ConstantToken {
         this.value = value;
     }
     
-    @Override
-    public Integer value() { return this.value; }
+    public Integer value() { 
+        return this.value; 
+    }
     
     private int value;
 }
