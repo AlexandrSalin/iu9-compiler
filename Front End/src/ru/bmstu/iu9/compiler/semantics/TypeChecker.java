@@ -32,7 +32,7 @@ public class TypeChecker {
             DebugInfo dInfo) {
         
         boolean result;
-        if (result = (found == null || !found.type().is(required)))
+        if (result = (found == null || !found.is(required)))
             Logger.logIncompatibleTypes(
                     (found == null) ? "UNKNOWN TYPE" : found.toString(),
                     required.name(), 
@@ -46,7 +46,7 @@ public class TypeChecker {
             DebugInfo dInfo) {
         
         boolean result;
-        if (result = (found == null || !(found instanceof PrimitiveType) || 
+        if (result = (found == null || /*!(found instanceof PrimitiveType) || */
                 !(((PrimitiveType)found).primitive() == required)))
             Logger.logIncompatibleTypes(
                     (found == null) ? "UNKNOWN TYPE" : found.toString(),
@@ -61,7 +61,7 @@ public class TypeChecker {
             DebugInfo dInfo) {
         
         boolean result;
-        if (result = (found == null || !(required instanceof PrimitiveType) || 
+        if (result = (found == null || /*!(required instanceof PrimitiveType) ||*/ 
                 !(((PrimitiveType)required).primitive() == found)))
             Logger.logIncompatibleTypes(
                     (found == null) ? "UNKNOWN TYPE" : found.toString(),
@@ -74,7 +74,7 @@ public class TypeChecker {
             BaseType found, 
             BaseType.Type[] required, 
             DebugInfo dInfo) {
-        boolean result = (found == null || !found.type().is(required));
+        boolean result = (found == null || !found.is(required));
         if (result) {
             StringBuilder str = new StringBuilder();
             for (int i = 0; i < required.length; ++i) {
@@ -95,9 +95,9 @@ public class TypeChecker {
             BaseType found, 
             PrimitiveType.Type[] required, 
             DebugInfo dInfo) {
-        
-        boolean result = (found == null || !(found instanceof PrimitiveType) ||
-                !((PrimitiveType)found).primitive().is(required));
+
+        boolean result = (found == null || /*!(found instanceof PrimitiveType) ||*/
+                !found.is(required));
         if (result) {
             StringBuilder str = new StringBuilder();
             for (int i = 0; i < required.length; ++i) {

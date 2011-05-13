@@ -16,10 +16,10 @@ abstract public class BaseType {
             this.value = 1 << this.ordinal();
         }
         
-        public boolean is(Type type) {
+        private boolean is(Type type) {
             return (this.value & type.value) != 0;
         }
-        public boolean is(Type[] types) {
+        private boolean is(Type[] types) {
             for (int i = 0; i < types.length; ++i) {
                 if ((this.value & types[i].value) != 0)
                     return true;
@@ -42,8 +42,14 @@ abstract public class BaseType {
     public boolean is(Type type) {
         return this.type().is(type);
     }
+    public boolean is(Type[] types) {
+        return this.type().is(types);
+    }
     
     public boolean is(PrimitiveType.Type type) {
+        return this.type().is(Type.PRIMITIVE_TYPE);
+    }
+    public boolean is(PrimitiveType.Type[] types) {
         return this.type().is(Type.PRIMITIVE_TYPE);
     }
     

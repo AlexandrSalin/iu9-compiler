@@ -16,11 +16,7 @@ public class UnaryOperationNode extends ExpressionNode {
     public enum Operation { 
         POST_INC, POST_DEC, MINUS, PLUS, REF, DEREF, PRE_DEC, PRE_INC, CAST
     };
-    
-    /*public Unary(Operation operation, Position position) {
-        super(BaseNode.NodeType.UNARY_OPERATION, position);
-        this.operation = operation.ordinal();
-    }*/
+
     public UnaryOperationNode(
             Operation operation, 
             ExpressionNode node, 
@@ -40,12 +36,14 @@ public class UnaryOperationNode extends ExpressionNode {
         this.node = node;
     }
     
-    public Operation operation() { return Operation.values()[this.operation]; }
-/*    public ExpressionNode node() { return this.node; }
-    public void setChild(ExpressionNode node) { this.node = node; }*/
+    public boolean is(Operation operation) {
+        return this.operation().equals(operation);
+    }
     
-//    @SerializedName("node1")
+    public Operation operation() { 
+        return Operation.values()[this.operation]; 
+    }
+    
     public final ExpressionNode node;
-//    @SerializedName("operation")
     public final int operation;
 }

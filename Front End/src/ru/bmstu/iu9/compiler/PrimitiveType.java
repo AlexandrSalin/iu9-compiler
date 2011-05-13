@@ -14,14 +14,14 @@ public class PrimitiveType extends BaseType {
             this.value = 1 << this.ordinal();
         }
         
-        public boolean is(Type[] typenames) {
-            for (int i = 0; i < typenames.length; ++i) {
-                if (this.is(typenames[i]))
+        private boolean is(PrimitiveType.Type[] types) {
+            for (int i = 0; i < types.length; ++i) {
+                if (this.is(types[i]))
                     return true;
             }
             return false;
         }
-        public boolean is(Type typename) {
+        private boolean is(Type typename) {
             return (this.value & typename.value) != 0;
         }
         
@@ -41,6 +41,10 @@ public class PrimitiveType extends BaseType {
     @Override
     public boolean is(PrimitiveType.Type type) {
         return super.is(type) && this.primitive().is(type);
+    }
+    @Override
+    public boolean is(PrimitiveType.Type[] types) {
+        return super.is(types) && this.primitive().is(types);
     }
     
     public Type primitive() { return Type.values()[this.primitive]; }

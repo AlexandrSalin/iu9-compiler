@@ -8,7 +8,7 @@ import ru.bmstu.iu9.compiler.*;
 import ru.bmstu.iu9.compiler.syntax.tree.*;
 
 /**
- *
+ * @todo Добавить проверку lhv и rhv
  * @author maggot
  */
 public class SemanticAnalyser {
@@ -533,6 +533,8 @@ public class SemanticAnalyser {
             }
             case IF:
             {
+                context.returns = false;
+                
                 IfNode ifNode = (IfNode)node;
                 
                 context.pushScope();
@@ -557,18 +559,33 @@ public class SemanticAnalyser {
                         ((ExpressionNode)ifNode.condition).dInfo);
                 break;
             }
+            // @todo Протестировать
             case SWITCH:
             {
+                context.returns = false;
+                
                 SwitchNode switchNode = ((SwitchNode)node);
                         
                 context.pushScope();
                 processNode(switchNode.expression);
-                processNode(switchNode.cases);
-                if(switchNode.defaultNode != null)
+                
+                boolean returns = context.returns;
+                
+                for(CaseNode child : switchNode.cases) {
+                    context.returns = false;
+                    processNode(child);
+                    context.returns = context.returns && returns;
+                }
+                if(switchNode.defaultNode != null) {
+                    context.returns = false;
                     processNode(switchNode.defaultNode);
+                    context.returns = context.returns && returns;
+                } else {
+                    context.returns = false;
+                }
                 context.popScope();
                 
-                for (CaseNode caseNode : ((SwitchNode)node).cases) {
+                for (CaseNode caseNode : switchNode.cases) {
                     TypeChecker.check(
                             switchNode.expression.realType(), 
                             caseNode.expression.realType(), 
@@ -697,7 +714,7 @@ public class SemanticAnalyser {
                    !returns) {
                     
                     Logger.log(
-                        "Not all paths return value", 
+                        "Not all code paths return value", 
                         function.dInfo.position);
                 }
 

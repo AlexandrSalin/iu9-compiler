@@ -55,7 +55,7 @@ final class AssignmentStatement extends Statement {
 
 
 final class IndirectAssignmentStatement extends Statement {
-    public IndirectAssignmentStatement(Operand rhv, VariableOperand lhv) {
+    public IndirectAssignmentStatement(VariableOperand lhv, Operand rhv) {
         super(Operation.INDIRECT_ASSIGN);
         this.lhv = lhv;
         this.rhv = rhv;
@@ -210,7 +210,7 @@ final class ArrayIndexStatement extends Statement {
     public ArrayIndexStatement(
             VariableOperand lhv,
             VariableOperand array, 
-            ConstantOperand index
+            VariableOperand index
             ) {
         
         super(Operation.INDEX);
@@ -225,7 +225,7 @@ final class ArrayIndexStatement extends Statement {
     }
 
     public final VariableOperand array;
-    public final ConstantOperand index;
+    public final VariableOperand index;
     public final VariableOperand lhv;
 }
 

@@ -62,32 +62,201 @@ public class IRGenerator {
         return;
     }
     
+    
+    private VariableOperand generateArrayIndex(BinaryOperationNode node) {
+        VariableOperand array = (VariableOperand) generate(node.leftChild());
+        VariableOperand index = (VariableOperand) generate(node.rightChild());
+
+        TmpVariableOperand address = 
+            new TmpVariableOperand(new PointerType(node.realType()), varTable);
+
+        code.addStatement(
+            new ArrayIndexStatement(address, array, index)
+        );
+
+        return address;
+    }
+    
+    private VariableOperand generateStructField(BinaryOperationNode node) {
+        VariableOperand struct = (VariableOperand) generate(node.leftChild());
+        VariableOperand field = (VariableOperand) generate(node.rightChild());
+
+        TmpVariableOperand address = 
+            new TmpVariableOperand(new PointerType(node.realType()), varTable);
+
+        code.addStatement(
+            new MemberSelectStatement(address, struct, field)
+        );
+
+        return address;
+    }
+    
+    
+    /**
+     * Генерирует код для левой части операции присваивания.
+     * 
+     * Генерирует код для левой части операции присваивания. При этом возможны
+     * два случая:
+     * <dl>
+     *   <dt>
+     *     Присваивание происходит переменной
+     *   </dt>
+     *   <dd>
+     *     Возвращается операнд, соответствующий этой переменной. Далее должна
+     *     быть сгенерирована инструкция прямого присваивания.
+     *   </dd>
+     *   <dt>
+     *     Присваивание происходит элементу массива, полю структуры или
+     *     переменной по адресу
+     *   </dt>
+     *   <dd>
+     *     Генерирует инструкцию индексации в массиве, доступа к полю структуры.
+     *     Обе эти инструкции помещают во временную переменную tmp адрес в 
+     *     памяти. Возвращает операнд, соответствующий tmp или адресу переменной
+     *     в третьем случае. Далее должна быть сгенерирована инструкция 
+     *     косвенного присваивания.
+     *   </dd>
+     * </dl>
+     * 
+     * @param node Узел, соответствующий левой части присваивания
+     * @return Операнд, в который помещена переменная или адрес в памяти
+     */
+    private VariableOperand generateLeftHandValue(BaseNode node) {
+        switch(node.nodeType()) {
+            case VARIABLE:
+            {
+                VariableLeaf l = (VariableLeaf) node;
+                
+                return 
+                    new NamedVariableOperand(varTable, varTable.get(l.name));
+            }
+            case BINARY_OPERATION:
+            {
+                BinaryOperationNode o = (BinaryOperationNode) node;
+                
+                switch(o.operation()) {
+                    case ARRAY_ELEMENT:
+                        return generateArrayIndex(o);
+                    case MEMBER_SELECT:
+                        return generateStructField(o);
+                    default:
+                        // @todo Report an error
+                        break;
+                }
+                
+                break;
+            }
+            case UNARY_OPERATION:
+            {
+                UnaryOperationNode o = (UnaryOperationNode) node;
+                
+                if(o.is(UnaryOperationNode.Operation.DEREF)) {
+                    VariableOperand variable = 
+                        (VariableOperand) generate(o.node);
+                    
+                    return variable;
+                } else {
+                    // @todo Report an error
+                }
+                
+                break;
+            }
+            default:
+                // @todo Report an error
+                break;
+        }
+        return null;
+    }
+    
+    private Operand generateRightHandValue(BaseNode node) {
+        return generate(node);
+    }
+    
+    
+    private VariableOperand generateAssignment(BinaryOperationNode node) {
+        VariableOperand lhv = generateLeftHandValue(node.leftChild());
+        Operand rhv = generateRightHandValue(node.rightChild());
+        
+        if(node.leftChild() instanceof VariableLeaf) {
+            code.addStatement(new AssignmentStatement(lhv, rhv));
+            
+            return lhv;
+        } else {
+            code.addStatement(new IndirectAssignmentStatement(lhv, rhv));
+            
+            TmpVariableOperand value = 
+                new TmpVariableOperand(
+                    ((PointerType)lhv.type()).pointerType,
+                    varTable);
+            
+            code.addStatement(
+                new UnaryOperationStatement(
+                    value, 
+                    lhv,
+                    UnaryOperationStatement.Operation.DEREF)
+            );
+            
+            return value;
+        }       
+    }
+    
+    
+    
+    private void generateReturn(ReturnNode node) {
+        code.addStatement(new ReturnStatement());
+    }
+    private void generateFunction(FunctionDeclNode node) {
+        for(ru.bmstu.iu9.compiler.syntax.tree.Statement n : node.block) {
+            generate(n.getNode());
+        }
+    }
+    private void generateBlock(BlockNode<BaseNode> node) {
+        for(BaseNode n : (BlockNode<BaseNode>)node) {
+            generate(n);
+        }
+    }
+    
+    private void declareVariable(VariableDeclNode node) {
+        NamedVariable variable = new NamedVariable(node.name, node.realType());
+
+        varTable.add(variable);
+
+        if(node.value != null) {
+            Operand value = generate(node.value);
+
+            code.addStatement(
+                new AssignmentStatement(
+                    new NamedVariableOperand(varTable,
+                        varTable.get(variable.name)),
+                    value)
+            );
+        }
+    }
+    
+    
     private Operand generate(BaseNode node) {
         switch(node.nodeType()) {
             case RETURN:
             {
+                generateReturn((ReturnNode) node);
                 break;
             }
             case FUNCTION_DECL:
             {
-                FunctionDeclNode f = (FunctionDeclNode)node;
-                
-                for(ru.bmstu.iu9.compiler.syntax.tree.Statement n : f.block) {
-                    generate(n.getNode());
-                }
+                generateFunction((FunctionDeclNode) node);
                 
                 break;
             }
             case BLOCK:
             {
-                for(BaseNode n : (BlockNode<BaseNode>)node) {
-                    generate(n);
-                }
+                generateBlock((BlockNode<BaseNode>) node);
                 break;
             }
             case BLOCK_DECL:
             {
-                for(VariableDeclNode decl : (BlockDeclNode<VariableDeclNode>)node) {
+                for(VariableDeclNode decl : 
+                        (BlockDeclNode<VariableDeclNode>) node) {
+                    
                     generate(decl);
                 }
                 break;
@@ -101,27 +270,7 @@ public class IRGenerator {
             }
             case VAR_DECL:
             {
-                VariableDeclNode decl = (VariableDeclNode)node;
-                
-                NamedVariable variable = 
-                    new NamedVariable(
-                        decl.name, 
-                        decl.realType()
-                    );
-                
-                varTable.add(variable);
-                
-                if(decl.value != null) {
-                    Operand value = generate(decl.value);
-                
-                    code.addStatement(
-                        new AssignmentStatement(
-                            new NamedVariableOperand(
-                                varTable,
-                                varTable.get(variable.name)),
-                            value)
-                    );
-                }
+                declareVariable((VariableDeclNode) node);
                 
                 break;
             }
@@ -200,7 +349,8 @@ public class IRGenerator {
                 BinaryOperationNode b = (BinaryOperationNode)node;
                 
                 VariableOperand left = (VariableOperand)generate(b.leftChild());
-                Operand right = generate(b.rightChild());
+                VariableOperand right = 
+                    (VariableOperand) generate(b.rightChild());
                 
                 switch(b.operation()) {
                     case ARRAY_ELEMENT:
@@ -212,14 +362,17 @@ public class IRGenerator {
                             );
                         
                         code.addStatement(
-                            new ArrayIndexStatement(
-                                result,
-                                left,
-                                (ConstantOperand)right)
+                            new ArrayIndexStatement(result, left, right)
                         );
                         
                         return result;
                     }
+                    /**
+                     * tmp1 = ((a.i).j);
+                     * a - address or value?
+                     * a [MEMBER_SELECT] i - address or value?
+                     * (a.i) [MEMBER_SELECT] j - address or value?
+                     */
                     case MEMBER_SELECT:
                     {
                         Operand struct = generate(b.leftChild());
@@ -397,7 +550,9 @@ public class IRGenerator {
                                 b.realType(),
                                 operation);
                         
-                        code.addStatement(new AssignmentStatement(left, result));
+                        code.addStatement(
+                            new AssignmentStatement(left, result)
+                        );
                     }
                     case ASSIGN:
                     {
@@ -420,7 +575,9 @@ public class IRGenerator {
             case ELSE:
             {
                 ElseNode e = (ElseNode) node;
-                for(ru.bmstu.iu9.compiler.syntax.tree.Statement stmt : e.block) {
+                for(ru.bmstu.iu9.compiler.syntax.tree.Statement stmt : 
+                        e.block) {
+                    
                     generate(stmt.getNode());
                 }
                 break;
