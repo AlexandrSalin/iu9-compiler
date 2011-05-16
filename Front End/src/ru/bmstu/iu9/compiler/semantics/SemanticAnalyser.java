@@ -9,6 +9,9 @@ import ru.bmstu.iu9.compiler.syntax.tree.*;
 
 /**
  * @todo Добавить проверку lhv и rhv
+ * @todo Проверка переопределения переменных
+ * @todo Проверка правильности расстановки break и continue
+ * 
  * @author maggot
  */
 public class SemanticAnalyser {
@@ -416,8 +419,7 @@ public class SemanticAnalyser {
                                 bNode.rightChild().realType(),
                                 bNode.dInfo);
 
-                        if (bNode.operation().is(
-                                BinaryOperationNode.Operation.Bitwise)) {
+                        if (bNode.is(BinaryOperationNode.Operation.Bitwise)) {
 
                             TypeChecker.check(
                                 bNode.realType(), 
@@ -425,8 +427,7 @@ public class SemanticAnalyser {
                                 bNode.dInfo);
                         }
 
-                        if (bNode.operation().is(
-                                BinaryOperationNode.Operation.Comparison)) {
+                        if (bNode.is(BinaryOperationNode.Operation.Comparison)) {
 
                             bNode.setRealType(
                                 new PrimitiveType(
@@ -449,10 +450,21 @@ public class SemanticAnalyser {
                 
                 processNode(uNode.node);
                 switch (uNode.operation()) {
+                    case NOT:
+                    {
+                        TypeChecker.check(
+                                uNode.node.realType(), 
+                                PrimitiveType.Type.BOOL, 
+                                uNode.dInfo);
+                        
+                        uNode.setRealType(uNode.node.realType());
+                        break;
+                    }
                     case POST_INC:
                     case POST_DEC:
                     case PRE_INC:
                     case PRE_DEC:
+                    case BITWISE_NOT:
                         TypeChecker.check(
                                 uNode.node.realType(), 
                                 new PrimitiveType.Type[] {
@@ -569,7 +581,7 @@ public class SemanticAnalyser {
                 context.pushScope();
                 processNode(switchNode.expression);
                 
-                boolean returns = context.returns;
+                boolean returns = true;
                 
                 for(CaseNode child : switchNode.cases) {
                     context.returns = false;

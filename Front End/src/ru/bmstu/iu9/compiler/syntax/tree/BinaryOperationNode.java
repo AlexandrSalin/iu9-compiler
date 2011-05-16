@@ -17,6 +17,9 @@ final public class BinaryOperationNode extends ExpressionNode {
         BITWISE_OR_ASSIGN, MOD_ASSIGN, DIV_ASSIGN, MUL_ASSIGN, MINUS_ASSIGN, 
         PLUS_ASSIGN, MEMBER_SELECT, ARRAY_ELEMENT, 
         
+        Bool(new Operation[] {
+            BOOL_AND, BOOL_OR
+        }),
         Bitwise(new Operation[] {
             BITWISE_SHIFT_RIGHT, BITWISE_SHIFT_LEFT, BITWISE_AND, BITWISE_XOR,
             BITWISE_OR, BITWISE_XOR_ASSIGN, BITWISE_SHIFT_RIGHT_ASSIGN, 
@@ -34,7 +37,7 @@ final public class BinaryOperationNode extends ExpressionNode {
                 this.value = this.value | operations[i].value;
         }
         
-        public boolean is(Operation operation) {
+        private boolean is(Operation operation) {
             return (this.value & operation.value) != 0;
         }
         
@@ -66,6 +69,10 @@ final public class BinaryOperationNode extends ExpressionNode {
         this.operation = operation.ordinal();
         this.left = left;
         this.right = right;
+    }
+    
+    public boolean is(Operation operation) {
+        return this.operation().is(operation);
     }
     
     public Operation operation() { 

@@ -1034,6 +1034,24 @@ public class Parser {
                     nextToken();
                     return ExpressionNode.InvalidNode(pos);
             }
+        } else if (current.type().is(Token.Type.BITWISE_NOT)) {
+            nextToken();
+            ExpressionNode node = EExpression();
+            
+            return new UnaryOperationNode(
+                UnaryOperationNode.Operation.BITWISE_NOT,
+                node,
+                pos
+            );
+        } else if (current.type().is(Token.Type.BOOL_NOT)) {
+            nextToken();
+            ExpressionNode node = EExpression();
+            
+            return new UnaryOperationNode(
+                UnaryOperationNode.Operation.NOT,
+                node,
+                pos
+            );
         } else if (current.type().is(Token.Type.IncDec)) {
             UnaryOperationNode.Operation operation;
             switch (current.type()) {

@@ -22,13 +22,14 @@ public class BaseNode {
         this.nodeType = nodeType.ordinal();
     }
     
-    public NodeType nodeType() { return NodeType.values()[this.nodeType]; }
+    public NodeType nodeType() {
+        return NodeType.values()[this.nodeType]; 
+    }
     
     protected int nodeType;
     
 
     public static class BaseNodeAdapter implements JsonDeserializer<BaseNode> {
-
         public BaseNode deserialize(
                 JsonElement json, 
                 Type typeOfNode,

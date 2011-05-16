@@ -15,6 +15,7 @@ class Code implements Iterable<Statement> {
     
     public void addStatement(Statement statement) {
         this.statements.add(statement);
+        System.out.println(statement);
     }
     
     public Statement[] statements() { 

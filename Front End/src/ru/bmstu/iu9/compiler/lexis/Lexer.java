@@ -338,6 +338,9 @@ class Scanner implements Iterable<Token> {
                 if (iterator.current().value() == '=') {
                     iterator.advance(1); 
                     tokenType = Token.Type.BITWISE_AND_ASSIGN;
+                } else if(iterator.current().value() == '&') {
+                    iterator.advance(1); 
+                    tokenType = Token.Type.BOOL_AND;
                 } else {
                     tokenType = Token.Type.AMPERSAND;
                 }
@@ -383,6 +386,9 @@ class Scanner implements Iterable<Token> {
                 if (iterator.current().value() == '=') {
                     iterator.advance(1); 
                     tokenType = Token.Type.BITWISE_OR_ASSIGN;
+                } else if(iterator.current().value() == '|') {
+                    iterator.advance(1); 
+                    tokenType = Token.Type.BOOL_OR;
                 } else {
                     tokenType = Token.Type.BITWISE_OR;
                 }

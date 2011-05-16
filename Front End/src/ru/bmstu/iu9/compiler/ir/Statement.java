@@ -1,6 +1,9 @@
 package ru.bmstu.iu9.compiler.ir;
 
+import java.util.*;
 import ru.bmstu.iu9.compiler.*;
+import ru.bmstu.iu9.compiler.syntax.tree.BinaryOperationNode;
+import ru.bmstu.iu9.compiler.syntax.tree.UnaryOperationNode;
 
 /**
  *
@@ -80,7 +83,7 @@ final class IndirectAssignmentStatement extends Statement {
 
 final class BinaryOperationStatement extends Statement {
     public enum Operation {
-        MUL, MINUS, PLUS, INDEX, DIV, MOD, BITWISE_SHIFT_RIGHT, 
+        MUL, MINUS, PLUS, ARRAY_ELEMENT, DIV, MOD, BITWISE_SHIFT_RIGHT, 
         BITWISE_SHIFT_LEFT, GREATER, GREATER_OR_EQUAL, LESS, LESS_OR_EUQAL, 
         NOT_EQUAL, EQUAL, BITWISE_AND, BITWISE_XOR, BITWISE_OR, BOOL_AND, 
         BOOL_OR
@@ -98,10 +101,48 @@ final class BinaryOperationStatement extends Statement {
         this.operation = operation;
     }
     
+    @Override
+    public String toString() {
+        return lhv + " = " + leftOperand + " " + 
+               operation.name() + " " + rightOperand;
+    }
+    
     public final Operand leftOperand;
     public final Operand rightOperand;
     public final Operand lhv;
     public final Operation operation;
+    
+    public static Operation operation(BinaryOperationNode.Operation operation) {
+        return operations.get(operation);
+    }
+    
+    private static final Map<BinaryOperationNode.Operation, Operation> operations;
+    
+    static {
+        operations = 
+            new EnumMap<BinaryOperationNode.Operation, Operation>(
+                BinaryOperationNode.Operation.class
+            );
+        
+        operations.put(BinaryOperationNode.Operation.MUL, Operation.MUL);
+        operations.put(BinaryOperationNode.Operation.BOOL_OR, Operation.BOOL_OR);
+        operations.put(BinaryOperationNode.Operation.BOOL_AND, Operation.BOOL_AND);
+        operations.put(BinaryOperationNode.Operation.BITWISE_OR, Operation.BITWISE_OR);
+        operations.put(BinaryOperationNode.Operation.BITWISE_XOR, Operation.BITWISE_XOR);
+        operations.put(BinaryOperationNode.Operation.BITWISE_AND, Operation.BITWISE_AND);
+        operations.put(BinaryOperationNode.Operation.EQUAL, Operation.EQUAL);
+        operations.put(BinaryOperationNode.Operation.NOT_EQUAL, Operation.NOT_EQUAL);
+        operations.put(BinaryOperationNode.Operation.LESS_OR_EUQAL, Operation.LESS_OR_EUQAL);
+        operations.put(BinaryOperationNode.Operation.LESS, Operation.LESS);
+        operations.put(BinaryOperationNode.Operation.GREATER_OR_EQUAL, Operation.GREATER_OR_EQUAL);
+        operations.put(BinaryOperationNode.Operation.GREATER, Operation.GREATER);
+        operations.put(BinaryOperationNode.Operation.BITWISE_SHIFT_LEFT, Operation.BITWISE_SHIFT_LEFT);
+        operations.put(BinaryOperationNode.Operation.BITWISE_SHIFT_RIGHT, Operation.BITWISE_SHIFT_RIGHT);
+        operations.put(BinaryOperationNode.Operation.DIV, Operation.DIV);
+        operations.put(BinaryOperationNode.Operation.ARRAY_ELEMENT, Operation.ARRAY_ELEMENT);
+        operations.put(BinaryOperationNode.Operation.PLUS, Operation.PLUS);
+        operations.put(BinaryOperationNode.Operation.MINUS, Operation.MINUS);
+    }
 }
 
 
@@ -138,9 +179,9 @@ final class GoToStatement extends Statement {
 }
 
 
-final class IfStatement extends Statement {
-    public IfStatement(
-            VariableOperand condition, 
+final class IfGoToStatement extends Statement {
+    public IfGoToStatement(
+            Operand condition, 
             Label labelTrue,
             Label labelFalse) {
         
@@ -155,7 +196,7 @@ final class IfStatement extends Statement {
         return "if " + condition + " ? " + labelTrue + " : " + labelFalse;
     }
     
-    public final VariableOperand condition;
+    public final Operand condition;
     public final Label labelTrue;
     public final Label labelFalse;
 }
@@ -188,11 +229,12 @@ final class CallStatement extends Statement {
 
 final class UnaryOperationStatement extends Statement {
     public enum Operation {
-        POST_INC, POST_DEC, MINUS, PLUS, REF, DEREF, PRE_DEC, PRE_INC, CAST
+        POST_INC, POST_DEC, MINUS, PLUS, REF, DEREF, PRE_DEC, PRE_INC, 
+        CAST, NOT, BITWISE_NOT
     };
     public UnaryOperationStatement(
             VariableOperand lhv, 
-            VariableOperand rhv,
+            Operand rhv,
             Operation operation) {
         
         super(Statement.Operation.UNARY_OPERATION);
@@ -201,9 +243,38 @@ final class UnaryOperationStatement extends Statement {
         this.operation = operation;
     }
     
-    public final VariableOperand rhv;
+    @Override
+    public String toString() {
+        return lhv + " = " + operation + " " + rhv;
+    }
+    
+    public final Operand rhv;
     public final VariableOperand lhv;
     public final Operation operation;
+    
+    public static Operation operation(UnaryOperationNode.Operation operation) {
+        return operations.get(operation);
+    }
+    
+    private static final Map<UnaryOperationNode.Operation, Operation> operations;
+    
+    static {
+        operations = 
+            new EnumMap<UnaryOperationNode.Operation, Operation>(
+                UnaryOperationNode.Operation.class
+            );
+        operations.put(UnaryOperationNode.Operation.POST_INC, Operation.POST_INC);
+        operations.put(UnaryOperationNode.Operation.POST_DEC, Operation.POST_DEC);
+        operations.put(UnaryOperationNode.Operation.MINUS, Operation.MINUS);
+        operations.put(UnaryOperationNode.Operation.PLUS, Operation.PLUS);
+        operations.put(UnaryOperationNode.Operation.REF, Operation.REF);
+        operations.put(UnaryOperationNode.Operation.DEREF, Operation.DEREF);
+        operations.put(UnaryOperationNode.Operation.PRE_DEC, Operation.PRE_DEC);
+        operations.put(UnaryOperationNode.Operation.PRE_INC, Operation.PRE_INC);
+        operations.put(UnaryOperationNode.Operation.CAST, Operation.CAST);
+        operations.put(UnaryOperationNode.Operation.NOT, Operation.NOT);
+        operations.put(UnaryOperationNode.Operation.BITWISE_NOT, Operation.BITWISE_NOT);        
+    }
 }
 
 final class ArrayIndexStatement extends Statement {

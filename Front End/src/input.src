@@ -1,26 +1,39 @@
-func q() void {
+func q() int {
     var (
         a = true bool;
-        d [5][5][6] int;
+        b = false bool;
+        c int;
+//        d [5][5][6] int;
     );
-    
+
+    switch(c) {
+    case 1:
+        return 1;
+        break;
+    case 2:
+        return 2;
+    default:
+        return 3;
+    }
+
+/*    
     d[0][1][2] = 5;
 
     var t struct abc;
-/*
+
     t.a = 5;
     t.b = 10;
     t.c = 1.2;
     t.d = &foo;
-*/
-    t.e.b.a = 5;
 
-    if(a) {
+    t.e.b.a = 5;
+*/
+    if(a && b) {
         var b int;
-    } else {
+    } else if(a || b) {
         var c double;
     }
-    return;
+//    return;
 }
 
 var bar const struct abc;
@@ -60,7 +73,9 @@ func main(args const * const * char) int {
     */
 
     var c = 'a' char;
-    args = &&c;
+    var q * char;
+    q = &c;
+    args = &q;
 //    bar = 0;
 
     if(c == 'b') {

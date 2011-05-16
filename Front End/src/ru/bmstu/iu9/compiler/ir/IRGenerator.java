@@ -216,6 +216,188 @@ public class IRGenerator {
         }
     }
     
+    private Operand generateBoolExpression(BinaryOperationNode node) {
+        if (node.is(BinaryOperationNode.Operation.Bool)) {
+            Label rightCond = new Label();
+            Label trueL = new Label();
+            Label falseL = new Label();
+            Label next = new Label();
+                    
+            switch(node.operation()) {
+                /**
+                 * a && b раскрывает в:
+                 *  
+                 *        tmp1 = generate(a);
+                 *        tmp2 = generate(b);
+                 *  
+                 *        tmp3 = NOT tmp1;
+                 *        tmp4 = NOT tmp2;
+                 *  
+                 *        if(tmp3) 
+                 *          goto false;
+                 *        else 
+                 *          goto cond;
+                 * cond:  if(tmp4) 
+                 *          goto false;
+                 *        else
+                 *          goto true;
+                 * true:  tmp5 = TRUE;
+                 *        goto next;
+                 * false: tmp5 = FALSE;
+                 * next:  usage of tmp5
+                 */
+                case BOOL_AND:
+                {
+                    Operand left = generate(node.leftChild());   // tmp1
+                    Operand right = generate(node.rightChild()); // tmp2
+                    
+                    // tmp3
+                    TmpVariableOperand first = 
+                        new TmpVariableOperand(
+                            new PrimitiveType(
+                                PrimitiveType.Type.BOOL, 
+                                true
+                            ),
+                            varTable
+                        );
+                    
+                    // tmp4
+                    TmpVariableOperand second = 
+                        new TmpVariableOperand(
+                            new PrimitiveType(
+                                PrimitiveType.Type.BOOL, 
+                                true
+                            ),
+                            varTable
+                        );
+                    
+                    // tmp3 = !a
+                    code.addStatement(
+                        new UnaryOperationStatement(
+                            first, 
+                            left,
+                            UnaryOperationStatement.Operation.NOT)
+                    );
+                    // tmp4 = !b
+                    code.addStatement(
+                        new UnaryOperationStatement(
+                            second, 
+                            right,
+                            UnaryOperationStatement.Operation.NOT)
+                    );
+                    
+                    // !a ? goto false : goto nextCondition
+                    code.addStatement(
+                        new IfGoToStatement(first, falseL, rightCond)
+                    );
+                    // !b ? goto false : goto true
+                    rightCond.setIndex(code.nextIndex());
+                    code.addStatement(
+                        new IfGoToStatement(second, falseL, trueL)
+                    );
+                    
+                    // tmp5
+                    TmpVariableOperand result = 
+                        new TmpVariableOperand(
+                            new PrimitiveType(PrimitiveType.Type.BOOL, true),
+                            varTable
+                        );
+                    
+                    // trueL:
+                    trueL.setIndex(code.nextIndex());
+                    
+                    // trueL: tmp5 = true
+                    code.addStatement(
+                        new AssignmentStatement(
+                            result,
+                            new ConstantOperand(
+                                new PrimitiveType(PrimitiveType.Type.BOOL),
+                                Boolean.TRUE
+                            )
+                        )
+                    );
+                    
+                    // goto next
+                    code.addStatement(new GoToStatement(next));
+                    
+                    // falseL:
+                    falseL.setIndex(code.nextIndex());
+                    
+                    // falseL: tmp5 = false
+                    code.addStatement(
+                        new AssignmentStatement(
+                            result,
+                            new ConstantOperand(
+                                new PrimitiveType(PrimitiveType.Type.BOOL),
+                                Boolean.FALSE
+                            )
+                        )
+                    );
+                    
+                    // next:
+                    next.setIndex(code.nextIndex());
+                    
+                    return result;
+                }
+                case BOOL_OR:
+                {
+                    Operand left = generate(node.leftChild());
+                    Operand right = generate(node.rightChild());
+                    
+                    code.addStatement(
+                        new IfGoToStatement(left, trueL, rightCond)
+                    );
+                    rightCond.setIndex(code.nextIndex());
+                    code.addStatement(
+                        new IfGoToStatement(right, trueL, falseL)
+                    );
+                    
+                    TmpVariableOperand result = 
+                        new TmpVariableOperand(
+                            new PrimitiveType(PrimitiveType.Type.BOOL, true),
+                            varTable
+                        );
+                    
+                    trueL.setIndex(code.nextIndex());
+                    
+                    code.addStatement(
+                        new AssignmentStatement(
+                            result,
+                            new ConstantOperand(
+                                new PrimitiveType(PrimitiveType.Type.BOOL),
+                                Boolean.TRUE
+                            )
+                        )
+                    );
+                    
+                    code.addStatement(new GoToStatement(next));
+                    
+                    falseL.setIndex(code.nextIndex());
+                    
+                    code.addStatement(
+                        new AssignmentStatement(
+                            result,
+                            new ConstantOperand(
+                                new PrimitiveType(PrimitiveType.Type.BOOL),
+                                Boolean.FALSE
+                            )
+                        )
+                    );
+                    
+                    next.setIndex(code.nextIndex());
+                    
+                    return result;
+                }
+                default:
+                    // @todo Report an error
+                    return null;
+            }
+        } else {
+            // @todo Report an error
+            return null;
+        }
+    }
+    
     private void declareVariable(VariableDeclNode node) {
         NamedVariable variable = new NamedVariable(node.name, node.realType());
 
@@ -236,6 +418,20 @@ public class IRGenerator {
     
     private Operand generate(BaseNode node) {
         switch(node.nodeType()) {
+            case BREAK:
+            {
+                code.addStatement(
+                    new GoToStatement(ControlStructureInfo.endOfBlockLabel)
+                );
+                break;
+            }
+            case CONTINUE:
+            {
+                code.addStatement(
+                    new GoToStatement(ControlStructureInfo.conditionLabel)
+                );
+                break;
+            }
             case RETURN:
             {
                 generateReturn((ReturnNode) node);
@@ -280,55 +476,6 @@ public class IRGenerator {
                 
                 VariableOperand op = (VariableOperand)generate(u.node);
                 
-                UnaryOperationStatement.Operation operation = null;
-                switch(u.operation()) {
-                    case POST_INC:
-                    {
-                        operation = UnaryOperationStatement.Operation.POST_INC;
-                        break;
-                    }
-                    case POST_DEC:
-                    {
-                        operation = UnaryOperationStatement.Operation.POST_DEC;
-                        break;
-                    }
-                    case MINUS:
-                    {
-                        operation = UnaryOperationStatement.Operation.MINUS;
-                        break;
-                    }
-                    case PLUS:
-                    {
-                        operation = UnaryOperationStatement.Operation.PLUS;
-                        break;
-                    }
-                    case REF:
-                    {
-                        operation = UnaryOperationStatement.Operation.REF;
-                        break;
-                    }
-                    case DEREF:
-                    {
-                        operation = UnaryOperationStatement.Operation.DEREF;
-                        break;
-                    }
-                    case PRE_DEC:
-                    {
-                        operation = UnaryOperationStatement.Operation.PRE_DEC;
-                        break;
-                    }
-                    case PRE_INC:
-                    {
-                        operation = UnaryOperationStatement.Operation.PRE_INC;
-                        break;
-                    }
-                    case CAST:
-                    {
-                        operation = UnaryOperationStatement.Operation.CAST;
-                        break;
-                    }
-                }
-                
                 TmpVariableOperand result = 
                     new TmpVariableOperand(
                         u.realType(),
@@ -339,7 +486,7 @@ public class IRGenerator {
                     new UnaryOperationStatement(
                         result,
                         op,
-                        operation)
+                        UnaryOperationStatement.operation(u.operation()))
                 );
                 
                 break;
@@ -348,24 +495,10 @@ public class IRGenerator {
             {
                 BinaryOperationNode b = (BinaryOperationNode)node;
                 
-                VariableOperand left = (VariableOperand)generate(b.leftChild());
-                VariableOperand right = 
-                    (VariableOperand) generate(b.rightChild());
-                
                 switch(b.operation()) {
                     case ARRAY_ELEMENT:
                     {
-                        TmpVariableOperand result = 
-                            new TmpVariableOperand(
-                                b.realType(),
-                                varTable
-                            );
-                        
-                        code.addStatement(
-                            new ArrayIndexStatement(result, left, right)
-                        );
-                        
-                        return result;
+                        return generateArrayIndex(b);
                     }
                     /**
                      * tmp1 = ((a.i).j);
@@ -375,19 +508,7 @@ public class IRGenerator {
                      */
                     case MEMBER_SELECT:
                     {
-                        Operand struct = generate(b.leftChild());
-                        //Code field = generate(b.rightChild());
-                        
-                        TmpVariable tmp = new TmpVariable(
-                                new PointerType(b.leftChild().realType(), true)
-                            );
-                        
-                        /*Statement stmt = 
-                            new RefStatement(
-                                tmp,
-                                
-                            );*/
-                        break;
+                        return generateStructField(b);
                     }
                     case MINUS: 
                     case DIV:
@@ -405,89 +526,22 @@ public class IRGenerator {
                     case BITWISE_AND:
                     case BITWISE_XOR:
                     case BITWISE_OR:
+                    {
+                        VariableOperand left =
+                            (VariableOperand)generate(b.leftChild());
+                        VariableOperand right = 
+                            (VariableOperand) generate(b.rightChild());
+                        
+                        return generateBinaryOperation(
+                            left,
+                            right,
+                            b.realType(),
+                            BinaryOperationStatement.operation(b.operation()));
+                    }
                     case BOOL_AND:
                     case BOOL_OR:
                     {
-                        BinaryOperationStatement.Operation operation = null;
-                        switch(b.operation()) {
-                            case MINUS: 
-                                operation = 
-                                    BinaryOperationStatement.Operation.MINUS;
-                                break;
-                            case DIV:
-                                operation = 
-                                    BinaryOperationStatement.Operation.DIV;
-                                break;
-                            case MUL:
-                                operation = 
-                                    BinaryOperationStatement.Operation.MUL;
-                                break;
-                            case MOD:
-                                operation = 
-                                    BinaryOperationStatement.Operation.MOD;
-                                break;
-                            case PLUS: 
-                                operation = 
-                                    BinaryOperationStatement.Operation.PLUS;
-                                break;
-                            case BITWISE_SHIFT_RIGHT:
-                                operation = 
-                                    BinaryOperationStatement.Operation.BITWISE_SHIFT_RIGHT;
-                                break;
-                            case BITWISE_SHIFT_LEFT:
-                                operation = 
-                                    BinaryOperationStatement.Operation.BITWISE_SHIFT_LEFT;
-                                break;
-                            case GREATER:
-                                operation = 
-                                    BinaryOperationStatement.Operation.GREATER;
-                                break;
-                            case GREATER_OR_EQUAL:
-                                operation = 
-                                    BinaryOperationStatement.Operation.GREATER_OR_EQUAL;
-                                break;
-                            case LESS:
-                                operation = 
-                                    BinaryOperationStatement.Operation.LESS;
-                                break;
-                            case LESS_OR_EUQAL:
-                                operation = 
-                                    BinaryOperationStatement.Operation.LESS_OR_EUQAL;
-                                break;
-                            case NOT_EQUAL:
-                                operation = 
-                                    BinaryOperationStatement.Operation.NOT_EQUAL;
-                                break;
-                            case EQUAL:
-                                operation = 
-                                    BinaryOperationStatement.Operation.EQUAL;
-                                break;
-                            case BITWISE_AND:
-                                operation = 
-                                    BinaryOperationStatement.Operation.BITWISE_AND;
-                                break;
-                            case BITWISE_XOR:
-                                operation = 
-                                    BinaryOperationStatement.Operation.BITWISE_XOR;
-                                break;
-                            case BITWISE_OR:
-                                operation = 
-                                    BinaryOperationStatement.Operation.BITWISE_OR;
-                                break;
-                            case BOOL_AND:
-                                operation = 
-                                    BinaryOperationStatement.Operation.BOOL_AND;
-                                break;
-                            case BOOL_OR:
-                                operation = 
-                                    BinaryOperationStatement.Operation.BOOL_OR;
-                                break;
-                        }
-                        return binaryOperationStatement(
-                                left,
-                                right,
-                                b.realType(),
-                                operation);
+                        return generateBoolExpression(b);
                     }
                     case BITWISE_AND_ASSIGN:
                     case BITWISE_XOR_ASSIGN: 
@@ -500,63 +554,54 @@ public class IRGenerator {
                     case MINUS_ASSIGN: 
                     case PLUS_ASSIGN:
                     {
-                        BinaryOperationStatement.Operation operation = null;
-                        switch(b.operation()) {
-                            case MINUS_ASSIGN: 
-                                operation = 
-                                    BinaryOperationStatement.Operation.MINUS;
-                                break;
-                            case DIV_ASSIGN:
-                                operation = 
-                                    BinaryOperationStatement.Operation.DIV;
-                                break;
-                            case MUL_ASSIGN:
-                                operation = 
-                                    BinaryOperationStatement.Operation.MUL;
-                                break;
-                            case MOD_ASSIGN:
-                                operation = 
-                                    BinaryOperationStatement.Operation.MOD;
-                                break;
-                            case PLUS_ASSIGN: 
-                                operation = 
-                                    BinaryOperationStatement.Operation.PLUS;
-                                break;
-                            case BITWISE_SHIFT_RIGHT_ASSIGN:
-                                operation = 
-                                    BinaryOperationStatement.Operation.BITWISE_SHIFT_RIGHT;
-                                break;
-                            case BITWISE_SHIFT_LEFT_ASSIGN:
-                                operation = 
-                                    BinaryOperationStatement.Operation.BITWISE_SHIFT_LEFT;
-                                break;
-                            case BITWISE_AND_ASSIGN:
-                                operation = 
-                                    BinaryOperationStatement.Operation.BITWISE_AND;
-                                break;
-                            case BITWISE_XOR_ASSIGN:
-                                operation = 
-                                    BinaryOperationStatement.Operation.BITWISE_XOR;
-                                break;
-                            case BITWISE_OR_ASSIGN:
-                                operation = 
-                                    BinaryOperationStatement.Operation.BITWISE_OR;
-                                break;
+                        VariableOperand lhv = 
+                            generateLeftHandValue(b.leftChild());
+                        
+                        VariableOperand left =
+                            (VariableOperand)generate(b.leftChild());
+                        VariableOperand right = 
+                            (VariableOperand) generate(b.rightChild());
+                        
+                        if (left.type().is(PrimitiveType.Type.POINTER)) {
+                            TmpVariableOperand value = 
+                                new TmpVariableOperand(
+                                    ((PointerType)left.type()).pointerType,
+                                    varTable);
+                            
+                            code.addStatement(
+                                new UnaryOperationStatement(
+                                    left, 
+                                    value,
+                                    UnaryOperationStatement.Operation.DEREF
+                                )
+                            );
+                            
+                            left = value;
                         }
                         
-                        Operand result = binaryOperationStatement(
-                                left,
-                                right,
-                                b.realType(),
-                                operation);
-                        
-                        code.addStatement(
-                            new AssignmentStatement(left, result)
+                        Operand result = generateBinaryOperation(
+                            left,
+                            right,
+                            b.realType(),
+                            BinaryOperationStatement.operation(b.operation())
                         );
+                        
+                        
+                        if(b.leftChild() instanceof VariableLeaf) {
+                            code.addStatement(
+                                new AssignmentStatement(lhv, result)
+                            );
+                        } else {
+                            code.addStatement(
+                                new IndirectAssignmentStatement(lhv, result)
+                            );
+                        }
+                        
+                        break;
                     }
                     case ASSIGN:
                     {
-                        code.addStatement(new AssignmentStatement(left, right));
+                        generateAssignment(b);                        
                         break;
                     }
                     
@@ -565,13 +610,17 @@ public class IRGenerator {
                 break;
             }
             case IF:
-            {
-                IfNode i = (IfNode) node;
-                
-                generateIf(i);
-                
+                generateIf((IfNode) node);
                 break;
-            }
+            case WHILE:
+                generateWhile((WhileNode) node);
+                break;
+            case DO_WHILE:
+                generateDoWhile((DoWhileNode) node);
+                break;
+            case SWITCH:
+                generateSwitch((SwitchNode) node);
+                break;
             case ELSE:
             {
                 ElseNode e = (ElseNode) node;
@@ -623,33 +672,124 @@ public class IRGenerator {
         return null;
     }
     
+    private void generateSwitch(SwitchNode node) {
+        Operand expr = generate(node.expression);
+        
+        ControlStructureInfo.renew();
+        Label defaultLabel = new Label();
+        
+        for(CaseNode c : node.cases) {
+            Label caseL = new Label();
+            
+            Operand caseExpr = generate(c.expression);
+            
+            TmpVariableOperand condition = 
+                new TmpVariableOperand(
+                    new PrimitiveType(PrimitiveType.Type.BOOL),
+                    varTable
+                );
+            
+            code.addStatement(
+                new BinaryOperationStatement(
+                    expr,
+                    caseExpr,
+                    condition,
+                    BinaryOperationStatement.Operation.EQUAL)
+            );
+            
+            code.addStatement(
+                new IfGoToStatement(condition, caseL, defaultLabel)
+            );
+
+            caseL.setIndex(code.nextIndex());
+
+            generate(c.block);
+            
+            code.addStatement(new GoToStatement(defaultLabel));
+        }
+        
+        if(node.defaultNode != null) {
+            defaultLabel.setIndex(code.nextIndex());
+            
+            generate(node.defaultNode.block);
+            ControlStructureInfo.endOfBlockLabel.setIndex(code.nextIndex());
+        } else {
+            ControlStructureInfo.endOfBlockLabel.setIndex(code.nextIndex());
+            defaultLabel.setIndex(code.nextIndex());
+        }
+    }
+    
+    private void generateDoWhile(DoWhileNode node) {
+        Operand condition = generate(node.expression);
+        
+        Label trueL = new Label();
+        Label falseL = new Label();
+        
+        trueL.setIndex(code.nextIndex());
+        
+        generate(node.block);
+        
+        code.addStatement(
+            new IfGoToStatement(condition, trueL, falseL)
+        );
+        
+        falseL.setIndex(code.nextIndex());
+    }
+    
+    private void generateWhile(WhileNode node) {
+        Operand condition = generate(node.expression);
+        
+        ControlStructureInfo.renew();
+        Label blockLabel = new Label();
+        
+        ControlStructureInfo.conditionLabel.setIndex(code.nextIndex());
+        
+        code.addStatement(
+            new IfGoToStatement(
+                condition, 
+                blockLabel, 
+                ControlStructureInfo.endOfBlockLabel)
+        );
+        
+        blockLabel.setIndex(code.nextIndex());
+        
+        generate(node.block);
+        
+        code.addStatement(
+            new GoToStatement(ControlStructureInfo.conditionLabel));
+        
+        ControlStructureInfo.endOfBlockLabel.setIndex(code.nextIndex());
+    }
+    
     private void generateIf(IfNode node) {
-        VariableOperand condition = (VariableOperand) generate(node.condition);
+        Operand condition = generate(node.condition);
         
-        Label labelTrue = new Label();
-        Label labelFalse = new Label();
+        Label trueL = new Label();
+        Label falseL = new Label();
         
-        code.addStatement(new IfStatement(condition, labelTrue, labelFalse));
+        code.addStatement(
+            new IfGoToStatement(condition, trueL, falseL)
+        );
         
-        labelTrue.setIndex(code.nextIndex());
+        trueL.setIndex(code.nextIndex());
         
         generate(node.block);
         
         if(node.elseNode != null) {
             Label endOfBlock = new Label();
             code.addStatement(new GoToStatement(endOfBlock));
-            labelFalse.setIndex(code.nextIndex());
+            falseL.setIndex(code.nextIndex());
             
             generate(node.elseNode);
             endOfBlock.setIndex(code.nextIndex());
         } else {
-            labelFalse.setIndex(code.nextIndex());
+            falseL.setIndex(code.nextIndex());
         }
         
-        code.addStatement(new ReturnStatement());
+//        code.addStatement(new ReturnStatement());
     }
     
-    private Operand binaryOperationStatement(
+    private Operand generateBinaryOperation(
             Operand left,
             Operand right,
             BaseType type,
@@ -670,4 +810,15 @@ public class IRGenerator {
     private VariablesTable varTable;
     private final BlockNode<BaseNode> parseTree;
     private Code code;
+    
+    
+    private static class ControlStructureInfo {
+        public static void renew() {
+            conditionLabel = new Label();
+            endOfBlockLabel = new Label();
+        }
+        
+        public static Label conditionLabel;
+        public static Label endOfBlockLabel;
+    }
 }

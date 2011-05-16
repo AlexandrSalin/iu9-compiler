@@ -14,7 +14,8 @@ import ru.bmstu.iu9.compiler.Position;
  */
 public class UnaryOperationNode extends ExpressionNode {
     public enum Operation { 
-        POST_INC, POST_DEC, MINUS, PLUS, REF, DEREF, PRE_DEC, PRE_INC, CAST
+        POST_INC, POST_DEC, MINUS, PLUS, REF, DEREF, PRE_DEC, PRE_INC, 
+        CAST, NOT, BITWISE_NOT
     };
 
     public UnaryOperationNode(
