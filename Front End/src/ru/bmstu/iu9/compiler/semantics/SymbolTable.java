@@ -1,7 +1,8 @@
 package ru.bmstu.iu9.compiler.semantics;
 
 import java.util.Iterator;
-import ru.bmstu.iu9.compiler.BaseType;
+import ru.bmstu.iu9.compiler.ir.type.BaseType;
+
 import java.util.Map;
 import java.util.LinkedHashMap;
 /**
@@ -38,8 +39,7 @@ class SymbolTable implements Iterable<Symbol> {
     public void setAssociatedSymbol(Symbol associatedSymbol) { 
         this.associatedSymbol = associatedSymbol; 
     }
-    
-    @Override
+
     public Iterator<Symbol> iterator() {
         return symbols.values().iterator();
     }

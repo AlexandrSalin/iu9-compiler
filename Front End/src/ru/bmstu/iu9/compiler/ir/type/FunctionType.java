@@ -1,4 +1,4 @@
-package ru.bmstu.iu9.compiler;
+package ru.bmstu.iu9.compiler.ir.type;
 
 import java.util.LinkedList;
 import java.util.List;

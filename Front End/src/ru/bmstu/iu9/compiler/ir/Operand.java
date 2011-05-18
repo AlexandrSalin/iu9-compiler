@@ -1,6 +1,6 @@
 package ru.bmstu.iu9.compiler.ir;
 
-import ru.bmstu.iu9.compiler.*;
+import ru.bmstu.iu9.compiler.ir.type.BaseType;
 
 /**
  * Интерфейс для всех инструкций в трехадресном коде.
@@ -29,7 +29,8 @@ abstract class VariableOperand implements Operand {
      * 
      * @return Тип переменной
      */
-    public BaseType type() { 
+    public
+    BaseType type() {
         return this.table.get(number).type; 
     }
 

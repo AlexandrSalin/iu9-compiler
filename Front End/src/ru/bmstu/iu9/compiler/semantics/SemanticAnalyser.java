@@ -4,7 +4,8 @@ import com.google.gson.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.*;
-import ru.bmstu.iu9.compiler.*;
+
+import ru.bmstu.iu9.compiler.ir.type.*;
 import ru.bmstu.iu9.compiler.syntax.tree.*;
 
 /**
@@ -54,7 +55,8 @@ public class SemanticAnalyser {
     
     public static void main(String[] args) {
         SemanticAnalyser analyser = 
-            new SemanticAnalyser("C:\\Users\\maggot\\Documents\\NetBeansProjects\\ru.bmstu.iu9.compiler\\Front End\\src\\parse_tree.json");
+            new SemanticAnalyser("C:\\Users\\maggot\\Documents\\IntelliJ IDEA" +
+                                 " Projects\\iu9-compiler\\Front End\\src\\parse_tree.json");
         analyser.Analyse();
 
         return;
@@ -138,7 +140,7 @@ public class SemanticAnalyser {
                     FunctionDeclNode func = (FunctionDeclNode)node;
                     FunctionSymbol symbol = 
                         (FunctionSymbol)context.global().get(func.name);
-                    assert symbol == null;
+                    assert symbol != null;
                     
                     SymbolTable scope = symbol.scope;
                     FunctionTypeNode type = (FunctionTypeNode)func.type;
@@ -165,6 +167,7 @@ public class SemanticAnalyser {
 
                     symbol.setType(realType);
                     type.setRealType(realType);
+                    func.setRealType(realType);
 
                     break;
                 }
@@ -350,10 +353,10 @@ public class SemanticAnalyser {
                 
                         TypeChecker.check(
                                 bNode.leftChild().realType(), 
-                                BaseType.Type.ARRAY, 
+                                BaseType.Type.ARRAY,
                                 bNode.dInfo);
                         
-                        ArrayType array = 
+                        ArrayType array =
                                 (ArrayType)bNode.leftChild().realType();
                         bNode.setRealType(array.element);
                         

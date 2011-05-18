@@ -1,7 +1,8 @@
 package ru.bmstu.iu9.compiler.ir;
 
 import java.util.*;
-import ru.bmstu.iu9.compiler.*;
+
+import ru.bmstu.iu9.compiler.ir.type.BaseType;
 
 
 /**
@@ -60,17 +61,17 @@ class VariablesTable {
     
     private final Iterator<Long> numerator = 
             new Iterator<Long>() {
-                @Override
+
                 public boolean hasNext() {
                     return true;
                 }
 
-                @Override
+
                 public Long next() {
                     return ++counter;
                 }
 
-                @Override
+
                 public void remove() {
                     throw 
                         new UnsupportedOperationException("Not supported yet.");

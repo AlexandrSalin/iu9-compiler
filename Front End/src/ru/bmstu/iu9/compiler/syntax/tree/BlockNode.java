@@ -47,7 +47,7 @@ public class BlockNode<T>
         this.children.addAll(children);
     }
 
-    @Override
+
     public Iterator<T> iterator() {
         return this.children.iterator();
     }
@@ -67,7 +67,7 @@ public class BlockNode<T>
     public static class BlockNodeAdapter 
             implements JsonSerializer<BlockNode> {
         
-        @Override
+
         public JsonElement serialize(
                 BlockNode src, 
                 Type type, 

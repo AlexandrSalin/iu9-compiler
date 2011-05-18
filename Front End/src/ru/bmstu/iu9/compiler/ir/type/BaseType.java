@@ -1,4 +1,4 @@
-package ru.bmstu.iu9.compiler;
+package ru.bmstu.iu9.compiler.ir.type;
 
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
@@ -88,9 +88,18 @@ abstract public class BaseType {
             BaseType result = null;
             
             BaseType.Type typeType = 
-                    BaseType.Type.values()[(Integer)context.deserialize(object.get("typeType"), Integer.class)];
+                    BaseType.Type.values()[
+                        (Integer)context.deserialize(
+                            object.get("typeType"),
+                            Integer.class
+                        )
+                    ];
             
-            boolean constancy = context.deserialize(object.get("constancy"), Boolean.class);
+            boolean constancy =
+                (Boolean)context.deserialize(
+                    object.get("constancy"),
+                    Boolean.class
+                );
             
             JsonPrimitive primitive = null;
             JsonObject obj = null;
@@ -99,13 +108,18 @@ abstract public class BaseType {
                 {
                     obj = object.getAsJsonObject("elementType");
                     assert obj == null;
-                    BaseType elementType = context.deserialize(obj, BaseType.class);
+                    BaseType elementType =
+                        context.deserialize(obj, BaseType.class);
                     
                     primitive = object.getAsJsonPrimitive("lenght");
                     if(primitive == null) {
                         result = new ArrayType(elementType, constancy);
                     } else {
-                        int lenght = context.deserialize(primitive, Integer.class);
+                        int lenght =
+                            (Integer)context.deserialize(
+                                primitive,
+                                Integer.class
+                            );
                         result = new ArrayType(elementType, lenght, constancy);
                     }
                     

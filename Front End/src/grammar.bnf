@@ -60,10 +60,8 @@ Program       ::= { FunctionDef | VariableDef ";" | StructDef ";" }
 
 FunctionDecl  ::= "func" Identifier Signature Block
 
-VariableDef   ::= Type Variable { "," Variable }
+VariableDef   ::= "var" Variable { "," Variable } ":" Type
 Variable      ::= Identifier [ "=" Expression ]
-
-FuncArgList   ::= "(" [ Type Identifier { "," Type Identifier }] ")"
 
 StructDef ::= "struct" Identifier "{" { VariableDef ";" } "}"
 
@@ -82,7 +80,7 @@ CBoolExpression ::= DboolExpression { OrderRelation DboolExpression }
 DboolExpression ::= AExpression { BitwiseShift AExpression } 
 AExpression ::= BExpression { PlusMinus BExpression } 
 BExpression ::= CExpression { ( Div | Asterisk | Mod ) CExpression } 
-CExpression ::= ( "(" ( Type ")" DExpression | Expression ")" )) | DExpression
+CExpression ::= [ "<" Type ">" ] DExpression
 DExpression ::= ([ PlusMinus ] | { Ampersand | Asterisk } | [ IncDec ]) EExpression 
 EExpression ::= FExpression [ IncDec ] 
 FExpression ::= JExpression { ArrayElement | MemberSelect Identifier | FuncArgs }

@@ -51,7 +51,7 @@ public class Lexer {
         } finally {
             try {
                 reader.close();
-            } catch(java.io.IOException ex) {
+            } catch(Exception ex) {
 //                ex.printStackTrace();
             }
         }
@@ -93,11 +93,11 @@ public class Lexer {
     }
     
     public static void main(String[] args) {
-        Lexer lex = 
-            new Lexer("C:\\Users\\maggot\\Documents\\NetBeansProjects\\ru.bmstu.iu9.compiler\\Front End\\src\\input.src");
+        Lexer lex = new Lexer("C:\\Users\\maggot\\Documents\\IntelliJ IDEA " +
+                              "Projects\\iu9-compiler\\Front End\\src\\input.src");
         lex.run();
-        lex.toJson(
-                "C:\\Users\\maggot\\Documents\\NetBeansProjects\\ru.bmstu.iu9.compiler\\Front End\\src\\output.json");
+        lex.toJson("C:\\Users\\maggot\\Documents\\IntelliJ IDEA " +
+                   "Projects\\iu9-compiler\\Front End\\src\\output.json");
     }
     
     /**
@@ -180,18 +180,18 @@ class Scanner implements Iterable<Token> {
      * 
      * @return Итератор по {@link ru.bmstu.iu9.compiler.lexis.token.Token Token}ам
      */
-    @Override
+
     public Iterator<Token> iterator() {
         return new Iterator<Token>() {
-                @Override
+
                 public boolean hasNext() {
                     return !skipWhitespacesAndComments();
                 }
-                @Override
+
                 public Token next() {
                     return nextToken();
                 }
-                @Override
+
                 public void remove() {
                     throw new UnsupportedOperationException();
                 }
@@ -416,7 +416,7 @@ class Scanner implements Iterable<Token> {
                     iterator.advance(1); 
                     tokenType = Token.Type.GREATER_OR_EQUAL;
                 } else {
-                    tokenType = Token.Type.GREATER;
+                    tokenType = Token.Type.RIGHT_ANGLE_BRACKET;
                 }
                 break;
             case '<':
@@ -433,7 +433,7 @@ class Scanner implements Iterable<Token> {
                     iterator.advance(1); 
                     tokenType = Token.Type.LESS_OR_EQUAL;
                 } else {
-                    tokenType = Token.Type.LESS;
+                    tokenType = Token.Type.LEFT_ANGLE_BRACKET;
                 }
                 break;
             default:

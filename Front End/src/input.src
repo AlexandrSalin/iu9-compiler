@@ -1,3 +1,4 @@
+/*
 func q() int {
     var (
         a = true bool;
@@ -9,14 +10,24 @@ func q() int {
     switch(c) {
     case 1:
         return 1;
-        break;
+    break;
     case 2:
         return 2;
     default:
         return 3;
     }
 
-/*    
+
+    for(var i = 0 int; i <= 10; ++i) {
+        var l = 10.0 double;
+
+        if(a) {
+            var k long;
+        }
+
+        var m char;
+    }
+
     d[0][1][2] = 5;
 
     var t struct abc;
@@ -27,7 +38,7 @@ func q() int {
     t.d = &foo;
 
     t.e.b.a = 5;
-*/
+
     if(a && b) {
         var b int;
     } else if(a || b) {
@@ -37,7 +48,7 @@ func q() int {
 }
 
 var bar const struct abc;
-
+     */
 struct def {
     a int;
     b **struct abc;
@@ -64,6 +75,8 @@ func main(args const * const * char) int {
     var (
         a = 0 int;
         b = 10 const int;
+        l [10][5] int;
+        m struct abc;
         );
 
     /*
@@ -71,6 +84,10 @@ func main(args const * const * char) int {
         multiline 
         comment 
     */
+    m.d = &main;
+ //   a = (*m.d)(args);
+
+    l[2][3] = a;
 
     var c = 'a' char;
     var q * char;

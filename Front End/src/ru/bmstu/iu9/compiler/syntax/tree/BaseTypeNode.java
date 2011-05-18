@@ -5,6 +5,7 @@
 package ru.bmstu.iu9.compiler.syntax.tree;
 
 import ru.bmstu.iu9.compiler.*;
+import ru.bmstu.iu9.compiler.ir.type.BaseType;
 
 /**
  *

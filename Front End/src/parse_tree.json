@@ -1,529 +1,14 @@
 {
   "children": [
     {
-      "block": {
-        "children": [
-          {
-            "children": [
-              {
-                "value": {
-                  "value": true,
-                  "constantType": 3,
-                  "dInfo": {
-                    "position": {
-                      "line": 3,
-                      "position": 13,
-                      "index": 37
-                    }
-                  },
-                  "nodeType": 14
-                },
-                "dInfo": {
-                  "position": {
-                    "line": 3,
-                    "position": 9,
-                    "index": 33
-                  }
-                },
-                "name": "a",
-                "type": {
-                  "primitive": 1,
-                  "type": 3,
-                  "constancy": false,
-                  "dInfo": {
-                    "position": {
-                      "line": 3,
-                      "position": 18,
-                      "index": 42
-                    }
-                  },
-                  "nodeType": 20
-                },
-                "nodeType": 2
-              },
-              {
-                "value": {
-                  "value": false,
-                  "constantType": 3,
-                  "dInfo": {
-                    "position": {
-                      "line": 4,
-                      "position": 13,
-                      "index": 60
-                    }
-                  },
-                  "nodeType": 14
-                },
-                "dInfo": {
-                  "position": {
-                    "line": 4,
-                    "position": 9,
-                    "index": 56
-                  }
-                },
-                "name": "b",
-                "type": {
-                  "primitive": 1,
-                  "type": 3,
-                  "constancy": false,
-                  "dInfo": {
-                    "position": {
-                      "line": 4,
-                      "position": 19,
-                      "index": 66
-                    }
-                  },
-                  "nodeType": 20
-                },
-                "nodeType": 2
-              },
-              {
-                "dInfo": {
-                  "position": {
-                    "line": 5,
-                    "position": 9,
-                    "index": 80
-                  }
-                },
-                "name": "c",
-                "type": {
-                  "primitive": 0,
-                  "type": 3,
-                  "constancy": false,
-                  "dInfo": {
-                    "position": {
-                      "line": 5,
-                      "position": 11,
-                      "index": 82
-                    }
-                  },
-                  "nodeType": 20
-                },
-                "nodeType": 2
-              }
-            ],
-            "nodeType": 26
-          },
-          {
-            "expression": {
-              "name": "c",
-              "dInfo": {
-                "position": {
-                  "line": 9,
-                  "position": 12,
-                  "index": 133
-                }
-              },
-              "nodeType": 13
-            },
-            "cases": {
-              "children": [
-                {
-                  "expression": {
-                    "value": 1,
-                    "constantType": 0,
-                    "dInfo": {
-                      "position": {
-                        "line": 10,
-                        "position": 10,
-                        "index": 147
-                      }
-                    },
-                    "nodeType": 14
-                  },
-                  "block": {
-                    "children": [
-                      {
-                        "returnExpr": {
-                          "value": 1,
-                          "constantType": 0,
-                          "dInfo": {
-                            "position": {
-                              "line": 11,
-                              "position": 16,
-                              "index": 165
-                            }
-                          },
-                          "nodeType": 14
-                        },
-                        "dInfo": {
-                          "position": {
-                            "line": 11,
-                            "position": 9,
-                            "index": 158
-                          }
-                        },
-                        "nodeType": 23
-                      },
-                      {
-                        "dInfo": {
-                          "position": {
-                            "line": 12,
-                            "position": 9,
-                            "index": 176
-                          }
-                        },
-                        "nodeType": 22
-                      }
-                    ],
-                    "nodeType": 12
-                  },
-                  "dInfo": {
-                    "position": {
-                      "line": 10,
-                      "position": 5,
-                      "index": 142
-                    }
-                  },
-                  "nodeType": 9
-                },
-                {
-                  "expression": {
-                    "value": 2,
-                    "constantType": 0,
-                    "dInfo": {
-                      "position": {
-                        "line": 13,
-                        "position": 10,
-                        "index": 192
-                      }
-                    },
-                    "nodeType": 14
-                  },
-                  "block": {
-                    "children": [
-                      {
-                        "returnExpr": {
-                          "value": 2,
-                          "constantType": 0,
-                          "dInfo": {
-                            "position": {
-                              "line": 14,
-                              "position": 16,
-                              "index": 210
-                            }
-                          },
-                          "nodeType": 14
-                        },
-                        "dInfo": {
-                          "position": {
-                            "line": 14,
-                            "position": 9,
-                            "index": 203
-                          }
-                        },
-                        "nodeType": 23
-                      }
-                    ],
-                    "nodeType": 12
-                  },
-                  "dInfo": {
-                    "position": {
-                      "line": 13,
-                      "position": 5,
-                      "index": 187
-                    }
-                  },
-                  "nodeType": 9
-                }
-              ],
-              "nodeType": 12
-            },
-            "defaultNode": {
-              "block": {
-                "children": [
-                  {
-                    "returnExpr": {
-                      "value": 3,
-                      "constantType": 0,
-                      "dInfo": {
-                        "position": {
-                          "line": 16,
-                          "position": 16,
-                          "index": 241
-                        }
-                      },
-                      "nodeType": 14
-                    },
-                    "dInfo": {
-                      "position": {
-                        "line": 16,
-                        "position": 9,
-                        "index": 234
-                      }
-                    },
-                    "nodeType": 23
-                  }
-                ],
-                "nodeType": 12
-              },
-              "dInfo": {
-                "position": {
-                  "line": 15,
-                  "position": 5,
-                  "index": 217
-                }
-              },
-              "nodeType": 4
-            },
-            "dInfo": {
-              "position": {
-                "line": 9,
-                "position": 5,
-                "index": 126
-              }
-            },
-            "nodeType": 8
-          },
-          {
-            "condition": {
-              "left": {
-                "name": "a",
-                "dInfo": {
-                  "position": {
-                    "line": 31,
-                    "position": 8,
-                    "index": 388
-                  }
-                },
-                "nodeType": 13
-              },
-              "right": {
-                "name": "b",
-                "dInfo": {
-                  "position": {
-                    "line": 31,
-                    "position": 13,
-                    "index": 393
-                  }
-                },
-                "nodeType": 13
-              },
-              "operation": 17,
-              "dInfo": {
-                "position": {
-                  "line": 31,
-                  "position": 10,
-                  "index": 390
-                }
-              },
-              "nodeType": 0
-            },
-            "elseNode": {
-              "block": {
-                "children": [
-                  {
-                    "condition": {
-                      "left": {
-                        "name": "a",
-                        "dInfo": {
-                          "position": {
-                            "line": 33,
-                            "position": 15,
-                            "index": 431
-                          }
-                        },
-                        "nodeType": 13
-                      },
-                      "right": {
-                        "name": "b",
-                        "dInfo": {
-                          "position": {
-                            "line": 33,
-                            "position": 20,
-                            "index": 436
-                          }
-                        },
-                        "nodeType": 13
-                      },
-                      "operation": 18,
-                      "dInfo": {
-                        "position": {
-                          "line": 33,
-                          "position": 17,
-                          "index": 433
-                        }
-                      },
-                      "nodeType": 0
-                    },
-                    "block": {
-                      "children": [
-                        {
-                          "children": [
-                            {
-                              "dInfo": {
-                                "position": {
-                                  "line": 34,
-                                  "position": 13,
-                                  "index": 453
-                                }
-                              },
-                              "name": "c",
-                              "type": {
-                                "primitive": 3,
-                                "type": 3,
-                                "constancy": false,
-                                "dInfo": {
-                                  "position": {
-                                    "line": 34,
-                                    "position": 15,
-                                    "index": 455
-                                  }
-                                },
-                                "nodeType": 20
-                              },
-                              "nodeType": 2
-                            }
-                          ],
-                          "nodeType": 26
-                        }
-                      ],
-                      "nodeType": 12
-                    },
-                    "dInfo": {
-                      "position": {
-                        "line": 33,
-                        "position": 12,
-                        "index": 428
-                      }
-                    },
-                    "nodeType": 7
-                  }
-                ],
-                "nodeType": 12
-              },
-              "dInfo": {
-                "position": {
-                  "line": 33,
-                  "position": 7,
-                  "index": 423
-                }
-              },
-              "nodeType": 3
-            },
-            "block": {
-              "children": [
-                {
-                  "children": [
-                    {
-                      "dInfo": {
-                        "position": {
-                          "line": 32,
-                          "position": 13,
-                          "index": 410
-                        }
-                      },
-                      "name": "b",
-                      "type": {
-                        "primitive": 0,
-                        "type": 3,
-                        "constancy": false,
-                        "dInfo": {
-                          "position": {
-                            "line": 32,
-                            "position": 15,
-                            "index": 412
-                          }
-                        },
-                        "nodeType": 20
-                      },
-                      "nodeType": 2
-                    }
-                  ],
-                  "nodeType": 26
-                }
-              ],
-              "nodeType": 12
-            },
-            "dInfo": {
-              "position": {
-                "line": 31,
-                "position": 5,
-                "index": 385
-              }
-            },
-            "nodeType": 7
-          }
-        ],
-        "nodeType": 12
-      },
-      "dInfo": {
-        "position": {
-          "line": 1,
-          "position": 6,
-          "index": 5
-        }
-      },
-      "name": "q",
-      "type": {
-        "arguments": {
-          "children": [],
-          "nodeType": 26
-        },
-        "returnValue": {
-          "primitive": 0,
-          "type": 3,
-          "constancy": false,
-          "dInfo": {
-            "position": {
-              "line": 1,
-              "position": 10,
-              "index": 9
-            }
-          },
-          "nodeType": 20
-        },
-        "type": 2,
-        "constancy": false,
-        "dInfo": {
-          "position": {
-            "line": 1,
-            "position": 7,
-            "index": 6
-          }
-        },
-        "nodeType": 20
-      },
-      "nodeType": 15
-    },
-    {
-      "children": [
-        {
-          "dInfo": {
-            "position": {
-              "line": 39,
-              "position": 5,
-              "index": 490
-            }
-          },
-          "name": "bar",
-          "type": {
-            "name": "abc",
-            "type": 1,
-            "constancy": true,
-            "dInfo": {
-              "position": {
-                "line": 39,
-                "position": 15,
-                "index": 500
-              }
-            },
-            "nodeType": 20
-          },
-          "nodeType": 2
-        }
-      ],
-      "nodeType": 26
-    },
-    {
       "declarations": {
         "children": [
           {
             "dInfo": {
               "position": {
-                "line": 42,
+                "line": 53,
                 "position": 5,
-                "index": 530
+                "index": 675
               }
             },
             "name": "a",
@@ -533,9 +18,9 @@
               "constancy": false,
               "dInfo": {
                 "position": {
-                  "line": 42,
+                  "line": 53,
                   "position": 7,
-                  "index": 532
+                  "index": 677
                 }
               },
               "nodeType": 20
@@ -545,9 +30,9 @@
           {
             "dInfo": {
               "position": {
-                "line": 43,
+                "line": 54,
                 "position": 5,
-                "index": 541
+                "index": 686
               }
             },
             "name": "b",
@@ -559,9 +44,9 @@
                   "constancy": false,
                   "dInfo": {
                     "position": {
-                      "line": 43,
+                      "line": 54,
                       "position": 9,
-                      "index": 545
+                      "index": 690
                     }
                   },
                   "nodeType": 20
@@ -571,9 +56,9 @@
                 "constancy": false,
                 "dInfo": {
                   "position": {
-                    "line": 43,
+                    "line": 54,
                     "position": 8,
-                    "index": 544
+                    "index": 689
                   }
                 },
                 "nodeType": 20
@@ -583,9 +68,9 @@
               "constancy": false,
               "dInfo": {
                 "position": {
-                  "line": 43,
+                  "line": 54,
                   "position": 7,
-                  "index": 543
+                  "index": 688
                 }
               },
               "nodeType": 20
@@ -597,9 +82,9 @@
       },
       "dInfo": {
         "position": {
-          "line": 41,
+          "line": 52,
           "position": 1,
-          "index": 513
+          "index": 658
         }
       },
       "name": "def",
@@ -609,9 +94,9 @@
         "constancy": false,
         "dInfo": {
           "position": {
-            "line": 41,
+            "line": 52,
             "position": 1,
-            "index": 513
+            "index": 658
           }
         },
         "nodeType": 20
@@ -624,9 +109,9 @@
           {
             "dInfo": {
               "position": {
-                "line": 46,
+                "line": 57,
                 "position": 5,
-                "index": 577
+                "index": 722
               }
             },
             "name": "a",
@@ -636,9 +121,9 @@
               "constancy": false,
               "dInfo": {
                 "position": {
-                  "line": 46,
+                  "line": 57,
                   "position": 10,
-                  "index": 582
+                  "index": 727
                 }
               },
               "nodeType": 20
@@ -648,9 +133,9 @@
           {
             "dInfo": {
               "position": {
-                "line": 46,
+                "line": 57,
                 "position": 8,
-                "index": 580
+                "index": 725
               }
             },
             "name": "b",
@@ -660,9 +145,9 @@
               "constancy": false,
               "dInfo": {
                 "position": {
-                  "line": 46,
+                  "line": 57,
                   "position": 10,
-                  "index": 582
+                  "index": 727
                 }
               },
               "nodeType": 20
@@ -672,9 +157,9 @@
           {
             "dInfo": {
               "position": {
-                "line": 47,
+                "line": 58,
                 "position": 5,
-                "index": 591
+                "index": 736
               }
             },
             "name": "c",
@@ -684,9 +169,9 @@
               "constancy": false,
               "dInfo": {
                 "position": {
-                  "line": 47,
+                  "line": 58,
                   "position": 7,
-                  "index": 593
+                  "index": 738
                 }
               },
               "nodeType": 20
@@ -696,9 +181,9 @@
           {
             "dInfo": {
               "position": {
-                "line": 48,
+                "line": 59,
                 "position": 5,
-                "index": 605
+                "index": 750
               }
             },
             "name": "d",
@@ -709,9 +194,9 @@
                     {
                       "dInfo": {
                         "position": {
-                          "line": 48,
+                          "line": 59,
                           "position": 12,
-                          "index": 612
+                          "index": 757
                         }
                       },
                       "name": "q",
@@ -721,9 +206,9 @@
                         "constancy": false,
                         "dInfo": {
                           "position": {
-                            "line": 48,
+                            "line": 59,
                             "position": 17,
-                            "index": 617
+                            "index": 762
                           }
                         },
                         "nodeType": 20
@@ -733,9 +218,9 @@
                     {
                       "dInfo": {
                         "position": {
-                          "line": 48,
+                          "line": 59,
                           "position": 15,
-                          "index": 615
+                          "index": 760
                         }
                       },
                       "name": "w",
@@ -745,9 +230,9 @@
                         "constancy": false,
                         "dInfo": {
                           "position": {
-                            "line": 48,
+                            "line": 59,
                             "position": 17,
-                            "index": 617
+                            "index": 762
                           }
                         },
                         "nodeType": 20
@@ -757,9 +242,9 @@
                     {
                       "dInfo": {
                         "position": {
-                          "line": 48,
+                          "line": 59,
                           "position": 22,
-                          "index": 622
+                          "index": 767
                         }
                       },
                       "name": "e",
@@ -769,9 +254,9 @@
                         "constancy": false,
                         "dInfo": {
                           "position": {
-                            "line": 48,
+                            "line": 59,
                             "position": 27,
-                            "index": 627
+                            "index": 772
                           }
                         },
                         "nodeType": 20
@@ -781,9 +266,9 @@
                     {
                       "dInfo": {
                         "position": {
-                          "line": 48,
+                          "line": 59,
                           "position": 25,
-                          "index": 625
+                          "index": 770
                         }
                       },
                       "name": "r",
@@ -793,9 +278,9 @@
                         "constancy": false,
                         "dInfo": {
                           "position": {
-                            "line": 48,
+                            "line": 59,
                             "position": 27,
-                            "index": 627
+                            "index": 772
                           }
                         },
                         "nodeType": 20
@@ -811,9 +296,9 @@
                   "constancy": false,
                   "dInfo": {
                     "position": {
-                      "line": 48,
+                      "line": 59,
                       "position": 34,
-                      "index": 634
+                      "index": 779
                     }
                   },
                   "nodeType": 20
@@ -822,9 +307,9 @@
                 "constancy": false,
                 "dInfo": {
                   "position": {
-                    "line": 48,
+                    "line": 59,
                     "position": 11,
-                    "index": 611
+                    "index": 756
                   }
                 },
                 "nodeType": 20
@@ -834,9 +319,9 @@
               "constancy": false,
               "dInfo": {
                 "position": {
-                  "line": 48,
+                  "line": 59,
                   "position": 7,
-                  "index": 607
+                  "index": 752
                 }
               },
               "nodeType": 20
@@ -846,9 +331,9 @@
           {
             "dInfo": {
               "position": {
-                "line": 49,
+                "line": 60,
                 "position": 5,
-                "index": 644
+                "index": 789
               }
             },
             "name": "e",
@@ -859,9 +344,9 @@
                 "constancy": false,
                 "dInfo": {
                   "position": {
-                    "line": 49,
+                    "line": 60,
                     "position": 8,
-                    "index": 647
+                    "index": 792
                   }
                 },
                 "nodeType": 20
@@ -871,9 +356,9 @@
               "constancy": false,
               "dInfo": {
                 "position": {
-                  "line": 49,
+                  "line": 60,
                   "position": 7,
-                  "index": 646
+                  "index": 791
                 }
               },
               "nodeType": 20
@@ -885,9 +370,9 @@
       },
       "dInfo": {
         "position": {
-          "line": 45,
+          "line": 56,
           "position": 1,
-          "index": 560
+          "index": 705
         }
       },
       "name": "abc",
@@ -897,9 +382,9 @@
         "constancy": false,
         "dInfo": {
           "position": {
-            "line": 45,
+            "line": 56,
             "position": 1,
-            "index": 560
+            "index": 705
           }
         },
         "nodeType": 20
@@ -914,9 +399,9 @@
               {
                 "dInfo": {
                   "position": {
-                    "line": 53,
+                    "line": 64,
                     "position": 9,
-                    "index": 715
+                    "index": 860
                   }
                 },
                 "name": "bar",
@@ -926,9 +411,9 @@
                   "constancy": true,
                   "dInfo": {
                     "position": {
-                      "line": 53,
+                      "line": 64,
                       "position": 19,
-                      "index": 725
+                      "index": 870
                     }
                   },
                   "nodeType": 20
@@ -941,9 +426,9 @@
           {
             "dInfo": {
               "position": {
-                "line": 54,
+                "line": 65,
                 "position": 5,
-                "index": 741
+                "index": 886
               }
             },
             "nodeType": 23
@@ -953,9 +438,9 @@
       },
       "dInfo": {
         "position": {
-          "line": 52,
+          "line": 63,
           "position": 6,
-          "index": 668
+          "index": 813
         }
       },
       "name": "foo",
@@ -965,9 +450,9 @@
             {
               "dInfo": {
                 "position": {
-                  "line": 52,
+                  "line": 63,
                   "position": 10,
-                  "index": 672
+                  "index": 817
                 }
               },
               "name": "q",
@@ -977,9 +462,9 @@
                 "constancy": true,
                 "dInfo": {
                   "position": {
-                    "line": 52,
+                    "line": 63,
                     "position": 21,
-                    "index": 683
+                    "index": 828
                   }
                 },
                 "nodeType": 20
@@ -989,9 +474,9 @@
             {
               "dInfo": {
                 "position": {
-                  "line": 52,
+                  "line": 63,
                   "position": 13,
-                  "index": 675
+                  "index": 820
                 }
               },
               "name": "w",
@@ -1001,9 +486,9 @@
                 "constancy": true,
                 "dInfo": {
                   "position": {
-                    "line": 52,
+                    "line": 63,
                     "position": 21,
-                    "index": 683
+                    "index": 828
                   }
                 },
                 "nodeType": 20
@@ -1013,9 +498,9 @@
             {
               "dInfo": {
                 "position": {
-                  "line": 52,
+                  "line": 63,
                   "position": 26,
-                  "index": 688
+                  "index": 833
                 }
               },
               "name": "e",
@@ -1025,9 +510,9 @@
                 "constancy": false,
                 "dInfo": {
                   "position": {
-                    "line": 52,
+                    "line": 63,
                     "position": 31,
-                    "index": 693
+                    "index": 838
                   }
                 },
                 "nodeType": 20
@@ -1037,9 +522,9 @@
             {
               "dInfo": {
                 "position": {
-                  "line": 52,
+                  "line": 63,
                   "position": 29,
-                  "index": 691
+                  "index": 836
                 }
               },
               "name": "r",
@@ -1049,9 +534,9 @@
                 "constancy": false,
                 "dInfo": {
                   "position": {
-                    "line": 52,
+                    "line": 63,
                     "position": 31,
-                    "index": 693
+                    "index": 838
                   }
                 },
                 "nodeType": 20
@@ -1067,9 +552,9 @@
           "constancy": false,
           "dInfo": {
             "position": {
-              "line": 52,
+              "line": 63,
               "position": 38,
-              "index": 700
+              "index": 845
             }
           },
           "nodeType": 20
@@ -1078,9 +563,9 @@
         "constancy": false,
         "dInfo": {
           "position": {
-            "line": 52,
+            "line": 63,
             "position": 9,
-            "index": 671
+            "index": 816
           }
         },
         "nodeType": 20
@@ -1095,18 +580,18 @@
             "constantType": 0,
             "dInfo": {
               "position": {
-                "line": 58,
+                "line": 69,
                 "position": 9,
-                "index": 766
+                "index": 911
               }
             },
             "nodeType": 14
           },
           "dInfo": {
             "position": {
-              "line": 58,
+              "line": 69,
               "position": 5,
-              "index": 762
+              "index": 907
             }
           },
           "name": "q",
@@ -1116,9 +601,9 @@
             "constancy": true,
             "dInfo": {
               "position": {
-                "line": 58,
+                "line": 69,
                 "position": 17,
-                "index": 774
+                "index": 919
               }
             },
             "nodeType": 20
@@ -1131,18 +616,18 @@
             "constantType": 2,
             "dInfo": {
               "position": {
-                "line": 59,
+                "line": 70,
                 "position": 9,
-                "index": 787
+                "index": 932
               }
             },
             "nodeType": 14
           },
           "dInfo": {
             "position": {
-              "line": 59,
+              "line": 70,
               "position": 5,
-              "index": 783
+              "index": 928
             }
           },
           "name": "w",
@@ -1152,9 +637,9 @@
             "constancy": false,
             "dInfo": {
               "position": {
-                "line": 59,
+                "line": 70,
                 "position": 25,
-                "index": 803
+                "index": 948
               }
             },
             "nodeType": 20
@@ -1167,18 +652,18 @@
             "constantType": 2,
             "dInfo": {
               "position": {
-                "line": 59,
+                "line": 70,
                 "position": 21,
-                "index": 799
+                "index": 944
               }
             },
             "nodeType": 14
           },
           "dInfo": {
             "position": {
-              "line": 59,
+              "line": 70,
               "position": 17,
-              "index": 795
+              "index": 940
             }
           },
           "name": "e",
@@ -1188,9 +673,9 @@
             "constancy": false,
             "dInfo": {
               "position": {
-                "line": 59,
+                "line": 70,
                 "position": 25,
-                "index": 803
+                "index": 948
               }
             },
             "nodeType": 20
@@ -1211,18 +696,18 @@
                   "constantType": 0,
                   "dInfo": {
                     "position": {
-                      "line": 65,
+                      "line": 76,
                       "position": 13,
-                      "index": 902
+                      "index": 1047
                     }
                   },
                   "nodeType": 14
                 },
                 "dInfo": {
                   "position": {
-                    "line": 65,
+                    "line": 76,
                     "position": 9,
-                    "index": 898
+                    "index": 1043
                   }
                 },
                 "name": "a",
@@ -1232,9 +717,9 @@
                   "constancy": false,
                   "dInfo": {
                     "position": {
-                      "line": 65,
+                      "line": 76,
                       "position": 15,
-                      "index": 904
+                      "index": 1049
                     }
                   },
                   "nodeType": 20
@@ -1247,18 +732,18 @@
                   "constantType": 0,
                   "dInfo": {
                     "position": {
-                      "line": 66,
+                      "line": 77,
                       "position": 13,
-                      "index": 921
+                      "index": 1066
                     }
                   },
                   "nodeType": 14
                 },
                 "dInfo": {
                   "position": {
-                    "line": 66,
+                    "line": 77,
                     "position": 9,
-                    "index": 917
+                    "index": 1062
                   }
                 },
                 "name": "b",
@@ -1268,9 +753,105 @@
                   "constancy": true,
                   "dInfo": {
                     "position": {
-                      "line": 66,
+                      "line": 77,
                       "position": 22,
-                      "index": 930
+                      "index": 1075
+                    }
+                  },
+                  "nodeType": 20
+                },
+                "nodeType": 2
+              },
+              {
+                "dInfo": {
+                  "position": {
+                    "line": 78,
+                    "position": 9,
+                    "index": 1088
+                  }
+                },
+                "name": "l",
+                "type": {
+                  "length": {
+                    "value": 10,
+                    "constantType": 0,
+                    "dInfo": {
+                      "position": {
+                        "line": 78,
+                        "position": 12,
+                        "index": 1091
+                      }
+                    },
+                    "nodeType": 14
+                  },
+                  "element": {
+                    "length": {
+                      "value": 5,
+                      "constantType": 0,
+                      "dInfo": {
+                        "position": {
+                          "line": 78,
+                          "position": 16,
+                          "index": 1095
+                        }
+                      },
+                      "nodeType": 14
+                    },
+                    "element": {
+                      "primitive": 0,
+                      "type": 3,
+                      "constancy": false,
+                      "dInfo": {
+                        "position": {
+                          "line": 78,
+                          "position": 19,
+                          "index": 1098
+                        }
+                      },
+                      "nodeType": 20
+                    },
+                    "type": 0,
+                    "constancy": false,
+                    "dInfo": {
+                      "position": {
+                        "line": 78,
+                        "position": 15,
+                        "index": 1094
+                      }
+                    },
+                    "nodeType": 20
+                  },
+                  "type": 0,
+                  "constancy": false,
+                  "dInfo": {
+                    "position": {
+                      "line": 78,
+                      "position": 11,
+                      "index": 1090
+                    }
+                  },
+                  "nodeType": 20
+                },
+                "nodeType": 2
+              },
+              {
+                "dInfo": {
+                  "position": {
+                    "line": 79,
+                    "position": 9,
+                    "index": 1111
+                  }
+                },
+                "name": "m",
+                "type": {
+                  "name": "abc",
+                  "type": 1,
+                  "constancy": false,
+                  "dInfo": {
+                    "position": {
+                      "line": 79,
+                      "position": 11,
+                      "index": 1113
                     }
                   },
                   "nodeType": 20
@@ -1279,6 +860,151 @@
               }
             ],
             "nodeType": 26
+          },
+          {
+            "left": {
+              "left": {
+                "name": "m",
+                "dInfo": {
+                  "position": {
+                    "line": 87,
+                    "position": 5,
+                    "index": 1205
+                  }
+                },
+                "nodeType": 13
+              },
+              "right": {
+                "name": "d",
+                "dInfo": {
+                  "position": {
+                    "line": 87,
+                    "position": 7,
+                    "index": 1207
+                  }
+                },
+                "nodeType": 13
+              },
+              "operation": 29,
+              "dInfo": {
+                "position": {
+                  "line": 87,
+                  "position": 6,
+                  "index": 1206
+                }
+              },
+              "nodeType": 0
+            },
+            "right": {
+              "node": {
+                "name": "main",
+                "dInfo": {
+                  "position": {
+                    "line": 87,
+                    "position": 12,
+                    "index": 1212
+                  }
+                },
+                "nodeType": 13
+              },
+              "operation": 4,
+              "dInfo": {
+                "position": {
+                  "line": 87,
+                  "position": 11,
+                  "index": 1211
+                }
+              },
+              "nodeType": 1
+            },
+            "operation": 0,
+            "dInfo": {
+              "position": {
+                "line": 87,
+                "position": 9,
+                "index": 1209
+              }
+            },
+            "nodeType": 0
+          },
+          {
+            "left": {
+              "left": {
+                "left": {
+                  "name": "l",
+                  "dInfo": {
+                    "position": {
+                      "line": 90,
+                      "position": 5,
+                      "index": 1247
+                    }
+                  },
+                  "nodeType": 13
+                },
+                "right": {
+                  "value": 2,
+                  "constantType": 0,
+                  "dInfo": {
+                    "position": {
+                      "line": 90,
+                      "position": 7,
+                      "index": 1249
+                    }
+                  },
+                  "nodeType": 14
+                },
+                "operation": 30,
+                "dInfo": {
+                  "position": {
+                    "line": 90,
+                    "position": 7,
+                    "index": 1249
+                  }
+                },
+                "nodeType": 0
+              },
+              "right": {
+                "value": 3,
+                "constantType": 0,
+                "dInfo": {
+                  "position": {
+                    "line": 90,
+                    "position": 10,
+                    "index": 1252
+                  }
+                },
+                "nodeType": 14
+              },
+              "operation": 30,
+              "dInfo": {
+                "position": {
+                  "line": 90,
+                  "position": 10,
+                  "index": 1252
+                }
+              },
+              "nodeType": 0
+            },
+            "right": {
+              "name": "a",
+              "dInfo": {
+                "position": {
+                  "line": 90,
+                  "position": 15,
+                  "index": 1257
+                }
+              },
+              "nodeType": 13
+            },
+            "operation": 0,
+            "dInfo": {
+              "position": {
+                "line": 90,
+                "position": 13,
+                "index": 1255
+              }
+            },
+            "nodeType": 0
           },
           {
             "children": [
@@ -1288,18 +1014,18 @@
                   "constantType": 1,
                   "dInfo": {
                     "position": {
-                      "line": 75,
+                      "line": 92,
                       "position": 13,
-                      "index": 1024
+                      "index": 1273
                     }
                   },
                   "nodeType": 14
                 },
                 "dInfo": {
                   "position": {
-                    "line": 75,
+                    "line": 92,
                     "position": 9,
-                    "index": 1020
+                    "index": 1269
                   }
                 },
                 "name": "c",
@@ -1309,9 +1035,9 @@
                   "constancy": false,
                   "dInfo": {
                     "position": {
-                      "line": 75,
+                      "line": 92,
                       "position": 17,
-                      "index": 1028
+                      "index": 1277
                     }
                   },
                   "nodeType": 20
@@ -1326,9 +1052,9 @@
               {
                 "dInfo": {
                   "position": {
-                    "line": 76,
+                    "line": 93,
                     "position": 9,
-                    "index": 1042
+                    "index": 1291
                   }
                 },
                 "name": "q",
@@ -1339,9 +1065,9 @@
                     "constancy": false,
                     "dInfo": {
                       "position": {
-                        "line": 76,
+                        "line": 93,
                         "position": 13,
-                        "index": 1046
+                        "index": 1295
                       }
                     },
                     "nodeType": 20
@@ -1351,9 +1077,9 @@
                   "constancy": false,
                   "dInfo": {
                     "position": {
-                      "line": 76,
+                      "line": 93,
                       "position": 11,
-                      "index": 1044
+                      "index": 1293
                     }
                   },
                   "nodeType": 20
@@ -1368,9 +1094,9 @@
               "name": "q",
               "dInfo": {
                 "position": {
-                  "line": 77,
+                  "line": 94,
                   "position": 5,
-                  "index": 1056
+                  "index": 1305
                 }
               },
               "nodeType": 13
@@ -1380,9 +1106,9 @@
                 "name": "c",
                 "dInfo": {
                   "position": {
-                    "line": 77,
+                    "line": 94,
                     "position": 10,
-                    "index": 1061
+                    "index": 1310
                   }
                 },
                 "nodeType": 13
@@ -1390,9 +1116,9 @@
               "operation": 4,
               "dInfo": {
                 "position": {
-                  "line": 77,
+                  "line": 94,
                   "position": 9,
-                  "index": 1060
+                  "index": 1309
                 }
               },
               "nodeType": 1
@@ -1400,9 +1126,9 @@
             "operation": 0,
             "dInfo": {
               "position": {
-                "line": 77,
+                "line": 94,
                 "position": 7,
-                "index": 1058
+                "index": 1307
               }
             },
             "nodeType": 0
@@ -1412,9 +1138,9 @@
               "name": "args",
               "dInfo": {
                 "position": {
-                  "line": 78,
+                  "line": 95,
                   "position": 5,
-                  "index": 1068
+                  "index": 1317
                 }
               },
               "nodeType": 13
@@ -1424,9 +1150,9 @@
                 "name": "q",
                 "dInfo": {
                   "position": {
-                    "line": 78,
+                    "line": 95,
                     "position": 13,
-                    "index": 1076
+                    "index": 1325
                   }
                 },
                 "nodeType": 13
@@ -1434,9 +1160,9 @@
               "operation": 4,
               "dInfo": {
                 "position": {
-                  "line": 78,
+                  "line": 95,
                   "position": 12,
-                  "index": 1075
+                  "index": 1324
                 }
               },
               "nodeType": 1
@@ -1444,9 +1170,9 @@
             "operation": 0,
             "dInfo": {
               "position": {
-                "line": 78,
+                "line": 95,
                 "position": 10,
-                "index": 1073
+                "index": 1322
               }
             },
             "nodeType": 0
@@ -1457,9 +1183,9 @@
                 "name": "c",
                 "dInfo": {
                   "position": {
-                    "line": 81,
+                    "line": 98,
                     "position": 8,
-                    "index": 1102
+                    "index": 1351
                   }
                 },
                 "nodeType": 13
@@ -1469,9 +1195,9 @@
                 "constantType": 1,
                 "dInfo": {
                   "position": {
-                    "line": 81,
+                    "line": 98,
                     "position": 13,
-                    "index": 1107
+                    "index": 1356
                   }
                 },
                 "nodeType": 14
@@ -1479,9 +1205,9 @@
               "operation": 13,
               "dInfo": {
                 "position": {
-                  "line": 81,
+                  "line": 98,
                   "position": 10,
-                  "index": 1104
+                  "index": 1353
                 }
               },
               "nodeType": 0
@@ -1493,9 +1219,9 @@
               },
               "dInfo": {
                 "position": {
-                  "line": 83,
+                  "line": 100,
                   "position": 7,
-                  "index": 1138
+                  "index": 1387
                 }
               },
               "nodeType": 3
@@ -1508,18 +1234,18 @@
                     "constantType": 0,
                     "dInfo": {
                       "position": {
-                        "line": 82,
+                        "line": 99,
                         "position": 16,
-                        "index": 1129
+                        "index": 1378
                       }
                     },
                     "nodeType": 14
                   },
                   "dInfo": {
                     "position": {
-                      "line": 82,
+                      "line": 99,
                       "position": 9,
-                      "index": 1122
+                      "index": 1371
                     }
                   },
                   "nodeType": 23
@@ -1529,9 +1255,9 @@
             },
             "dInfo": {
               "position": {
-                "line": 81,
+                "line": 98,
                 "position": 5,
-                "index": 1099
+                "index": 1348
               }
             },
             "nodeType": 7
@@ -1542,9 +1268,9 @@
                 "name": "a",
                 "dInfo": {
                   "position": {
-                    "line": 89,
+                    "line": 106,
                     "position": 13,
-                    "index": 1211
+                    "index": 1460
                   }
                 },
                 "nodeType": 13
@@ -1553,9 +1279,9 @@
                 "name": "b",
                 "dInfo": {
                   "position": {
-                    "line": 89,
+                    "line": 106,
                     "position": 18,
-                    "index": 1216
+                    "index": 1465
                   }
                 },
                 "nodeType": 13
@@ -1563,9 +1289,9 @@
               "operation": 11,
               "dInfo": {
                 "position": {
-                  "line": 89,
+                  "line": 106,
                   "position": 15,
-                  "index": 1213
+                  "index": 1462
                 }
               },
               "nodeType": 0
@@ -1578,18 +1304,18 @@
                     "constantType": 0,
                     "dInfo": {
                       "position": {
-                        "line": 88,
+                        "line": 105,
                         "position": 16,
-                        "index": 1196
+                        "index": 1445
                       }
                     },
                     "nodeType": 14
                   },
                   "dInfo": {
                     "position": {
-                      "line": 88,
+                      "line": 105,
                       "position": 9,
-                      "index": 1189
+                      "index": 1438
                     }
                   },
                   "nodeType": 23
@@ -1599,9 +1325,9 @@
             },
             "dInfo": {
               "position": {
-                "line": 87,
+                "line": 104,
                 "position": 5,
-                "index": 1176
+                "index": 1425
               }
             },
             "nodeType": 11
@@ -1612,9 +1338,9 @@
                 "name": "a",
                 "dInfo": {
                   "position": {
-                    "line": 91,
+                    "line": 108,
                     "position": 8,
-                    "index": 1228
+                    "index": 1477
                   }
                 },
                 "nodeType": 13
@@ -1623,9 +1349,9 @@
                 "name": "b",
                 "dInfo": {
                   "position": {
-                    "line": 91,
+                    "line": 108,
                     "position": 12,
-                    "index": 1232
+                    "index": 1481
                   }
                 },
                 "nodeType": 13
@@ -1633,9 +1359,9 @@
               "operation": 8,
               "dInfo": {
                 "position": {
-                  "line": 91,
+                  "line": 108,
                   "position": 10,
-                  "index": 1230
+                  "index": 1479
                 }
               },
               "nodeType": 0
@@ -1649,9 +1375,9 @@
                       "constantType": 0,
                       "dInfo": {
                         "position": {
-                          "line": 92,
+                          "line": 109,
                           "position": 17,
-                          "index": 1253
+                          "index": 1502
                         }
                       },
                       "nodeType": 14
@@ -1659,18 +1385,18 @@
                     "operation": 2,
                     "dInfo": {
                       "position": {
-                        "line": 92,
+                        "line": 109,
                         "position": 16,
-                        "index": 1252
+                        "index": 1501
                       }
                     },
                     "nodeType": 1
                   },
                   "dInfo": {
                     "position": {
-                      "line": 92,
+                      "line": 109,
                       "position": 9,
-                      "index": 1245
+                      "index": 1494
                     }
                   },
                   "nodeType": 23
@@ -1680,9 +1406,9 @@
             },
             "dInfo": {
               "position": {
-                "line": 91,
+                "line": 108,
                 "position": 5,
-                "index": 1225
+                "index": 1474
               }
             },
             "nodeType": 7
@@ -1696,18 +1422,18 @@
                     "constantType": 0,
                     "dInfo": {
                       "position": {
-                        "line": 95,
+                        "line": 112,
                         "position": 17,
-                        "index": 1279
+                        "index": 1528
                       }
                     },
                     "nodeType": 14
                   },
                   "dInfo": {
                     "position": {
-                      "line": 95,
+                      "line": 112,
                       "position": 13,
-                      "index": 1275
+                      "index": 1524
                     }
                   },
                   "name": "i",
@@ -1717,9 +1443,9 @@
                     "constancy": false,
                     "dInfo": {
                       "position": {
-                        "line": 95,
+                        "line": 112,
                         "position": 19,
-                        "index": 1281
+                        "index": 1530
                       }
                     },
                     "nodeType": 20
@@ -1736,9 +1462,9 @@
                     "name": "i",
                     "dInfo": {
                       "position": {
-                        "line": 95,
+                        "line": 112,
                         "position": 35,
-                        "index": 1297
+                        "index": 1546
                       }
                     },
                     "nodeType": 13
@@ -1746,9 +1472,9 @@
                   "operation": 7,
                   "dInfo": {
                     "position": {
-                      "line": 95,
+                      "line": 112,
                       "position": 33,
-                      "index": 1295
+                      "index": 1544
                     }
                   },
                   "nodeType": 1
@@ -1761,9 +1487,9 @@
                 "name": "i",
                 "dInfo": {
                   "position": {
-                    "line": 95,
+                    "line": 112,
                     "position": 24,
-                    "index": 1286
+                    "index": 1535
                   }
                 },
                 "nodeType": 13
@@ -1773,9 +1499,9 @@
                 "constantType": 0,
                 "dInfo": {
                   "position": {
-                    "line": 95,
+                    "line": 112,
                     "position": 29,
-                    "index": 1291
+                    "index": 1540
                   }
                 },
                 "nodeType": 14
@@ -1783,9 +1509,9 @@
               "operation": 11,
               "dInfo": {
                 "position": {
-                  "line": 95,
+                  "line": 112,
                   "position": 26,
-                  "index": 1288
+                  "index": 1537
                 }
               },
               "nodeType": 0
@@ -1798,9 +1524,9 @@
                       "name": "i",
                       "dInfo": {
                         "position": {
-                          "line": 96,
+                          "line": 113,
                           "position": 12,
-                          "index": 1313
+                          "index": 1562
                         }
                       },
                       "nodeType": 13
@@ -1810,9 +1536,9 @@
                       "constantType": 0,
                       "dInfo": {
                         "position": {
-                          "line": 96,
+                          "line": 113,
                           "position": 16,
-                          "index": 1317
+                          "index": 1566
                         }
                       },
                       "nodeType": 14
@@ -1820,9 +1546,9 @@
                     "operation": 8,
                     "dInfo": {
                       "position": {
-                        "line": 96,
+                        "line": 113,
                         "position": 14,
-                        "index": 1315
+                        "index": 1564
                       }
                     },
                     "nodeType": 0
@@ -1835,9 +1561,9 @@
                             "name": "b",
                             "dInfo": {
                               "position": {
-                                "line": 99,
+                                "line": 116,
                                 "position": 15,
-                                "index": 1370
+                                "index": 1619
                               }
                             },
                             "nodeType": 13
@@ -1845,9 +1571,9 @@
                           "operation": 6,
                           "dInfo": {
                             "position": {
-                              "line": 99,
+                              "line": 116,
                               "position": 13,
-                              "index": 1368
+                              "index": 1617
                             }
                           },
                           "nodeType": 1
@@ -1857,9 +1583,9 @@
                     },
                     "dInfo": {
                       "position": {
-                        "line": 98,
+                        "line": 115,
                         "position": 11,
-                        "index": 1349
+                        "index": 1598
                       }
                     },
                     "nodeType": 3
@@ -1871,9 +1597,9 @@
                           "name": "a",
                           "dInfo": {
                             "position": {
-                              "line": 97,
+                              "line": 114,
                               "position": 13,
-                              "index": 1334
+                              "index": 1583
                             }
                           },
                           "nodeType": 13
@@ -1881,9 +1607,9 @@
                         "operation": 0,
                         "dInfo": {
                           "position": {
-                            "line": 97,
+                            "line": 114,
                             "position": 14,
-                            "index": 1335
+                            "index": 1584
                           }
                         },
                         "nodeType": 1
@@ -1893,9 +1619,9 @@
                   },
                   "dInfo": {
                     "position": {
-                      "line": 96,
+                      "line": 113,
                       "position": 9,
-                      "index": 1310
+                      "index": 1559
                     }
                   },
                   "nodeType": 7
@@ -1905,9 +1631,9 @@
             },
             "dInfo": {
               "position": {
-                "line": 95,
+                "line": 112,
                 "position": 5,
-                "index": 1267
+                "index": 1516
               }
             },
             "nodeType": 6
@@ -1917,9 +1643,9 @@
       },
       "dInfo": {
         "position": {
-          "line": 62,
+          "line": 73,
           "position": 6,
-          "index": 820
+          "index": 965
         }
       },
       "name": "main",
@@ -1929,9 +1655,9 @@
             {
               "dInfo": {
                 "position": {
-                  "line": 62,
+                  "line": 73,
                   "position": 11,
-                  "index": 825
+                  "index": 970
                 }
               },
               "name": "args",
@@ -1943,9 +1669,9 @@
                     "constancy": false,
                     "dInfo": {
                       "position": {
-                        "line": 62,
+                        "line": 73,
                         "position": 32,
-                        "index": 846
+                        "index": 991
                       }
                     },
                     "nodeType": 20
@@ -1955,9 +1681,9 @@
                   "constancy": true,
                   "dInfo": {
                     "position": {
-                      "line": 62,
+                      "line": 73,
                       "position": 30,
-                      "index": 844
+                      "index": 989
                     }
                   },
                   "nodeType": 20
@@ -1967,9 +1693,9 @@
                 "constancy": true,
                 "dInfo": {
                   "position": {
-                    "line": 62,
+                    "line": 73,
                     "position": 22,
-                    "index": 836
+                    "index": 981
                   }
                 },
                 "nodeType": 20
@@ -1985,9 +1711,9 @@
           "constancy": false,
           "dInfo": {
             "position": {
-              "line": 62,
+              "line": 73,
               "position": 38,
-              "index": 852
+              "index": 997
             }
           },
           "nodeType": 20
@@ -1996,9 +1722,9 @@
         "constancy": false,
         "dInfo": {
           "position": {
-            "line": 62,
+            "line": 73,
             "position": 10,
-            "index": 824
+            "index": 969
           }
         },
         "nodeType": 20

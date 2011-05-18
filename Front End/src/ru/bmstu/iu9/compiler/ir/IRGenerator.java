@@ -6,18 +6,23 @@ package ru.bmstu.iu9.compiler.ir;
 
 import com.google.gson.*;
 import java.io.*;
-import ru.bmstu.iu9.compiler.*;
+import java.util.*;
+
+import ru.bmstu.iu9.compiler.ir.type.*;
 import ru.bmstu.iu9.compiler.semantics.*;
 import ru.bmstu.iu9.compiler.syntax.tree.*;
 
 /**
  *
- * @author maggot
+ * @todo call
+ * @todo проблема goto'а за пределы функции
+ *
+ * @author anton.bobukh
  */
 public class IRGenerator {
     public IRGenerator(BlockNode<BaseNode> parseTree) {
         this.parseTree = parseTree;
-        this.code = new Code();
+        this.codes = new LinkedList<Code>();
         this.varTable = new VariablesTable();
     }
     
@@ -31,12 +36,13 @@ public class IRGenerator {
                             BaseNode.class, 
                             new BaseNode.BaseNodeAdapter()).
                         registerTypeHierarchyAdapter(
-                            BaseType.class, 
+                            BaseType.class,
                             new BaseType.TypeAdapter()).
                         create();
             
             reader = new BufferedReader(
-                        new FileReader("C:\\Users\\maggot\\Documents\\NetBeansProjects\\ru.bmstu.iu9.compiler\\Front End\\src\\parse_tree.json"));
+                        new FileReader("C:\\Users\\maggot\\Documents" +
+                                       "\\IntelliJ IDEA Projects\\iu9-compiler\\Front End\\src\\parse_tree.json"));
             
             BlockNode<BaseNode> tree = gson.fromJson(reader, BlockNode.class);
             SemanticAnalyser analyser = new SemanticAnalyser(tree);
@@ -65,7 +71,7 @@ public class IRGenerator {
     
     private VariableOperand generateArrayIndex(BinaryOperationNode node) {
         VariableOperand array = (VariableOperand) generate(node.leftChild());
-        VariableOperand index = (VariableOperand) generate(node.rightChild());
+        Operand index = generate(node.rightChild());
 
         TmpVariableOperand address = 
             new TmpVariableOperand(new PointerType(node.realType()), varTable);
@@ -203,12 +209,31 @@ public class IRGenerator {
     
     
     private void generateReturn(ReturnNode node) {
-        code.addStatement(new ReturnStatement());
+        if (node.returnExpr != null) {
+            Operand value = generate(node.returnExpr);
+            code.addStatement(new ReturnStatement(value));
+        } else {
+            code.addStatement(new ReturnStatement());
+        }
     }
     private void generateFunction(FunctionDeclNode node) {
+        code = new Code();
+        codes.add(code);
+
+        scopes.enterBlock();
+
+        FunctionType type = (FunctionType) node.realType();
+        for(FunctionType.Argument arg : type.arguments()) {
+            varTable.add(new NamedVariable(arg.name, arg.type));
+        }
+
         for(ru.bmstu.iu9.compiler.syntax.tree.Statement n : node.block) {
             generate(n.getNode());
         }
+
+        scopes.leaveBlock();
+
+        code.print();
     }
     private void generateBlock(BlockNode<BaseNode> node) {
         for(BaseNode n : (BlockNode<BaseNode>)node) {
@@ -255,7 +280,7 @@ public class IRGenerator {
                     TmpVariableOperand first = 
                         new TmpVariableOperand(
                             new PrimitiveType(
-                                PrimitiveType.Type.BOOL, 
+                                PrimitiveType.Type.BOOL,
                                 true
                             ),
                             varTable
@@ -400,6 +425,7 @@ public class IRGenerator {
     
     private void declareVariable(VariableDeclNode node) {
         NamedVariable variable = new NamedVariable(node.name, node.realType());
+        scopes.addVariable(variable);
 
         varTable.add(variable);
 
@@ -408,9 +434,12 @@ public class IRGenerator {
 
             code.addStatement(
                 new AssignmentStatement(
-                    new NamedVariableOperand(varTable,
-                        varTable.get(variable.name)),
-                    value)
+                    new NamedVariableOperand(
+                        varTable,
+                        varTable.get(variable.name)
+                    ),
+                    value
+                )
             );
         }
     }
@@ -421,14 +450,14 @@ public class IRGenerator {
             case BREAK:
             {
                 code.addStatement(
-                    new GoToStatement(ControlStructureInfo.endOfBlockLabel)
+                    new GoToStatement(csi.endOfBlockLabel)
                 );
                 break;
             }
             case CONTINUE:
             {
                 code.addStatement(
-                    new GoToStatement(ControlStructureInfo.conditionLabel)
+                    new GoToStatement(csi.conditionLabel)
                 );
                 break;
             }
@@ -445,7 +474,9 @@ public class IRGenerator {
             }
             case BLOCK:
             {
+                scopes.enterBlock();
                 generateBlock((BlockNode<BaseNode>) node);
+                scopes.leaveBlock();
                 break;
             }
             case BLOCK_DECL:
@@ -474,7 +505,7 @@ public class IRGenerator {
             {
                 UnaryOperationNode u = (UnaryOperationNode)node;
                 
-                VariableOperand op = (VariableOperand)generate(u.node);
+                Operand op = generate(u.node);
                 
                 TmpVariableOperand result = 
                     new TmpVariableOperand(
@@ -489,7 +520,7 @@ public class IRGenerator {
                         UnaryOperationStatement.operation(u.operation()))
                 );
                 
-                break;
+                return result;
             }
             case BINARY_OPERATION:
             {
@@ -527,10 +558,10 @@ public class IRGenerator {
                     case BITWISE_XOR:
                     case BITWISE_OR:
                     {
-                        VariableOperand left =
-                            (VariableOperand)generate(b.leftChild());
-                        VariableOperand right = 
-                            (VariableOperand) generate(b.rightChild());
+                        Operand left =
+                            generate(b.leftChild());
+                        Operand right =
+                            generate(b.rightChild());
                         
                         return generateBinaryOperation(
                             left,
@@ -597,12 +628,11 @@ public class IRGenerator {
                             );
                         }
                         
-                        break;
+                        return result;
                     }
                     case ASSIGN:
                     {
-                        generateAssignment(b);                        
-                        break;
+                        return generateAssignment(b);
                     }
                     
                 }
@@ -611,6 +641,9 @@ public class IRGenerator {
             }
             case IF:
                 generateIf((IfNode) node);
+                break;
+            case FOR:
+                generateFor((ForNode) node);
                 break;
             case WHILE:
                 generateWhile((WhileNode) node);
@@ -660,22 +693,82 @@ public class IRGenerator {
                             constant.realType(),
                             ((BoolConstantLeaf)constant).value);
                     }
+                    default:
+                        // @todo Report an error
+                        break;
                 }
-                
+            }
+            case CALL:
+            {
+                generateCall((CallNode) node);
                 break;
             }
             default:
             {
+                // @todo Report an error
                 break;
             }
         }
         return null;
     }
-    
+
+    private Operand generateCall(CallNode node) {
+        List<Operand> args = new LinkedList<Operand>();
+
+        for(ExpressionNode arg : node.arguments) {
+            args.add(generate(arg));
+        }
+
+        VariableOperand function = (VariableOperand) generate(node.function);
+
+        for(Operand arg : args) {
+            code.addStatement(new ParamStatement(arg));
+        }
+
+        if (!node.realType().is(PrimitiveType.Type.VOID)) {
+            TmpVariableOperand result =
+                new TmpVariableOperand(node.realType(), varTable);
+
+            code.addStatement(new CallStatement(function, args.size(), result));
+
+            return result;
+        } else {
+            code.addStatement(new CallStatement(function, args.size()));
+
+            return null;
+        }
+    }
+
+    private void generateFor(ForNode node) {
+        scopes.enterBlock();
+
+        generate(node.initialization);
+        Operand condition = generate(node.expression);
+
+        csi.renew();
+
+        Label block = new Label();
+
+        csi.conditionLabel.setIndex(code.nextIndex());
+        code.addStatement(
+            new IfGoToStatement(condition, block, csi.endOfBlockLabel)
+        );
+        block.setIndex(code.nextIndex());
+
+        generate(node.block);
+        generate(node.step);
+        code.addStatement(new GoToStatement(csi.conditionLabel));
+        csi.endOfBlockLabel.setIndex(code.nextIndex());
+
+        scopes.leaveBlock();
+    }
+
     private void generateSwitch(SwitchNode node) {
+        scopes.enterBlock();
+
         Operand expr = generate(node.expression);
         
-        ControlStructureInfo.renew();
+        csi.renew();
         Label defaultLabel = new Label();
         
         for(CaseNode c : node.cases) {
@@ -712,43 +805,55 @@ public class IRGenerator {
             defaultLabel.setIndex(code.nextIndex());
             
             generate(node.defaultNode.block);
-            ControlStructureInfo.endOfBlockLabel.setIndex(code.nextIndex());
+            csi.endOfBlockLabel.setIndex(code.nextIndex());
         } else {
-            ControlStructureInfo.endOfBlockLabel.setIndex(code.nextIndex());
+            csi.endOfBlockLabel.setIndex(code.nextIndex());
             defaultLabel.setIndex(code.nextIndex());
         }
+
+        scopes.leaveBlock();
     }
     
     private void generateDoWhile(DoWhileNode node) {
+        scopes.enterBlock();
+
         Operand condition = generate(node.expression);
         
-        Label trueL = new Label();
-        Label falseL = new Label();
-        
-        trueL.setIndex(code.nextIndex());
+        csi.renew();
+
+        Label blockLabel = new Label();
+        csi.conditionLabel.setIndex(code.nextIndex());
         
         generate(node.block);
         
         code.addStatement(
-            new IfGoToStatement(condition, trueL, falseL)
+            new IfGoToStatement(
+                condition,
+                blockLabel,
+                csi.endOfBlockLabel
+            )
         );
         
-        falseL.setIndex(code.nextIndex());
+        csi.endOfBlockLabel.setIndex(code.nextIndex());
+
+        scopes.leaveBlock();
     }
     
     private void generateWhile(WhileNode node) {
+        scopes.enterBlock();
+
         Operand condition = generate(node.expression);
         
-        ControlStructureInfo.renew();
+        csi.renew();
         Label blockLabel = new Label();
         
-        ControlStructureInfo.conditionLabel.setIndex(code.nextIndex());
+        csi.conditionLabel.setIndex(code.nextIndex());
         
         code.addStatement(
             new IfGoToStatement(
                 condition, 
                 blockLabel, 
-                ControlStructureInfo.endOfBlockLabel)
+                csi.endOfBlockLabel)
         );
         
         blockLabel.setIndex(code.nextIndex());
@@ -756,12 +861,16 @@ public class IRGenerator {
         generate(node.block);
         
         code.addStatement(
-            new GoToStatement(ControlStructureInfo.conditionLabel));
+            new GoToStatement(csi.conditionLabel));
         
-        ControlStructureInfo.endOfBlockLabel.setIndex(code.nextIndex());
+        csi.endOfBlockLabel.setIndex(code.nextIndex());
+
+        scopes.leaveBlock();
     }
     
     private void generateIf(IfNode node) {
+        scopes.enterBlock();
+
         Operand condition = generate(node.condition);
         
         Label trueL = new Label();
@@ -785,7 +894,8 @@ public class IRGenerator {
         } else {
             falseL.setIndex(code.nextIndex());
         }
-        
+
+        scopes.leaveBlock();
 //        code.addStatement(new ReturnStatement());
     }
     
@@ -809,16 +919,41 @@ public class IRGenerator {
     
     private VariablesTable varTable;
     private final BlockNode<BaseNode> parseTree;
+    private List<Code> codes;
     private Code code;
+    private ControlStructureInfo csi = this.new ControlStructureInfo();
+    private Scopes scopes = this.new Scopes();
     
-    
-    private static class ControlStructureInfo {
-        public static void renew() {
+
+    private class Scopes {
+        public void addVariable(NamedVariable variable) {
+            variable.scope.setFirst(code.nextIndex());
+            variables.add(variable);
+        }
+        public void enterBlock() {
+            variables.add(null);
+//            if (!variables.empty())
+//                currentVariable = variables.peek();
+        }
+        public void leaveBlock() {
+            NamedVariable currentVariable;
+            while ((currentVariable = variables.pop()) != null) {
+                currentVariable.scope.setLast(code.currentIndex());
+            }
+        }
+
+        public final Stack<NamedVariable> variables =
+            new Stack<NamedVariable>();
+//        private NamedVariable currentVariable;
+    }
+
+    private class ControlStructureInfo {
+        public void renew() {
             conditionLabel = new Label();
             endOfBlockLabel = new Label();
         }
         
-        public static Label conditionLabel;
-        public static Label endOfBlockLabel;
+        public Label conditionLabel;
+        public Label endOfBlockLabel;
     }
 }

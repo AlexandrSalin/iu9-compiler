@@ -12,8 +12,9 @@ public abstract class Token {
     public enum Type { 
         MEMBER_SELECT, INC, DEC, BITWISE_NOT, BOOL_NOT, PLUS, 
         MINUS, AMPERSAND, ASTERISK, DIV, MOD, BITWISE_SHIFT_LEFT,
-        BITWISE_SHIFT_RIGHT, GREATER_OR_EQUAL, LESS_OR_EQUAL, GREATER, LESS, 
-        EQUAL, NOT_EQUAL, BITWISE_XOR, BITWISE_OR, BOOL_AND, BOOL_OR, 
+        BITWISE_SHIFT_RIGHT, GREATER_OR_EQUAL, LESS_OR_EQUAL,
+        RIGHT_ANGLE_BRACKET, LEFT_ANGLE_BRACKET, EQUAL, NOT_EQUAL,
+        BITWISE_XOR, BITWISE_OR, BOOL_AND, BOOL_OR,
 
         ASSIGN, PLUS_ASSIGN, MINUS_ASSIGN, MUL_ASSIGN, DIV_ASSIGN, MOD_ASSIGN,
         COMMA, BITWISE_SHIFT_LEFT_ASSIGN, BITWISE_SHIFT_RIGHT_ASSIGN,
@@ -42,7 +43,7 @@ public abstract class Token {
             BITWISE_XOR_ASSIGN
         }),
         Type(new Type[] { 
-            PrimitiveType, LEFT_BRACKET, ASTERISK, LEFT_SQUARE_BRACKET,
+            PrimitiveType, /*LEFT_BRACKET,*/ ASTERISK, LEFT_SQUARE_BRACKET,
             STRUCT, FUNC 
         }),
         FirstOfExpression(new Type[] {
@@ -56,8 +57,9 @@ public abstract class Token {
         Equality(new Type[] { 
             EQUAL, NOT_EQUAL 
         }),
-        OrderRelation(new Type[] { 
-            GREATER, LESS, GREATER_OR_EQUAL, LESS_OR_EQUAL 
+        OrderRelation(new Type[] {
+                RIGHT_ANGLE_BRACKET,
+                LEFT_ANGLE_BRACKET, GREATER_OR_EQUAL, LESS_OR_EQUAL
         }),
         IncDec(new Type[] { 
             INC, DEC 
@@ -116,7 +118,6 @@ public abstract class Token {
     
     public static class TokenAdapter implements JsonDeserializer<Token> {
 
-        @Override
         public Token deserialize(
                 JsonElement src, 
                 java.lang.reflect.Type type, 

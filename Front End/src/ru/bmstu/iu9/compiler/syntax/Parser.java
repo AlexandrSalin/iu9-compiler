@@ -100,7 +100,7 @@ public class Parser {
             public void remove() {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
-            
+
             private int counter = 0;
             private Token[] container;
             
@@ -140,11 +140,11 @@ public class Parser {
     
     public static void main(String[] args) {
         
-        Parser parser = new Parser(
-            "C:\\Users\\maggot\\Documents\\NetBeansProjects\\ru.bmstu.iu9.compiler\\Front End\\src\\output.json");
+        Parser parser = new Parser("C:\\Users\\maggot\\Documents\\IntelliJ " +
+                                   "IDEA Projects\\iu9-compiler\\Front End\\src\\output.json");
         parser.process();
-        parser.toJson(
-            "C:\\Users\\maggot\\Documents\\NetBeansProjects\\ru.bmstu.iu9.compiler\\Front End\\src\\parse_tree.json");
+        parser.toJson("C:\\Users\\maggot\\Documents\\IntelliJ IDEA " +
+                      "Projects\\iu9-compiler\\Front End\\src\\parse_tree.json");
     }
     
     /**
@@ -242,7 +242,9 @@ public class Parser {
             case STRUCT:
                 return StructType(constancy);
             default:
-                return BaseTypeNode.InvalidNode(current.coordinates().starting());
+                return BaseTypeNode.InvalidNode(
+                    current.coordinates().starting()
+                );
         }
     }
     private StructTypeNode StructType(boolean constancy) {
@@ -563,10 +565,18 @@ public class Parser {
     private boolean checkTokens(Token found, Token.Type required) {
         boolean result;
         if (result = !found.type().is(required))
-            Logger.logUnexpectedToken(found.type(), required, current.coordinates().starting());
+            Logger.logUnexpectedToken(
+                found.type(),
+                required,
+                current.coordinates().starting()
+            );
         return !result;
     }
-    private boolean checkTokens(Token found, Token.Type required, Position pos) {
+    private boolean checkTokens(
+            Token found,
+            Token.Type required,
+            Position pos) {
+
         boolean result;
         if (result = !found.type().is(required))
             Logger.logUnexpectedToken(found.type(), required, pos);
@@ -600,7 +610,8 @@ public class Parser {
             nextToken();
             
             if (current.type().is(Token.Type.IF)) {
-                elseNode = new ElseNode(new BlockNode<Statement>(If()), elsepos);
+                elseNode =
+                    new ElseNode(new BlockNode<Statement>(If()), elsepos);
             } else {
                 BlockNode<Statement> code = Code();
                 elseNode = new ElseNode(code, elsepos);
@@ -904,13 +915,13 @@ public class Parser {
             BinaryOperationNode.Operation operation = null;
             Position pos = current.coordinates().starting();
             switch (current.type()) {
-                case GREATER:
+                case RIGHT_ANGLE_BRACKET:
                     operation = BinaryOperationNode.Operation.GREATER;
                     break;
                 case GREATER_OR_EQUAL:
                     operation = BinaryOperationNode.Operation.GREATER_OR_EQUAL;
                     break;
-                case LESS:
+                case LEFT_ANGLE_BRACKET:
                     operation = BinaryOperationNode.Operation.LESS;
                     break;
                 case LESS_OR_EQUAL:
@@ -1000,19 +1011,13 @@ public class Parser {
         return result;
     }
     private ExpressionNode CExpression() {
-        if (current.type() == Token.Type.LEFT_BRACKET) {
+        if (current.type() == Token.Type.LEFT_ANGLE_BRACKET) {
             nextToken();
-            if (current.type().is(Token.Type.VAR)) {
-                BaseTypeNode type = Type();
-                RightBracket();
-                Position pos = current.coordinates().starting();
-                
-                return new CastNode(type, DExpression(), pos);
-            } else {
-                ExpressionNode node = Expression();
-                RightBracket();
-                return node;
-            }
+            BaseTypeNode type = Type();
+            RightAngleBracket();
+            Position pos = current.coordinates().starting();
+
+            return new CastNode(type, DExpression(), pos);
         } else {
             return DExpression();
         }
@@ -1167,6 +1172,11 @@ public class Parser {
     private ExpressionNode JExpression() {
         if (current.type().is(Token.Type.Constant)) {
             return Const();
+        } else if (current.type().is(Token.Type.LEFT_BRACKET)) {
+            nextToken();
+            ExpressionNode node = Expression();
+            RightBracket();
+            return node;
         } else {
             Position pos = current.coordinates().starting();
             return new VariableLeaf(Identifier(), pos);
@@ -1276,8 +1286,12 @@ public class Parser {
                 nodes.addAll(VariableSpec());
                 
                 type = ((VariableDeclNode)nodes.get(nodes.size() - 1)).type;
-            } else {
+            } else if (current.type().is(Token.Type.COLON)) {
+                nextToken();
                 type = Type();
+            } else {
+                type = null;
+                // @todo Report an error
             }
             nodes.add(0, new VariableDeclNode(name, type, declPos, expr));
         } else if (current.type().is(Token.Type.COMMA)) {
@@ -1321,6 +1335,11 @@ public class Parser {
     }
     private void RightBrace() {
         if (checkTokens(current, Token.Type.RIGHT_BRACE)) {
+            nextToken();
+        }
+    }
+    private void RightAngleBracket() {
+        if (checkTokens(current, Token.Type.RIGHT_ANGLE_BRACKET)) {
             nextToken();
         }
     }

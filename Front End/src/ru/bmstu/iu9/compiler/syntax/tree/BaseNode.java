@@ -8,7 +8,7 @@ import ru.bmstu.iu9.compiler.*;
 
 /**
  *
- * @author maggot
+ * @author anton.bobukh
  */
 public class BaseNode {
     public enum NodeType { 
@@ -40,7 +40,10 @@ public class BaseNode {
 
             BaseNode.NodeType nodeType = 
                 BaseNode.NodeType.values()[
-                    (Integer)context.deserialize(object.get("nodeType"), Integer.class)
+                    (Integer)context.deserialize(
+                        object.get("nodeType"),
+                        Integer.class
+                    )
                 ];
             
             JsonObject obj = null;
@@ -57,13 +60,19 @@ public class BaseNode {
                     assert primitive == null;
                     BaseTypeNode.Type TYPE = 
                         BaseTypeNode.Type.values()[
-                            (Integer)context.deserialize(primitive, Integer.class)
+                            (Integer)context.deserialize(
+                                primitive,
+                                Integer.class
+                            )
                         ];
                     
                     primitive = object.getAsJsonPrimitive("constancy");
                     assert primitive == null;
                     boolean constancy = 
-                            context.deserialize(primitive, Boolean.class);
+                            (Boolean)context.deserialize(
+                                primitive,
+                                Boolean.class
+                            );
                     
                     switch(TYPE) {
                         case ARRAY:
@@ -135,7 +144,10 @@ public class BaseNode {
                             assert primitive == null;
                             PrimitiveTypeNode.Type t = 
                                 PrimitiveTypeNode.Type.values()[
-                                    (Integer)context.deserialize(primitive, Integer.class)
+                                    (Integer)context.deserialize(
+                                        primitive,
+                                        Integer.class
+                                    )
                                 ];
                             switch(t) {
                                 case POINTER:
@@ -197,7 +209,10 @@ public class BaseNode {
                     assert primitive == null;
                     BinaryOperationNode.Operation operation = 
                             BinaryOperationNode.Operation.values()[
-                                (Integer)context.deserialize(primitive, Integer.class)
+                                (Integer)context.deserialize(
+                                    primitive,
+                                    Integer.class
+                                )
                             ];
                     
                     result = 
@@ -213,21 +228,29 @@ public class BaseNode {
                     
                     obj = object.getAsJsonObject("node");
                     assert obj == null;
-                    ExpressionNode node = context.deserialize(obj, ExpressionNode.class);
+                    ExpressionNode node =
+                        context.deserialize(obj, ExpressionNode.class);
                                         
                     primitive = object.getAsJsonPrimitive("operation");
                     assert primitive == null;
                     UnaryOperationNode.Operation uoperation = 
-                            UnaryOperationNode.Operation.values()[(Integer)context.deserialize(primitive, Integer.class)];
+                            UnaryOperationNode.Operation.values()[
+                                (Integer)context.deserialize(
+                                    primitive,
+                                    Integer.class
+                                )
+                            ];
                     
                     switch(uoperation) {
                         case CAST:
                             obj = object.getAsJsonObject("castingType");
-                            BaseTypeNode t = context.deserialize(obj, BaseTypeNode.class);
+                            BaseTypeNode t =
+                                context.deserialize(obj, BaseTypeNode.class);
                             result = new CastNode(t, node, dInfo);
                             break;
                         default:
-                            result = new UnaryOperationNode(uoperation, node, dInfo);
+                            result =
+                                new UnaryOperationNode(uoperation, node, dInfo);
                             break;
                     }
                     
@@ -320,13 +343,21 @@ public class BaseNode {
                     
                     obj = object.getAsJsonObject("initialization");
                     assert obj == null;
-                    BlockNode initialization = context.deserialize(obj, BlockNode.class);
+                    BlockNode initialization =
+                        context.deserialize(obj, BlockNode.class);
                     
                     obj = object.getAsJsonObject("step");
                     assert obj == null;
                     BlockNode step = context.deserialize(obj, BlockNode.class);
                     
-                    result = new ForNode(initialization, expression, step, block, dInfo);
+                    result =
+                        new ForNode(
+                            initialization,
+                            expression,
+                            step,
+                            block,
+                            dInfo
+                        );
                     
                     break;
                 }
@@ -347,7 +378,8 @@ public class BaseNode {
                     
                     obj = object.getAsJsonObject("elseNode");
                     assert obj == null;
-                    ElseNode elseNode = context.deserialize(obj, ElseNode.class);
+                    ElseNode elseNode =
+                        context.deserialize(obj, ElseNode.class);
                     
                     result = new IfNode(condition, block, elseNode, dInfo);
                     
@@ -370,9 +402,11 @@ public class BaseNode {
                     
                     obj = object.getAsJsonObject("defaultNode");
                     assert obj == null;
-                    DefaultNode defaultNode = context.deserialize(obj, DefaultNode.class);
+                    DefaultNode defaultNode =
+                        context.deserialize(obj, DefaultNode.class);
                     
-                    result = new SwitchNode(expression, cases, defaultNode, dInfo);
+                    result =
+                        new SwitchNode(expression, cases, defaultNode, dInfo);
                     
                     break;
                 }
@@ -477,7 +511,10 @@ public class BaseNode {
                     assert primitive == null;
                     ConstantLeaf.ConstantType type = 
                         ConstantLeaf.ConstantType.values()[
-                            (Integer)context.deserialize(primitive, Integer.class)
+                            (Integer)context.deserialize(
+                                primitive,
+                                Integer.class
+                            )
                         ];
                     
                     primitive = object.getAsJsonPrimitive("value");
@@ -487,28 +524,38 @@ public class BaseNode {
                         case INT:
                         {
                             int value = 
-                                context.deserialize(primitive, Integer.class);
+                                (Integer)context.deserialize(
+                                        primitive, Integer.class);
                             result = new IntegerConstantLeaf(value, dInfo);
                             break;
                         }
                         case DOUBLE:
                         {
                             double value = 
-                                context.deserialize(primitive, Double.class);
+                                (Double)context.deserialize(
+                                    primitive,
+                                    Double.class
+                                );
                             result = new DoubleConstantLeaf(value, dInfo);
                             break;
                         }
                         case CHAR:
                         {
                             int value = 
-                                context.deserialize(primitive, Integer.class);
+                                (Integer)context.deserialize(
+                                    primitive,
+                                    Integer.class
+                                );
                             result = new CharConstantLeaf(value, dInfo);
                             break;
                         }
                         case BOOL:
                         {
                             boolean value = 
-                                context.deserialize(primitive, Boolean.class);
+                                (Boolean)context.deserialize(
+                                    primitive,
+                                    Boolean.class
+                                );
                             result = new BoolConstantLeaf(value, dInfo);
                             break;
                         }
@@ -624,7 +671,11 @@ public class BaseNode {
                         context.deserialize(obj, BaseTypeNode.class);
                     
                     result = 
-                        new FunctionTypeNode.ArgumentNode(name, typeNode, dInfo);
+                        new FunctionTypeNode.ArgumentNode(
+                            name,
+                            typeNode,
+                            dInfo
+                        );
                     
                     break;
                 }

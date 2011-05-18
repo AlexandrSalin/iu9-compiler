@@ -1,7 +1,8 @@
 package ru.bmstu.iu9.compiler.ir;
 
 import java.util.*;
-import ru.bmstu.iu9.compiler.*;
+
+import ru.bmstu.iu9.compiler.ir.type.PrimitiveType;
 import ru.bmstu.iu9.compiler.syntax.tree.BinaryOperationNode;
 import ru.bmstu.iu9.compiler.syntax.tree.UnaryOperationNode;
 
@@ -25,12 +26,19 @@ abstract class Statement {
 final class ReturnStatement extends Statement {
     public ReturnStatement() {
         super(Operation.RETURN);
+        value = null;
+    }
+    public ReturnStatement(Operand value) {
+        super(Operation.RETURN);
+        this.value = value;
     }
     
     @Override
     public String toString() {
-        return "return";
+        return "return" + (value == null ? "" : " " + value);
     }
+
+    public final Operand value;
 }
 
 final class AssignmentStatement extends Statement {
@@ -204,7 +212,7 @@ final class IfGoToStatement extends Statement {
 
 final class CallStatement extends Statement {
     public CallStatement(
-            ConstantOperand function, 
+            VariableOperand function,
             int argsNumber, 
             VariableOperand lhv) {
         
@@ -212,17 +220,17 @@ final class CallStatement extends Statement {
         this.function = function;
         this.argsNumber = 
             new ConstantOperand(
-                new PrimitiveType(PrimitiveType.Type.INT, true), 
+                new PrimitiveType(PrimitiveType.Type.INT, true),
                 argsNumber
             );
         this.result = lhv;
     }
         
-    public CallStatement(ConstantOperand function, int argsNumber) {
+    public CallStatement(VariableOperand function, int argsNumber) {
         this(function, argsNumber, null);
     }
     
-    public final ConstantOperand function;
+    public final VariableOperand function;
     public final ConstantOperand argsNumber;
     public final VariableOperand result;
 }
@@ -281,7 +289,7 @@ final class ArrayIndexStatement extends Statement {
     public ArrayIndexStatement(
             VariableOperand lhv,
             VariableOperand array, 
-            VariableOperand index
+            Operand index
             ) {
         
         super(Operation.INDEX);
@@ -296,8 +304,22 @@ final class ArrayIndexStatement extends Statement {
     }
 
     public final VariableOperand array;
-    public final VariableOperand index;
+    public final Operand index;
     public final VariableOperand lhv;
+}
+
+final class ParamStatement extends Statement {
+    public ParamStatement(Operand value) {
+        super(Operation.PARAM);
+        this.value = value;
+    }
+
+    @Override
+    public String toString() {
+        return "param " + value;
+    }
+
+    public final Operand value;
 }
 
 final class MemberSelectStatement extends Statement {

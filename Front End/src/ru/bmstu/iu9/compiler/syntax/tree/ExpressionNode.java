@@ -1,7 +1,7 @@
 package ru.bmstu.iu9.compiler.syntax.tree;
 
 import ru.bmstu.iu9.compiler.Position;
-import ru.bmstu.iu9.compiler.BaseType;
+import ru.bmstu.iu9.compiler.ir.type.BaseType;
 import ru.bmstu.iu9.compiler.DebugInfo;
 
 /**

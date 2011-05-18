@@ -1,7 +1,7 @@
 package ru.bmstu.iu9.compiler.syntax.tree;
 
 import ru.bmstu.iu9.compiler.DebugInfo;
-import ru.bmstu.iu9.compiler.FunctionType;
+import ru.bmstu.iu9.compiler.ir.type.FunctionType;
 import ru.bmstu.iu9.compiler.Position;
 
 /**

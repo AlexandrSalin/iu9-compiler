@@ -15,7 +15,9 @@ class Code implements Iterable<Statement> {
     
     public void addStatement(Statement statement) {
         this.statements.add(statement);
-        System.out.println(statement);
+        System.out.println(
+                currentIndex() + " :\t" + statement.toString()
+            );
     }
     
     public Statement[] statements() { 
@@ -25,8 +27,10 @@ class Code implements Iterable<Statement> {
     public int nextIndex() {
         return statements.size();
     }
-    
-    @Override
+    public int currentIndex() {
+        return nextIndex() - 1;
+    }
+
     public ListIterator<Statement> iterator() {
         return this.statements.listIterator();
     }
@@ -37,4 +41,12 @@ class Code implements Iterable<Statement> {
     }
     
     private List<Statement> statements;
+
+    public void print() {
+        for(int i = 0; i < statements.size(); ++i) {
+            System.out.println(
+                i + " :\t" + statements.get(i).toString()
+            );
+        }
+    }
 }

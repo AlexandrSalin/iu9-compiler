@@ -5,6 +5,8 @@
 package ru.bmstu.iu9.compiler.semantics;
 
 import ru.bmstu.iu9.compiler.*;
+import ru.bmstu.iu9.compiler.ir.type.BaseType;
+import ru.bmstu.iu9.compiler.ir.type.PrimitiveType;
 
 /**
  *
@@ -13,7 +15,7 @@ import ru.bmstu.iu9.compiler.*;
 public class TypeChecker {
     
     public static boolean check(
-            BaseType found, 
+            BaseType found,
             BaseType required, 
             DebugInfo dInfo) {
         
@@ -93,7 +95,7 @@ public class TypeChecker {
     
     public static boolean check(
             BaseType found, 
-            PrimitiveType.Type[] required, 
+            PrimitiveType.Type[] required,
             DebugInfo dInfo) {
 
         boolean result = (found == null || /*!(found instanceof PrimitiveType) ||*/
