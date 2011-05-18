@@ -76,24 +76,37 @@ abstract class SymbolWithScope extends Symbol {
     protected SymbolWithScope(
             String name, 
             BaseType type, 
-//            SymbolTable ambientScope,
+            SymbolTable ambientScope,
             SymbolTable scope) {
         
         super(name, type);
         this.scope = scope;
-//        this.scope.setOpenScope(ambientScope);
+        this.scope.setOpenScope(ambientScope);
     }
     protected SymbolWithScope(
             String name,
-//            SymbolTable ambientScope,
+            SymbolTable ambientScope,
             SymbolTable scope) {
         
         super(name);
         this.scope = scope;
- //       this.scope.setOpenScope(ambientScope);
+        this.scope.setOpenScope(ambientScope);
     }
-    
-//    public SymbolTable scope() { return this.scope; }
+    protected SymbolWithScope(
+            String name,
+            BaseType type,
+            SymbolTable scope) {
+
+        super(name, type);
+        this.scope = scope;
+    }
+    protected SymbolWithScope(
+            String name,
+            SymbolTable scope) {
+
+        super(name);
+        this.scope = scope;
+    }
     
     @Override
     public boolean equals(Object obj) {
@@ -110,23 +123,23 @@ final class VariableSymbol extends Symbol {
 }
 
 final class FunctionSymbol extends SymbolWithScope {
-    public FunctionSymbol(String name, BaseType type/*, SymbolTable ambientScope*/) {
+    public FunctionSymbol(String name, BaseType type, SymbolTable ambientScope) {
         super(name, type, /*ambientScope,*/ new SymbolTable());
     }
     public FunctionSymbol(
             String name, 
             BaseType type, 
-//            SymbolTable ambientScope,
+            SymbolTable ambientScope,
             SymbolTable scope) {
         
-        super(name, type, /*ambientScope,*/ scope);
+        super(name, type, ambientScope, scope);
     }
     public FunctionSymbol(
             String name,
-//            SymbolTable ambientScope,
+            SymbolTable ambientScope,
             SymbolTable scope) {
         
-        super(name, /*ambientScope,*/ scope);
+        super(name, ambientScope, scope);
     }
     
     @Override
@@ -136,23 +149,21 @@ final class FunctionSymbol extends SymbolWithScope {
 }
 
 final class StructSymbol extends SymbolWithScope {
-    public StructSymbol(String name, BaseType type/*, SymbolTable ambientScope*/) {
-        super(name, type, /*ambientScope,*/ new SymbolTable());
+    public StructSymbol(String name, BaseType type) {
+        super(name, type, new SymbolTable());
+    }
+    public StructSymbol(
+            String name,
+            SymbolTable scope) {
+        
+        super(name, scope);
     }
     public StructSymbol(
             String name, 
-//            SymbolTable ambientScope,
+            BaseType type,
             SymbolTable scope) {
         
-        super(name, /*ambientScope,*/ scope);
-    }
-    public StructSymbol(
-            String name, 
-            BaseType type, 
-//            SymbolTable ambientScope,
-            SymbolTable scope) {
-        
-        super(name, type, /*ambientScope,*/ scope);
+        super(name, type, scope);
     }
     
     @Override

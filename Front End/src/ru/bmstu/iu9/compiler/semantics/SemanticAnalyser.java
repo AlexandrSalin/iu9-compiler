@@ -78,7 +78,6 @@ public class SemanticAnalyser {
                         new StructSymbol(
                             struct.name, 
                             realType,
-//                            context.global(),
                             new SymbolTable()
                         ));
                     
@@ -90,7 +89,7 @@ public class SemanticAnalyser {
                     context.global().add(
                         new FunctionSymbol(
                             f.name, 
-//                            context.global(),
+                            context.global(),
                             new SymbolTable()
                         ));
                     break;
@@ -386,13 +385,7 @@ public class SemanticAnalyser {
                             VariableLeaf fieldName = 
                                 (VariableLeaf)bNode.rightChild();
 
-                            String name = ((StructType)type).name;
-
-                            StructSymbol struct = 
-                                (StructSymbol) context.get(name);
-                            assert struct != null;
-
-                            Symbol field = struct.scope.get(fieldName.name);
+                            Symbol field = context.get(fieldName.name);
                             if (field == null) {
                                 Logger.logUndeclaredVarialbe(
                                         fieldName.name, 
