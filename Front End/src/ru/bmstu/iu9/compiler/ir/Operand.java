@@ -144,14 +144,14 @@ class TmpVariableOperand extends VariableOperand {
  * 
  * @author anton.bobukh
  */
-class ConstantOperand implements Operand {
+class ConstantOperand<T> implements Operand {
     /**
      * Создает операнд для константы.
      * 
      * @param type Тип константы
      * @param value Значение константы
      */
-    public ConstantOperand(BaseType type, Object value) {
+    public ConstantOperand(BaseType type, T value) {
         this.type = type;
         this.value = value;
     }
@@ -182,6 +182,6 @@ class ConstantOperand implements Operand {
     /**
      * Значение константы
      */
-    public final Object value;
+    public final T value;
     private final BaseType type;
 }

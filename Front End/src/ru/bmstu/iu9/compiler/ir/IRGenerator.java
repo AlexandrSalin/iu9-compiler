@@ -73,11 +73,37 @@ public class IRGenerator {
         VariableOperand array = (VariableOperand) generate(node.leftChild());
         Operand index = generate(node.rightChild());
 
-        TmpVariableOperand address = 
+        long elementSize =
+            ((ArrayType) node.leftChild().realType()).element.size();
+
+        TmpVariableOperand offset =
+            new TmpVariableOperand(
+                new PrimitiveType(PrimitiveType.Type.LONG),
+                varTable
+            );
+
+        code.addStatement(
+            new BinaryOperationStatement(
+                index,
+                new ConstantOperand<Long>(
+                    new PrimitiveType(PrimitiveType.Type.LONG),
+                    elementSize
+                ),
+                offset,
+                BinaryOperationStatement.Operation.MUL
+            )
+        );
+
+        TmpVariableOperand address =
             new TmpVariableOperand(new PointerType(node.realType()), varTable);
 
         code.addStatement(
-            new ArrayIndexStatement(address, array, index)
+            new BinaryOperationStatement(
+                array,
+                offset,
+                address,
+                BinaryOperationStatement.Operation.PLUS
+            )
         );
 
         return address;
@@ -85,13 +111,24 @@ public class IRGenerator {
     
     private VariableOperand generateStructField(BinaryOperationNode node) {
         VariableOperand struct = (VariableOperand) generate(node.leftChild());
-        VariableOperand field = (VariableOperand) generate(node.rightChild());
+//        VariableOperand field = (VariableOperand) generate(node.rightChild());
+        String fieldName = ((VariableLeaf) node.rightChild()).name;
+
+        long offset = ((StructType) struct.type()).getFieldOffset(fieldName);
 
         TmpVariableOperand address = 
             new TmpVariableOperand(new PointerType(node.realType()), varTable);
 
         code.addStatement(
-            new MemberSelectStatement(address, struct, field)
+            new BinaryOperationStatement(
+                struct,
+                new ConstantOperand<Long>(
+                    new PrimitiveType(PrimitiveType.Type.LONG),
+                    offset
+                ),
+                address,
+                BinaryOperationStatement.Operation.PLUS
+            )
         );
 
         return address;
@@ -468,7 +505,12 @@ public class IRGenerator {
             }
             case FUNCTION_DECL:
             {
-                generateFunction((FunctionDeclNode) node);
+                FunctionDeclNode function = (FunctionDeclNode) node;
+                varTable.add(new NamedVariable(
+                    function.name,
+                    function.realType()
+                ));
+                generateFunction(function);
                 
                 break;
             }

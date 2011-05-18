@@ -125,9 +125,7 @@ public class SemanticAnalyser {
                             ));
                         decl.setRealType(decl.type.realType());
 
-                        type.addField(
-                            new StructType.Field(decl.name, decl.realType())
-                        );
+                        type.addField(decl.name, decl.realType());
                     }
 
                     break;

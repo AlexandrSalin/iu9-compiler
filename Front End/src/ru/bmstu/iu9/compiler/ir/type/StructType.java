@@ -9,12 +9,13 @@ import java.util.List;
  */
 public final class StructType extends BaseType {
     public static class Field {
-        public Field(String name, BaseType type) {
+        private Field(String name, BaseType type, long offset) {
             this.name = name;
             this.type = type;
+            this.offset = offset;
         }
-        public Field(Field arg) {
-            this(arg.name, arg.type);
+        public Field(Field field) {
+            this(field.name, field.type, field.offset);
         }
 
         @Override
@@ -24,14 +25,9 @@ public final class StructType extends BaseType {
 
         public final String name;
         public final BaseType type;
+        public final long offset;
     }
 
-    /*
-    public StructType(String name, boolean constancy, long size) {
-        super(Type.STRUCT, constancy, size);
-        this.name = name;
-    }
-    */
     public StructType(String name, boolean constancy) {
         super(Type.STRUCT, constancy, 0);
         this.name = name;
@@ -41,13 +37,24 @@ public final class StructType extends BaseType {
         this.name = name;
         this.fields.addAll(fields);
     }
-    
-    /*public void setSize(long size) {
-        this.size = size;
-    }*/
-    public void addField(Field field) {
-        this.fields.add(field);
-        this.size += field.type.size();
+
+    public void addField(String name, BaseType type) {
+        this.fields.add(new Field(name, type, currentOffset));
+        this.size += type.size();
+        this.currentOffset += type.size();
+    }
+
+    public long getFieldOffset(String name) {
+        long offset = 0;
+        for(Field field : fields) {
+            if (field.name.equals(name)) {
+                return offset;
+            } else {
+                offset += field.offset;
+            }
+        }
+
+        return -1;
     }
     
     @Override
@@ -62,4 +69,5 @@ public final class StructType extends BaseType {
     
     public final String name;
     public final List<Field> fields = new LinkedList<Field>();
+    private long currentOffset = 0;
 }
