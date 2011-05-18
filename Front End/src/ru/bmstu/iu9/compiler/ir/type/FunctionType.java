@@ -5,7 +5,7 @@ import java.util.List;
 
 /**
  *
- * @author maggot
+ * @author anton.bobukh
  */
 public final class FunctionType extends BaseType {
     public static class Argument {
@@ -54,8 +54,9 @@ public final class FunctionType extends BaseType {
                         ((FunctionType)obj).arguments.get(i).type)))
                     return false;
             }
+            return true;
         }
-        return true;
+        return false;
     }
     @Override
     public String toString() {

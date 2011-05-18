@@ -54,29 +54,30 @@ struct def {
     b **struct abc;
 };
 struct abc {
-    a, b int;
+    a, b  int;
     c double;
-    d func(q, w int, e, r float) void;
+    d func(q, w int, e, r float) int;
     e *struct def;
 };
 
 func foo(q, w const int, e, r float) void {
-    var bar const struct abc;
+    var bar : const struct abc;
     return;
 }
 
 var (
-    q = 5 const int;
-    w = 9.9e-5, e = 5.0 double;
+    q = 5 : const int;
+    w = 9.9e-5, e = 5.0 : double;
 );
 
 func main(args const * const * char) int {
     // comment 1 2 3 
     var (
-        a = 0 int;
-        b = 10 const int;
-        l [10][5] int;
-        m struct abc;
+        a = 0 : int;
+        b = 10 : const int;
+        l : [10][5] int;
+        m : struct abc;
+        g : long;
         );
 
     /*
@@ -85,13 +86,14 @@ func main(args const * const * char) int {
         comment 
     */
     m.d = &main;
- //   a = (*m.d)(args);
+    a = (*m.d)(args);
+
+    g = <long>a;
 
     l[2][3] = a;
 
-    var c = 'a' char;
-    var q * char;
-    q = &c;
+    var c = 'a' : char;
+    var q = &c : *char;
     args = &q;
 //    bar = 0;
 
@@ -109,7 +111,7 @@ func main(args const * const * char) int {
         return -1;
     }
 
-    for(var i = 0 int; i <= 10; ++i) {
+    for(var i = 0 : int; i <= 10; ++i) {
         if(i > 0) {
             a++;
         } else {

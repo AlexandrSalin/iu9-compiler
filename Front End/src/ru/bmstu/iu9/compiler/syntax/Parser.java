@@ -1300,7 +1300,8 @@ public class Parser {
             type = ((VariableDeclNode)nodes.get(nodes.size() - 1)).type;
             
             nodes.add(0, new VariableDeclNode(name, type, declPos));
-        } else {
+        } else if (current.type().is(Token.Type.COLON)){
+            nextToken();
             type = Type();
             return Arrays.asList(new VariableDeclNode(name, type, declPos));
         }

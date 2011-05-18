@@ -78,7 +78,7 @@ public class SemanticAnalyser {
                         new StructSymbol(
                             struct.name, 
                             realType,
-                            context.global(), 
+//                            context.global(),
                             new SymbolTable()
                         ));
                     
@@ -90,7 +90,7 @@ public class SemanticAnalyser {
                     context.global().add(
                         new FunctionSymbol(
                             f.name, 
-                            context.global(), 
+//                            context.global(),
                             new SymbolTable()
                         ));
                     break;
@@ -499,8 +499,11 @@ public class SemanticAnalyser {
                             ((PointerType)uNode.node.realType()).pointerType);
                         break;
                     case CAST:
-                        uNode.setRealType(
-                            ((CastNode)uNode).castingType.realType());
+                        CastNode c = (CastNode) node;
+
+                        processNode(c.castingType);
+                        uNode.setRealType(c.castingType.realType());
+
                         break;
                     case REF:
                         uNode.setRealType(
