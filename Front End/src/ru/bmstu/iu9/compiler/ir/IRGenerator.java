@@ -223,7 +223,7 @@ public class IRGenerator {
         scopes.enterBlock();
 
         FunctionType type = (FunctionType) node.realType();
-        for(FunctionType.Argument arg : type.arguments()) {
+        for(FunctionType.Argument arg : type.arguments) {
             varTable.add(new NamedVariable(arg.name, arg.type));
         }
 

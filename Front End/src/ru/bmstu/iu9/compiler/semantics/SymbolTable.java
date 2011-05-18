@@ -18,7 +18,7 @@ class SymbolTable implements Iterable<Symbol> {
         this.openScope = openScope;
     }
     public Symbol add(Symbol symbol) {
-        return symbols.put(symbol.name(), symbol);
+        return symbols.put(symbol.name, symbol);
     }
     public Symbol get(String name) {
         if (symbols.containsKey(name)) {
@@ -58,10 +58,13 @@ abstract class Symbol {
     protected Symbol(String name) {
         this.name = name;
     }
-    
-    public String name() { return this.name; }
-    public BaseType type() { return this.type; }
-    public void setType(BaseType type) { this.type = type; }
+
+    public BaseType type() {
+        return this.type;
+    }
+    public void setType(BaseType type) {
+        this.type = type;
+    }
     
     @Override
     public String toString() {
@@ -69,7 +72,7 @@ abstract class Symbol {
     }
     
     protected BaseType type;
-    protected final String name;
+    public final String name;
 }
 
 abstract class SymbolWithScope extends Symbol {
@@ -123,8 +126,8 @@ final class VariableSymbol extends Symbol {
 }
 
 final class FunctionSymbol extends SymbolWithScope {
-    public FunctionSymbol(String name, BaseType type, SymbolTable ambientScope) {
-        super(name, type, /*ambientScope,*/ new SymbolTable());
+    /*public FunctionSymbol(String name, BaseType type, SymbolTable ambientScope) {
+        super(name, type, ambientScope, new SymbolTable());
     }
     public FunctionSymbol(
             String name, 
@@ -133,7 +136,7 @@ final class FunctionSymbol extends SymbolWithScope {
             SymbolTable scope) {
         
         super(name, type, ambientScope, scope);
-    }
+    }*/
     public FunctionSymbol(
             String name,
             SymbolTable ambientScope,
@@ -149,7 +152,7 @@ final class FunctionSymbol extends SymbolWithScope {
 }
 
 final class StructSymbol extends SymbolWithScope {
-    public StructSymbol(String name, BaseType type) {
+    /*public StructSymbol(String name, BaseType type) {
         super(name, type, new SymbolTable());
     }
     public StructSymbol(
@@ -157,7 +160,7 @@ final class StructSymbol extends SymbolWithScope {
             SymbolTable scope) {
         
         super(name, scope);
-    }
+    }*/
     public StructSymbol(
             String name, 
             BaseType type,

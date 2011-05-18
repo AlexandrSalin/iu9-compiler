@@ -130,8 +130,14 @@ abstract public class BaseType {
                     primitive = object.getAsJsonPrimitive("name");
                     assert primitive == null;
                     String name = context.deserialize(primitive, String.class);
+
+                    JsonArray f = object.getAsJsonArray("fields");
+                    assert f == null;
+                    List<StructType.Field> fields = context.deserialize(
+                        f,
+                        new TypeToken<List<StructType.Field>>(){}.getType());
                     
-                    result = new StructType(name, constancy);
+                    result = new StructType(name, fields, constancy);
                     
                     break;
                 }

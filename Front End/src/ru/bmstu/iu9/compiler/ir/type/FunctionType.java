@@ -16,9 +16,6 @@ public final class FunctionType extends BaseType {
         public Argument(Argument arg) {
             this(arg.name, arg.type);
         }
-        private Argument() {
-            this(null, null);
-        }
         
         @Override
         public String toString() {
@@ -61,10 +58,6 @@ public final class FunctionType extends BaseType {
     @Override
     public String toString() {
         return "FUNC (" + arguments + ") " + returnValue;
-    }
-    
-    public List<Argument> arguments() {
-        return this.arguments;
     }
     
     public final BaseType returnValue;

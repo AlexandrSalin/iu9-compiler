@@ -113,7 +113,8 @@ public class SemanticAnalyser {
                     assert symbol == null;
                     
                     SymbolTable scope = symbol.scope;
-                    
+
+                    StructType type = (StructType)symbol.type;
 
                     for(VariableDeclNode decl : struct.declarations) {
                         processType(decl.type);
@@ -123,15 +124,12 @@ public class SemanticAnalyser {
                                 decl.type.realType()
                             ));
                         decl.setRealType(decl.type.realType());
+
+                        type.addField(
+                            new StructType.Field(decl.name, decl.realType())
+                        );
                     }
-                    
-                    long size = 0;
-                    for(Symbol s : scope) {
-                        size += s.type().size();
-                    }
-                    
-                    ((StructType)symbol.type).setSize(size);
-                    
+
                     break;
                 }
                 case FUNCTION_DECL:
@@ -177,7 +175,8 @@ public class SemanticAnalyser {
             }
         }
     }
-    
+
+
     private void processType(BaseTypeNode type) {
         switch(type.type()) {
             case ARRAY:
@@ -378,12 +377,12 @@ public class SemanticAnalyser {
                                 bNode.dInfo)
                         ) {
                             
-                            context.enterStruct((StructType)type);
+                            context.enterStruct((StructType) type);
 
                             processNode(bNode.rightChild());
 
                             VariableLeaf fieldName = 
-                                (VariableLeaf)bNode.rightChild();
+                                (VariableLeaf) bNode.rightChild();
 
                             Symbol field = context.get(fieldName.name);
                             if (field == null) {
@@ -442,7 +441,7 @@ public class SemanticAnalyser {
             }
             case UNARY_OPERATION:
             {
-                UnaryOperationNode uNode = ((UnaryOperationNode)node);
+                UnaryOperationNode uNode = ((UnaryOperationNode) node);
                 
                 processNode(uNode.node);
                 switch (uNode.operation()) {
@@ -767,12 +766,12 @@ public class SemanticAnalyser {
                     
                     FunctionType func = (FunctionType)call.function.realType();
                     
-                    if (func.arguments().size() == 
+                    if (func.arguments.size() ==
                             call.arguments.children().size()) {
                         
-                        for (int i = 0; i < func.arguments().size(); ++i) {
+                        for (int i = 0; i < func.arguments.size(); ++i) {
                             TypeChecker.check(
-                                    func.arguments().get(i).type, 
+                                    func.arguments.get(i).type,
                                     call.arguments.children().get(i).realType(), 
                                     call.dInfo);
                         }
