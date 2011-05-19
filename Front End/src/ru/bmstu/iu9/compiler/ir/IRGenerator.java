@@ -14,6 +14,7 @@ import ru.bmstu.iu9.compiler.syntax.tree.*;
 
 /**
  *
+ * @todo добавить start_lock, end_lock и barrier
  * @todo call
  * @todo проблема goto'а за пределы функции
  *

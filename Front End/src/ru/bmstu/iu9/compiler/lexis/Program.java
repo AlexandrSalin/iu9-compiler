@@ -19,8 +19,8 @@ class CodePoint implements Cloneable {
     /**
      * Создает объект CodePoint.
      * 
-     * @param CPValue кодовая точка
-     * @param CPPosition позиция кодовой точки в программе
+     * @param value кодовая точка
+     * @param position позиция кодовой точки в программе
      */
     public CodePoint(int value, Position position) {
         this.value = value;
@@ -34,6 +34,9 @@ class CodePoint implements Cloneable {
      */
     public int value() { 
         return value;
+    }
+    public char asChar() {
+        return Character.toChars(value)[0];
     }
     /**
      * Метод, предоставляющий доступ к координатам кодовой точки.
@@ -57,7 +60,7 @@ class CodePoint implements Cloneable {
     
     @Override
     public String toString() {
-        return "'" + Character.toChars(value)[0] + "' at " + position;
+        return "'" + asChar() + "' at " + position;
     }
     
     private int value;

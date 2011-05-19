@@ -8,12 +8,13 @@ import ru.bmstu.iu9.compiler.syntax.tree.UnaryOperationNode;
 
 /**
  *
- * @author maggot
+ * @author anton.bobukh
  */
 abstract class Statement {
     public enum Operation { 
         PARAM, CALL, RETURN, GOTO, IF_GOTO, RUN, BARRIER, BINATY_OPERATION, 
-        UNARY_OPERATION, ASSIGN, INDIRECT_ASSIGN, MEMBER_SELECT, INDEX
+        UNARY_OPERATION, ASSIGN, INDIRECT_ASSIGN, MEMBER_SELECT, INDEX,
+        START_LOCK, END_LOCK
     };
     
     protected Statement(Operation operation) {
@@ -41,6 +42,39 @@ final class ReturnStatement extends Statement {
     public final Operand value;
 }
 
+final class StartLockStatement extends Statement {
+    public StartLockStatement() {
+        super(Operation.START_LOCK);
+    }
+
+    @Override
+    public String toString() {
+        return "start lock";
+    }
+}
+
+final class EndLockStatement extends Statement {
+    public EndLockStatement() {
+        super(Operation.END_LOCK);
+    }
+
+    @Override
+    public String toString() {
+        return "end lock";
+    }
+}
+
+final class BarrierStatement extends Statement {
+    public BarrierStatement() {
+        super(Operation.BARRIER);
+    }
+
+    @Override
+    public String toString() {
+        return "barrier";
+    }
+}
+
 final class AssignmentStatement extends Statement {
     public AssignmentStatement(VariableOperand lhv, Operand rhv) {
         super(Operation.ASSIGN);
@@ -48,20 +82,13 @@ final class AssignmentStatement extends Statement {
         this.rhv = rhv;
     }
     
-    public Operand rightHandValue() { 
-        return this.rhv; 
-    }
-    public Operand leftHandValue() { 
-        return this.lhv; 
-    }
-    
     @Override
     public String toString() {
         return lhv + " = " + rhv;
     }
     
-    private final Operand rhv;
-    private final VariableOperand lhv;
+    public final Operand rhv;
+    public final VariableOperand lhv;
 }
 
 
@@ -72,20 +99,13 @@ final class IndirectAssignmentStatement extends Statement {
         this.rhv = rhv;
     }
     
-    public Operand rightHandValue() { 
-        return this.rhv; 
-    }
-    public Operand leftHandValue() { 
-        return this.lhv;
-    }
-    
     @Override
     public String toString() {
         return "*" + lhv + " = " + rhv;
     }
     
-    private final Operand rhv;
-    private final VariableOperand lhv;
+    public final Operand rhv;
+    public final VariableOperand lhv;
 }
 
 
@@ -284,7 +304,7 @@ final class UnaryOperationStatement extends Statement {
         operations.put(UnaryOperationNode.Operation.BITWISE_NOT, Operation.BITWISE_NOT);        
     }
 }
-
+/*
 final class ArrayIndexStatement extends Statement {
     public ArrayIndexStatement(
             VariableOperand lhv,
@@ -307,7 +327,7 @@ final class ArrayIndexStatement extends Statement {
     public final Operand index;
     public final VariableOperand lhv;
 }
-
+*/
 final class ParamStatement extends Statement {
     public ParamStatement(Operand value) {
         super(Operation.PARAM);
@@ -321,7 +341,7 @@ final class ParamStatement extends Statement {
 
     public final Operand value;
 }
-
+/*
 final class MemberSelectStatement extends Statement {
     public MemberSelectStatement(
             VariableOperand lhv,
@@ -343,3 +363,4 @@ final class MemberSelectStatement extends Statement {
     public final VariableOperand field;
     public final VariableOperand lhv;
 }
+*/

@@ -4,6 +4,7 @@ import ru.bmstu.iu9.compiler.lexis.token.*;
 import ru.bmstu.iu9.compiler.Fragment;
 import com.google.gson.*;
 import java.io.*;
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.regex.*;
 import ru.bmstu.iu9.compiler.lexis.Program.CodePointIterator;
@@ -189,7 +190,13 @@ class Scanner implements Iterable<Token> {
                 }
 
                 public Token next() {
-                    return nextToken();
+                    for(;;) {
+                        try {
+                            return nextToken();
+                        } catch(LexisException ex) {
+                            errorRecovery();
+                        }
+                    }
                 }
 
                 public void remove() {
@@ -199,13 +206,14 @@ class Scanner implements Iterable<Token> {
     }
     
     /**
-     * Пропускает все символы, пока не дойдет до пробельного символа или символа
-     * ';'.
+     * Пропускает все символы, пока не дойдет до пробельного символа или
+     * зарезервированного символа
      */
     private void errorRecovery() {
         while (iterator.hasNext() && 
                 (!Character.isWhitespace(iterator.current().value()) ||
-                  iterator.current().value() != ';')) {
+                 !reservedSymbols.contains(iterator.current().value())
+              )) {
             iterator.next();
         }
     }
@@ -221,7 +229,7 @@ class Scanner implements Iterable<Token> {
      * @return {@link ru.bmstu.iu9.compiler.lexis.token.Token Token}, 
      *         соответствующий следующей лексеме в тексте программы
      */
-    private Token nextToken() {
+    private Token nextToken() throws LexisException {
         if (skipWhitespacesAndComments()) {
             return null;
         }
@@ -257,8 +265,7 @@ class Scanner implements Iterable<Token> {
                     return new CharConstantToken(current.position(),
                         iterator.current().position(), cp);
                 } else {
-                    errorRecovery();
-                    return null;
+                    throw new InvalidCodePointException(iterator.current());
                 }
             case '~':
                 iterator.advance(1);
@@ -450,7 +457,7 @@ class Scanner implements Iterable<Token> {
                         try {
                             value = Double.parseDouble(matcherDouble.group());
                         } catch(NumberFormatException ex) {
-                            Logger.log(ex.toString(), current.position());
+                            throw new InvalidCodePointException(iterator.current());
                         }
                         return new DoubleConstantToken(
                             iterator.current().position(), 
@@ -485,11 +492,21 @@ class Scanner implements Iterable<Token> {
                             }
                             
                             try {
-                                value = Integer.parseInt(program.toString().substring(
-                                    current.position().index(), 
-                                    iterator.current().position().index()), 16);
+                                value = Integer.parseInt(
+                                    program.toString().substring(
+                                        current.position().index(),
+                                        iterator.current().position().index()
+                                    ),
+                                    16
+                                );
                             } catch(NumberFormatException ex) {
-                                Logger.log(ex.toString(), current.position());
+                                throw new InvalidNumberFormatException(
+                                    program.toString().substring(
+                                        current.position().index(),
+                                        iterator.current().position().index()
+                                    ),
+                                    iterator.current().position()
+                                );
                             }
                         } else {
                             while (iterator.hasNext() && 
@@ -499,11 +516,21 @@ class Scanner implements Iterable<Token> {
                             }
                             
                             try {
-                                value = Integer.parseInt(program.toString().substring(
-                                    current.position().index(), 
-                                    iterator.current().position().index()), 8);
+                                value = Integer.parseInt(
+                                    program.toString().substring(
+                                        current.position().index(),
+                                        iterator.current().position().index()
+                                    ),
+                                    8
+                                );
                             } catch(NumberFormatException ex) {
-                                Logger.log(ex.toString(), current.position());
+                                throw new InvalidNumberFormatException(
+                                    program.toString().substring(
+                                        current.position().index(),
+                                        iterator.current().position().index()
+                                    ),
+                                    iterator.current().position()
+                                );
                             }
                         }
                     } else {
@@ -513,11 +540,19 @@ class Scanner implements Iterable<Token> {
                         }
                         
                         try {
-                            value = Integer.parseInt(program.toString().substring(
+                            value = Integer.parseInt(
+                                program.toString().substring(
                                     current.position().index(), 
-                                    iterator.current().position().index()));
+                                    iterator.current().position().index()
+                            ));
                         } catch(NumberFormatException ex) {
-                            Logger.log(ex.toString(), current.position());
+                            throw new InvalidNumberFormatException(
+                                program.toString().substring(
+                                    current.position().index(),
+                                    iterator.current().position().index()
+                                ),
+                                iterator.current().position()
+                            );
                         }
                     }
                     
@@ -615,22 +650,23 @@ class Scanner implements Iterable<Token> {
                         case 't':
                             if (keyword.equals("true"))
                                 type = Token.Type.TRUE;
-                            break;                            
+                            break;
+                        default:
+                            return new IdentifierToken(
+                                current.position(),
+                                iterator.current().position(),
+                                keyword
+                            );
                     }
-                    
-                    if (type != null)
-                        return new SpecialToken(
-                            current.position(), iterator.current().position(), 
-                            type);
-                    else
-                        return new IdentifierToken(
-                            current.position(), iterator.current().position(), 
-                            keyword);
+                    return new SpecialToken(
+                        current.position(),
+                        iterator.current().position(),
+                        type
+                    );
+
                     
                 } else {
-                    Logger.logUnknownCharacter(current.position());
-                    iterator.advance(1);
-                    return null;
+                    throw new InvalidCodePointException(iterator.current());
                 }
         }
         
@@ -639,9 +675,7 @@ class Scanner implements Iterable<Token> {
                 current.position(), iterator.current().position(),
                 tokenType);
         } else {
-            Logger.logUnknownCharacter(current.position());
-            iterator.advance(1);
-            return null;
+            throw new InvalidCodePointException(iterator.current());
         }
     }
     
@@ -685,4 +719,8 @@ class Scanner implements Iterable<Token> {
     
     private CodePointIterator iterator;
     private Program program;
+    private final List<Character> reservedSymbols = Arrays.asList(
+        '.', ',', ':', ';', '-', '+', '/', '\'', '%', '*', '&', '>', '<', '=',
+        '[', ']', '{', '}', '(', ')', '|', '^', '!', '~'
+    );
 }

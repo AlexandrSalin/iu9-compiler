@@ -6,7 +6,7 @@ import ru.bmstu.iu9.compiler.DebugInfo;
 
 /**
  *
- * @author maggot
+ * @author anton.bobukh
  */
 public class ExpressionNode extends BaseNode implements Statement {
     public static ExpressionNode InvalidNode(Position position) {
