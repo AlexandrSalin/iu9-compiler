@@ -41,7 +41,7 @@ public class Parser {
      *               сгенерированный лексическим анализатором
      */
     public Parser(final Token[] tokens) {
-        createIterator(tokens);
+        iterator = new TokenIterator(tokens);
     }
     /**
      * Создает объект Parser.
@@ -68,7 +68,7 @@ public class Parser {
             
             reader = new BufferedReader(new FileReader(filename));
             Token[] tokens = gson.fromJson(reader, Token[].class);
-            createIterator(tokens);
+            iterator = new TokenIterator(tokens);
         } catch(java.io.IOException ex) {
 //            ex.printStackTrace();
         } finally {
@@ -81,33 +81,53 @@ public class Parser {
     }
     
     /**
-     * Создает анонимный класс-итератор по массиву 
+     * Класс-итератор по массиву 
      * {@link ru.bmstu.iu9.compiler.lexis.token.Token Token}ов.
      * 
-     * @param tokens массив {@link ru.bmstu.iu9.compiler.lexis.token.Token Token}ов,
-     *               по которому будет производиться итерирование
+     * Класс-итератор по массиву 
+     * {@link ru.bmstu.iu9.compiler.lexis.token.Token Token}ов. Расширяет 
+     * интерфейс {@link java.util.Iterator<Token> Iterator<Token>}, добавляя
+     * возможность доступа к текущему токену. Содержит в себе коллекцию, по
+     * которой происходит итерирование, что позволяет не отводить отдельную 
+     * переменную для коллекции.
      */
-    private void createIterator(final Token[] tokens) {
-        token = new Iterator<Token>() {
-            public boolean hasNext() {
-                return counter < container.length;
-            }
+    private class TokenIterator implements Iterator<Token> {
+        /**
+         * Создает класс-итератор по массиву токенов.
+         * 
+         * @param tokens массив {@link ru.bmstu.iu9.compiler.lexis.token.Token Token}ов,
+         *               по которому будет производиться итерирование
+         */
+        public TokenIterator(final Token[] tokens) {
+            this.tokens = tokens;
+        }
+        
+        public boolean hasNext() {
+            return position < tokens.length;
+        }
 
-            public Token next() {
-                return container[counter++];
-            }
+        public Token next() {
+            current = tokens[position++];
+            return current;
+        }
+        
+        /**
+         * Возвращает текущий {@link ru.bmstu.iu9.compiler.lexis.token.Token Token} 
+         * без инкрементирования счетчика.
+         * 
+         * @return Текущий {@link ru.bmstu.iu9.compiler.lexis.token.Token Token}
+         */
+        public Token current() {
+            return current;
+        }
 
-            public void remove() {
-                throw new UnsupportedOperationException("Not supported yet.");
-            }
-
-            private int counter = 0;
-            private Token[] container;
-            
-            {
-                container = tokens;
-            }
-        };
+        public void remove() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+        
+        private Token current;
+        private int position = 0;
+        private final Token[] tokens;
     }
     
     /**
@@ -140,11 +160,11 @@ public class Parser {
     
     public static void main(String[] args) {
         
-        Parser parser = new Parser("C:\\Users\\maggot\\Documents\\IntelliJ " +
-                                   "IDEA Projects\\iu9-compiler\\Front End\\src\\output.json");
+        Parser parser = new Parser("C:\\Users\\maggot\\Documents\\" + 
+                "NetBeansProjects\\ru.bmstu.iu9.compiler\\Front End\\src\\output.json");
         parser.process();
-        parser.toJson("C:\\Users\\maggot\\Documents\\IntelliJ IDEA " +
-                      "Projects\\iu9-compiler\\Front End\\src\\parse_tree.json");
+        parser.toJson("C:\\Users\\maggot\\Documents\\NetBeansProjects\\" +
+                "ru.bmstu.iu9.compiler\\Front End\\src\\parse_tree.json");
     }
     
     /**
@@ -162,51 +182,65 @@ public class Parser {
      * Переходит к следующему {@link ru.bmstu.iu9.compiler.lexis.token.Token Token}у.
      */
     private void nextToken() {
-        if (token.hasNext())
-            current = token.next();
+        if (iterator.hasNext()) {
+            iterator.next();
+        }
     }
     
-    private Iterator<Token> token;
-    private Token current;
+    /**
+     * Итератор по токенам, полученным из лексера
+     */
+    private TokenIterator iterator;
     private BlockNode<Statement> parseTree = new BlockNode<Statement>();
     
     private void Program() {
         nextToken();
-        while (current.type().is(
+        while (iterator.current().type().is(
                 new Token.Type[] { 
                     Token.Type.VAR, Token.Type.FUNC, Token.Type.STRUCT
+            })) {
+
+            try {
+                if(iterator.current().type().is(Token.Type.FUNC)) {
+                    parseTree.addChild(FunctionDecl());
+                } else if (iterator.current().type().is(Token.Type.STRUCT)) {
+                    parseTree.addChild(StructDecl());
+                    Semicolon();
+                } else if (iterator.current().type().is(Token.Type.VAR)){
+                    parseTree.addChild(VariableDecl());
+                    Semicolon();
                 }
-              )) {
-            
-            if(current.type().is(Token.Type.FUNC)) {
-                parseTree.addChild(FunctionDecl());
-            } else if (current.type().is(Token.Type.STRUCT)) {
-                parseTree.addChild(StructDecl());
-                Semicolon();
-            } else if (current.type().is(Token.Type.VAR)){
-                parseTree.addChild(VariableDecl());
-                Semicolon();
+            } catch(SyntaxException ex) {
+                continue;
             }
         }
     }
-    private FunctionDeclNode FunctionDecl() {
-        nextToken();
-        Position pos = current.coordinates().starting();
-        String name = Identifier();
-        FunctionTypeNode signature = Signature();
-        BlockNode<Statement> code = Code();
-        
-        return new FunctionDeclNode(name, signature, code, pos);
+    private FunctionDeclNode FunctionDecl() throws SyntaxException {
+        try {
+            nextToken();
+            Position pos = iterator.current().coordinates().starting();
+            String name = Identifier();
+            FunctionTypeNode signature = Signature();
+            BlockNode<Statement> code = Code();
+
+            return new FunctionDeclNode(name, signature, code, pos);
+        } catch(SyntaxException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonAnalysisException)new NonAnalysisException(ex)
+                    .initPosition(iterator.current().coordinates().starting())
+                    .Log("ru.bmstu.iu9.compiler.syntax");
+        }        
     }
     
     
-    private BaseTypeNode Type() {
+    private BaseTypeNode Type() throws SyntaxException {
         boolean constancy = isConstant();
         
         BaseTypeNode type;
-        if (current.type().is(Token.Type.PrimitiveType)) {
+        if (iterator.current().type().is(Token.Type.PrimitiveType)) {
             type = PrimitiveType(constancy);
-        } else if (current.type().is(
+        } else if (iterator.current().type().is(
             new Token.Type[] {
                 Token.Type.ASTERISK, 
                 Token.Type.LEFT_SQUARE_BRACKET,
@@ -224,15 +258,15 @@ public class Parser {
         return type;
     }
     private boolean isConstant() {
-        if (current.type().is(Token.Type.CONST)) {
+        if (iterator.current().type().is(Token.Type.CONST)) {
             nextToken();
             return true;
         } else {
             return false;
         }
     }
-    private BaseTypeNode TypeLit(boolean constancy) {
-        switch (current.type()) {
+    private BaseTypeNode TypeLit(boolean constancy) throws SyntaxException {
+        switch (iterator.current().type()) {
             case ASTERISK:
                 return PointerType(constancy);
             case LEFT_SQUARE_BRACKET:
@@ -243,127 +277,201 @@ public class Parser {
                 return StructType(constancy);
             default:
                 return BaseTypeNode.InvalidNode(
-                    current.coordinates().starting()
+                    iterator.current().coordinates().starting()
                 );
         }
     }
-    private StructTypeNode StructType(boolean constancy) {
-        Position pos = current.coordinates().starting();
+    private StructTypeNode StructType(boolean constancy) 
+            throws SyntaxException {
+        
+        Position pos = iterator.current().coordinates().starting();
         nextToken();
         return new StructTypeNode(Identifier(), constancy, pos);
     }
-    private ArrayTypeNode ArrayType(boolean constancy) {
-        IntegerConstantLeaf length = null;
-        Position pos = current.coordinates().starting();
-        LeftSquareBracket();
-        if (checkTokens(
-                current, 
-                Token.Type.CONST_INT, 
-                current.coordinates().starting()
-            )
-        ) {
-            length = (IntegerConstantLeaf)Const();
+    private ArrayTypeNode ArrayType(boolean constancy) throws SyntaxException {
+        try {
+            IntegerConstantLeaf length = null;
+            Position pos = iterator.current().coordinates().starting();
+            LeftSquareBracket();
+            if (checkTokens(iterator.current(), Token.Type.CONST_INT)) {
+                length = (IntegerConstantLeaf)Const();
+            }
+            RightSquareBracket();
+
+            if (length == null) {
+                return new ArrayTypeNode(Type(), constancy, pos);
+            } else {
+                return new ArrayTypeNode(Type(), length, constancy, pos);
+            }
+        } catch(SyntaxException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonAnalysisException)new NonAnalysisException(ex)
+                    .initPosition(iterator.current().coordinates().starting())
+                    .Log("ru.bmstu.iu9.compiler.syntax");
         }
-        RightSquareBracket();
-        
-        if (length == null)
-            return new ArrayTypeNode(Type(), constancy, pos);
-        else
-            return new ArrayTypeNode(Type(), length, constancy, pos);
     }
-    private PointerTypeNode FunctionType(boolean constancy) {
-        Position pos = current.coordinates().starting();
+    private PointerTypeNode FunctionType(boolean constancy) 
+            throws SyntaxException{
+
+        Position pos = iterator.current().coordinates().starting();
         nextToken();
         return new PointerTypeNode(Signature(), constancy, pos);
     }
-    private FunctionTypeNode Signature() {
-        Position pos = current.coordinates().starting();
-        BlockDeclNode<FunctionTypeNode.ArgumentNode> args = 
-                new BlockDeclNode<FunctionTypeNode.ArgumentNode>(Parameters());
-        BaseTypeNode result = Type();
-        
-        return new FunctionTypeNode(result, args, false, pos);
+    private FunctionTypeNode Signature() throws SyntaxException {
+        try {
+            Position pos = iterator.current().coordinates().starting();
+            BlockDeclNode<FunctionTypeNode.ArgumentNode> args = 
+                    new BlockDeclNode<FunctionTypeNode.ArgumentNode>(Parameters());
+            BaseTypeNode result = Type();
+
+            return new FunctionTypeNode(result, args, false, pos);
+        } catch(SyntaxException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonAnalysisException)new NonAnalysisException(ex)
+                    .initPosition(iterator.current().coordinates().starting())
+                    .Log("ru.bmstu.iu9.compiler.syntax");
+        }
     }
-    private List<FunctionTypeNode.ArgumentNode> Parameters() {
-        LeftBracket();
-        List<FunctionTypeNode.ArgumentNode> args = ParameterList();
-        RightBracket();
+    private List<FunctionTypeNode.ArgumentNode> Parameters() 
+            throws SyntaxException {
         
-        return args;
+        try {
+            LeftBracket();
+            List<FunctionTypeNode.ArgumentNode> args = ParameterList();
+            RightBracket();
+
+            return args;
+        } catch(SyntaxException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonAnalysisException)new NonAnalysisException(ex)
+                    .initPosition(iterator.current().coordinates().starting())
+                    .Log("ru.bmstu.iu9.compiler.syntax");
+        }
     }
-    private List<FunctionTypeNode.ArgumentNode> ParameterList() {
-        List<FunctionTypeNode.ArgumentNode> args = 
-                new LinkedList<FunctionTypeNode.ArgumentNode>();
+    private List<FunctionTypeNode.ArgumentNode> ParameterList() 
+            throws SyntaxException {
         
-        args.addAll(ParameterDecl());
-        while (current.type().is(Token.Type.COMMA)) {
-            nextToken();
+        try{
+            List<FunctionTypeNode.ArgumentNode> args = 
+                    new LinkedList<FunctionTypeNode.ArgumentNode>();
+
             args.addAll(ParameterDecl());
+            while (iterator.current().type().is(Token.Type.COMMA)) {
+                nextToken();
+                args.addAll(ParameterDecl());
+            }
+
+            return args;
+        } catch(SyntaxException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonAnalysisException)new NonAnalysisException(ex)
+                    .initPosition(iterator.current().coordinates().starting())
+                    .Log("ru.bmstu.iu9.compiler.syntax");
         }
-        
-        return args;
     }
-    private List<FunctionTypeNode.ArgumentNode> ParameterDecl() {
-        if (current.type().is(Token.Type.IDENTIFIER)) {
-            return IdentifierList();
-        } else if (current.type().is(Token.Type.Type)) {
-            Position pos = current.coordinates().starting();
-            return Arrays.asList(
-                    new FunctionTypeNode.ArgumentNode("", Type(), pos));
-        } else {
-            return new LinkedList<FunctionTypeNode.ArgumentNode>();
+    private List<FunctionTypeNode.ArgumentNode> ParameterDecl()
+            throws SyntaxException {
+        
+        try {
+            if (iterator.current().type().is(Token.Type.IDENTIFIER)) {
+                return IdentifierList();
+            } else if (iterator.current().type().is(Token.Type.Type)) {
+                Position pos = iterator.current().coordinates().starting();
+                return Arrays.asList(
+                        new FunctionTypeNode.ArgumentNode("", Type(), pos));
+            } else {
+                return new LinkedList<FunctionTypeNode.ArgumentNode>();
+            }
+        } catch(SyntaxException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonAnalysisException)new NonAnalysisException(ex)
+                    .initPosition(iterator.current().coordinates().starting())
+                    .Log("ru.bmstu.iu9.compiler.syntax");
         }
     }
-    private List<FunctionTypeNode.ArgumentNode> IdentifierList() {
-        List<FunctionTypeNode.ArgumentNode> vars = 
-                new LinkedList<FunctionTypeNode.ArgumentNode>();
+    
+    private List<FunctionTypeNode.ArgumentNode> IdentifierList()
+            throws SyntaxException {
+        try {
+            List<FunctionTypeNode.ArgumentNode> vars = 
+                    new LinkedList<FunctionTypeNode.ArgumentNode>();
+
+            Position pos = iterator.current().coordinates().starting();
+            String name = Identifier();
+            if (iterator.current().type().is(Token.Type.COMMA)) {
+                nextToken();
+                vars.addAll(IdentifierList());
+                vars.add(
+                    0,
+                    new FunctionTypeNode.ArgumentNode(name, vars.get(0).type, pos)
+                );
+            } else {
+                BaseTypeNode type = Type();
+                vars.add(0, new FunctionTypeNode.ArgumentNode(name, type, pos));
+            }
+
+            return vars;
+        } catch(SyntaxException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonAnalysisException)new NonAnalysisException(ex)
+                    .initPosition(iterator.current().coordinates().starting())
+                    .Log("ru.bmstu.iu9.compiler.syntax");
+        }
+    }
+    
+    
+    
+    
+    private List<VariableDeclNode> FieldsList() throws SyntaxException {
+        try {
+            List<VariableDeclNode> vars = new LinkedList<VariableDeclNode>();
+
+            Position pos = iterator.current().coordinates().starting();
+            String name = Identifier();
+            if (iterator.current().type().is(Token.Type.COMMA)) {
+                nextToken();
+                vars.addAll(FieldsList());
+                vars.add(0, new VariableDeclNode(name, vars.get(0).type, pos));
+            } else {
+                BaseTypeNode type = Type();
+                vars.add(0, new VariableDeclNode(name, type, pos));
+            }
+
+            return vars;
+        } catch(SyntaxException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonAnalysisException)new NonAnalysisException(ex)
+                    .initPosition(iterator.current().coordinates().starting())
+                    .Log("ru.bmstu.iu9.compiler.syntax");
+        }
+    }
+    
+    private PointerTypeNode PointerType(boolean constancy) 
+            throws SyntaxException {
         
-        Position pos = current.coordinates().starting();
-        String name = Identifier();
-        if (current.type().is(Token.Type.COMMA)) {
+        try {
+            Position pos = iterator.current().coordinates().starting();
             nextToken();
-            vars.addAll(IdentifierList());
-            vars.add(
-                0,
-                new FunctionTypeNode.ArgumentNode(name, vars.get(0).type, pos)
-            );
-        } else {
-            BaseTypeNode type = Type();
-            vars.add(0, new FunctionTypeNode.ArgumentNode(name, type, pos));
+            return new PointerTypeNode(Type(), constancy, pos);
+        } catch(SyntaxException ex) {
+            throw ex;
         }
-        
-        return vars;
     }
     
-    
-    
-    
-    private List<VariableDeclNode> FieldsList() {
-        List<VariableDeclNode> vars = new LinkedList<VariableDeclNode>();
+    private PrimitiveTypeNode PrimitiveType(boolean constancy)
+            throws SyntaxException {
         
-        Position pos = current.coordinates().starting();
-        String name = Identifier();
-        if (current.type().is(Token.Type.COMMA)) {
-            nextToken();
-            vars.addAll(FieldsList());
-            vars.add(0, new VariableDeclNode(name, vars.get(0).type, pos));
-        } else {
-            BaseTypeNode type = Type();
-            vars.add(0, new VariableDeclNode(name, type, pos));
-        }
-        
-        return vars;
-    }
-    private PointerTypeNode PointerType(boolean constancy) {
-        Position pos = current.coordinates().starting();
-        nextToken();
-        return new PointerTypeNode(Type(), constancy, pos);
-    }
-    private PrimitiveTypeNode PrimitiveType(boolean constancy) {
         PrimitiveTypeNode type = null;
-        Position pos = current.coordinates().starting();
+        Position pos = iterator.current().coordinates().starting();
         
-        switch (current.type()) {
+        switch (iterator.current().type()) {
             case INT:
                 type = new PrimitiveTypeNode(
                         PrimitiveTypeNode.Type.INT, 
@@ -407,10 +515,12 @@ public class Parser {
                         pos);
                 break;
             default:
-                Logger.logUnexpectedToken(
-                        current.type(), 
-                        Token.Type.PrimitiveType, 
-                        current.coordinates().starting());
+                throw (InvalidTokenException)new InvalidTokenException(
+                        iterator.current(), 
+                        Token.Type.PrimitiveType
+                    )
+                    .initPosition(iterator.current().coordinates().starting())
+                    .Log("ru.bmstu.iu9.compiler.syntax");
         }
         nextToken();
         return type;
@@ -418,311 +528,422 @@ public class Parser {
     
     
     
-    private String Identifier() {
-        if (checkTokens(current, Token.Type.IDENTIFIER)) {
-            String identifier = ((IdentifierToken)current).value();
+    private String Identifier() throws SyntaxException {
+        if (checkTokens(iterator.current(), Token.Type.IDENTIFIER)) {
+            String identifier = ((IdentifierToken)iterator.current()).value();
             nextToken();
             return identifier;
         } else {
-            return "";
+            // @todo а надо ли?
+            // было просто return "";
+            throw (InvalidTokenException)new InvalidTokenException(
+                    iterator.current(), 
+                    Token.Type.IDENTIFIER
+                )
+                .initPosition(iterator.current().coordinates().starting())
+                .Log("ru.bmstu.iu9.compiler.syntax");
         }
     }
-    private BlockNode<Statement> Code() {
-        LeftBrace();
-        BlockNode<Statement> block = Block();
-        RightBrace();
-        
-        return block;
+    
+    private BlockNode<Statement> Code() throws SyntaxException {
+        try {
+            LeftBrace();
+            BlockNode<Statement> block = Block();
+            RightBrace();
+
+            return block;
+        } catch(SyntaxException ex) {
+            throw ex;
+        }
     } 
     
     private BlockNode<Statement> Block() {
         BlockNode<Statement> block = new BlockNode<Statement>();
-        
-      
-        while (current.type().is(
+
+
+        while (iterator.current().type().is(
             new Token.Type[] {
                 Token.Type.FirstOfControlStructure, 
                 Token.Type.FirstOfExpression,
                 Token.Type.VAR
-            })
-        ) {
-            
-            if (current.type().is(
-                new Token.Type[] {
-                    Token.Type.FirstOfControlStructure, 
-                    Token.Type.VAR
-                })
-            ) {
-                switch (current.type()) {
-                    case FOR:
-                        block.addChild(For());
-                        break;
-                    case IF:
-                        block.addChild(If());
-                        break;
-                    case WHILE:
-                        block.addChild(While());
-                        break;
-                    case DO:
-                        block.addChild(DoWhile());
-                        Semicolon();
-                        break;
-                    case RUN:
-                        block.addChild(NewThread());
-                        Semicolon();
-                        break;
-                    case SWITCH:
-                        block.addChild(Switch());
-                        break;
-                    case RETURN:
-                        block.addChild(Return());
-                        Semicolon();
-                        break;
-                    case CONTINUE:
-                        block.addChild(Continue());
-                        Semicolon();
-                        break;
-                    case LOCK:
-                        block.addChild(Lock());
-                        break;
-                    case BARRIER:
-                        block.addChild(Barrier());
-                        Semicolon();
-                        break;
-                    case BREAK:
-                        block.addChild(Break());
-                        Semicolon();
-                        break;
-                    case VAR:
-                        block.addChild(VariableDecl());
-                        Semicolon();
-                        break;
+        })) {
+            try {
+                if (iterator.current().type().is(
+                    new Token.Type[] {
+                        Token.Type.FirstOfControlStructure, 
+                        Token.Type.VAR
+                    })
+                ) {
+                    switch (iterator.current().type()) {
+                        case FOR:
+                            block.addChild(For());
+                            break;
+                        case IF:
+                            block.addChild(If());
+                            break;
+                        case WHILE:
+                            block.addChild(While());
+                            break;
+                        case DO:
+                            block.addChild(DoWhile());
+                            Semicolon();
+                            break;
+                        case RUN:
+                            block.addChild(NewThread());
+                            Semicolon();
+                            break;
+                        case SWITCH:
+                            block.addChild(Switch());
+                            break;
+                        case RETURN:
+                            block.addChild(Return());
+                            Semicolon();
+                            break;
+                        case CONTINUE:
+                            block.addChild(Continue());
+                            Semicolon();
+                            break;
+                        case LOCK:
+                            block.addChild(Lock());
+                            break;
+                        case BARRIER:
+                            block.addChild(Barrier());
+                            Semicolon();
+                            break;
+                        case BREAK:
+                            block.addChild(Break());
+                            Semicolon();
+                            break;
+                        case VAR:
+                            block.addChild(VariableDecl());
+                            Semicolon();
+                            break;
+                    }
+                } else if(iterator.current().type().is(Token.Type.FirstOfExpression)) {
+                    block.addChild(Expression());
+                    Semicolon();
                 }
-            } else if(current.type().is(Token.Type.FirstOfExpression)) {
-                block.addChild(Expression());
-                Semicolon();
+            } catch(SyntaxException ex) {
+                continue;
             }
         }
-        
+
         return block;
     }
-    private ForNode For() {
-        BlockNode init = null;
-        ExpressionNode condition = null;
-        BlockNode<ExpressionNode> step = new BlockNode<ExpressionNode>();
-        
-        Position pos = current.coordinates().starting();
-        nextToken();
-        LeftBracket();
+    private ForNode For() throws SyntaxException {
+        try {
+            BlockNode init = null;
+            ExpressionNode condition = null;
+            BlockNode<ExpressionNode> step = new BlockNode<ExpressionNode>();
 
-        if (current.type().is(Token.Type.VAR)) {
-            init = VariableDecl();
-        } else if (current.type().is(Token.Type.FirstOfExpression)) {
-            init = new BlockNode<ExpressionNode>();
-            init.addChild(Expression());
-            
-            while (current.type().is(Token.Type.COMMA)) {
-                nextToken();
-                init.addChild(Expression());
-            }
-        }
-        Semicolon();
-        if (current.type().is(Token.Type.FirstOfExpression)) {
-            condition = Expression();
-        }
-        Semicolon();
-        if (current.type().is(Token.Type.FirstOfExpression)) {
-            step.addChild(Expression());
-            
-            while (current.type().is(Token.Type.COMMA)) {
-                nextToken();
-                step.addChild(Expression());
-            }
-        }
-        
-        RightBracket();
-        BlockNode<Statement> code = Code();
-        
-        return new ForNode(init, condition, step, code, pos);
-    }
-    private void Semicolon() {
-        if (checkTokens(current, Token.Type.SEMICOLON))
+            Position pos = iterator.current().coordinates().starting();
             nextToken();
-    }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    private boolean checkTokens(Token found, Token.Type required) {
-        boolean result;
-        if (result = !found.type().is(required))
-            Logger.logUnexpectedToken(
-                found.type(),
-                required,
-                current.coordinates().starting()
-            );
-        return !result;
-    }
-    private boolean checkTokens(
-            Token found,
-            Token.Type required,
-            Position pos) {
-
-        boolean result;
-        if (result = !found.type().is(required))
-            Logger.logUnexpectedToken(found.type(), required, pos);
-        return !result;
-    }   
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    private IfNode If() {
-        Position pos = current.coordinates().starting();
-        nextToken();
-        
-        
-        LeftBracket();
-        ExpressionNode expr = Expression();
-        RightBracket();
-        
-        BlockNode<Statement> block = Code();
-        ElseNode elseNode = null;
-        
-        if (current.type().is(Token.Type.ELSE)) {
-            Position elsepos = current.coordinates().starting();
-            nextToken();
-            
-            if (current.type().is(Token.Type.IF)) {
-                elseNode =
-                    new ElseNode(new BlockNode<Statement>(If()), elsepos);
-            } else {
-                BlockNode<Statement> code = Code();
-                elseNode = new ElseNode(code, elsepos);
-            }
-        }
-        return new IfNode(expr, block, elseNode, pos);
-    }
-    private WhileNode While() {
-        Position pos = current.coordinates().starting();
-        nextToken();
-        
-        LeftBracket();
-        ExpressionNode expr = Expression();
-        RightBracket();
-        
-        BlockNode<Statement> block = Code();
-        
-        return new WhileNode(expr, block, pos);
-    }
-    private DoWhileNode DoWhile() {
-        Position pos = current.coordinates().starting();
-        nextToken();
-        
-        BlockNode<Statement> block = Code();
-        ExpressionNode cond = null;
-        if (checkTokens(current, Token.Type.WHILE)) {
-            nextToken();
-            
             LeftBracket();
-            cond = Expression();
+
+            if (iterator.current().type().is(Token.Type.VAR)) {
+                init = VariableDecl();
+            } else if (iterator.current().type().is(Token.Type.FirstOfExpression)) {
+                init = new BlockNode<ExpressionNode>();
+                init.addChild(Expression());
+
+                while (iterator.current().type().is(Token.Type.COMMA)) {
+                    nextToken();
+                    init.addChild(Expression());
+                }
+            }
+            Semicolon();
+            if (iterator.current().type().is(Token.Type.FirstOfExpression)) {
+                condition = Expression();
+            }
+            Semicolon();
+            if (iterator.current().type().is(Token.Type.FirstOfExpression)) {
+                step.addChild(Expression());
+
+                while (iterator.current().type().is(Token.Type.COMMA)) {
+                    nextToken();
+                    step.addChild(Expression());
+                }
+            }
+
             RightBracket();
+            BlockNode<Statement> code = Code();
+
+            return new ForNode(init, condition, step, code, pos);
+        } catch(SyntaxException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonAnalysisException)new NonAnalysisException(ex)
+                    .initPosition(iterator.current().coordinates().starting())
+                    .Log("ru.bmstu.iu9.compiler.syntax");
         }
-        
-        return new DoWhileNode(cond, block, pos);
     }
-    private RunNode NewThread() {
-        Position pos = current.coordinates().starting();
-        nextToken();
-        
-        return new RunNode(Expression(), pos);
-    }
-    private SwitchNode Switch() {
-        Position pos = current.coordinates().starting();
-        nextToken();
-        
-        LeftBracket();
-        ExpressionNode expr = Expression();
-        RightBracket();
-        
-        LeftBrace();
-        BlockNode<CaseNode> cases = new BlockNode<CaseNode>(Case());
-        
-        while (current.type().is(Token.Type.CASE)) {
-            cases.addChild(Case());
-        }
-        DefaultNode defaultNode = null;
-        if (current.type().is(Token.Type.DEFAULT)) {
-            Position dpos = current.coordinates().starting();
-            defaultNode = new DefaultNode(Default(), dpos);
-        }
-        RightBrace();
-        
-        return new SwitchNode(expr, cases, defaultNode, pos);
-    }
-    private CaseNode Case() {
-        Position pos = current.coordinates().starting();
-        nextToken();
-        
-        ExpressionNode expr = Expression();
-        Colon();
-        BlockNode<Statement> block = Block();
-        
-        return new CaseNode(expr, block, pos);
-    }
-    private BlockNode<Statement> Default() {
-        nextToken();
-        
-        Colon();
-        return Block();
-    }
-    private void Colon() {
-        if (checkTokens(current, Token.Type.COLON))
+    private void Semicolon() throws SyntaxException {
+        if (checkTokens(iterator.current(), Token.Type.SEMICOLON)) {
             nextToken();
+        } else {
+            throw (InvalidTokenException)new InvalidTokenException(
+                iterator.current(), 
+                Token.Type.SEMICOLON
+            )
+            .initPosition(iterator.current().coordinates().starting())
+            .Log("ru.bmstu.iu9.compiler.syntax");
+        }
     }
-    private ReturnNode Return() {
-        Position pos = current.coordinates().starting();
-        nextToken();
+    
+    
+    
+    
+    /*
+     } catch(SyntaxException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonAnalysisException)new NonAnalysisException(ex)
+                    .initPosition(iterator.current().coordinates().starting())
+                    .Log("ru.bmstu.iu9.compiler.syntax");
+        }
+     */
+    
+    
+    
+    
+    
+    private boolean checkTokens(Token found, Token.Type required)
+            throws SyntaxException {
         
-        if (current.type().is(Token.Type.FirstOfExpression)) {
-            return new ReturnNode(Expression(), pos);
-        } else {            
-            return new ReturnNode(pos);
+        if (!found.type().is(required)) {
+            throw (InvalidTokenException)new InvalidTokenException(
+                found, 
+                required
+            )
+            .initPosition(found.coordinates().starting())
+            .Log("ru.bmstu.iu9.compiler.syntax");
+        }
+        return true;
+    }  
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    private IfNode If() throws SyntaxException {
+        try {
+            Position pos = iterator.current().coordinates().starting();
+            nextToken();
+
+
+            LeftBracket();
+            ExpressionNode expr = Expression();
+            RightBracket();
+
+            BlockNode<Statement> block = Code();
+            ElseNode elseNode = null;
+
+            if (iterator.current().type().is(Token.Type.ELSE)) {
+                Position elsepos = iterator.current().coordinates().starting();
+                nextToken();
+
+                if (iterator.current().type().is(Token.Type.IF)) {
+                    elseNode =
+                        new ElseNode(new BlockNode<Statement>(If()), elsepos);
+                } else {
+                    BlockNode<Statement> code = Code();
+                    elseNode = new ElseNode(code, elsepos);
+                }
+            }
+            return new IfNode(expr, block, elseNode, pos);
+        } catch(SyntaxException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonAnalysisException)new NonAnalysisException(ex)
+                    .initPosition(iterator.current().coordinates().starting())
+                    .Log("ru.bmstu.iu9.compiler.syntax");
+        }
+    }
+    private WhileNode While() throws SyntaxException {
+        try {
+            Position pos = iterator.current().coordinates().starting();
+            nextToken();
+
+            LeftBracket();
+            ExpressionNode expr = Expression();
+            RightBracket();
+
+            BlockNode<Statement> block = Code();
+
+            return new WhileNode(expr, block, pos);
+        } catch(SyntaxException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonAnalysisException)new NonAnalysisException(ex)
+                    .initPosition(iterator.current().coordinates().starting())
+                    .Log("ru.bmstu.iu9.compiler.syntax");
+        }
+    }
+    private DoWhileNode DoWhile() throws SyntaxException {
+        try {
+            Position pos = iterator.current().coordinates().starting();
+            nextToken();
+
+            BlockNode<Statement> block = Code();
+            ExpressionNode cond = null;
+            if (checkTokens(iterator.current(), Token.Type.WHILE)) {
+                nextToken();
+
+                LeftBracket();
+                cond = Expression();
+                RightBracket();
+            }
+
+            return new DoWhileNode(cond, block, pos);
+        } catch(SyntaxException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonAnalysisException)new NonAnalysisException(ex)
+                    .initPosition(iterator.current().coordinates().starting())
+                    .Log("ru.bmstu.iu9.compiler.syntax");
+        }
+    }
+    private RunNode NewThread() throws SyntaxException {
+        try {
+            Position pos = iterator.current().coordinates().starting();
+            nextToken();
+
+            return new RunNode(Expression(), pos);
+        } catch(SyntaxException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonAnalysisException)new NonAnalysisException(ex)
+                    .initPosition(iterator.current().coordinates().starting())
+                    .Log("ru.bmstu.iu9.compiler.syntax");
+        }
+    }
+    private SwitchNode Switch() throws SyntaxException {
+        try {
+            Position pos = iterator.current().coordinates().starting();
+            nextToken();
+
+            LeftBracket();
+            ExpressionNode expr = Expression();
+            RightBracket();
+
+            LeftBrace();
+            BlockNode<CaseNode> cases = new BlockNode<CaseNode>(Case());
+
+            while (iterator.current().type().is(Token.Type.CASE)) {
+                cases.addChild(Case());
+            }
+            DefaultNode defaultNode = null;
+            if (iterator.current().type().is(Token.Type.DEFAULT)) {
+                Position dpos = iterator.current().coordinates().starting();
+                defaultNode = new DefaultNode(Default(), dpos);
+            }
+            RightBrace();
+
+            return new SwitchNode(expr, cases, defaultNode, pos);
+        } catch(SyntaxException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonAnalysisException)new NonAnalysisException(ex)
+                    .initPosition(iterator.current().coordinates().starting())
+                    .Log("ru.bmstu.iu9.compiler.syntax");
+        }
+    }
+    private CaseNode Case() throws SyntaxException {
+        try {
+            Position pos = iterator.current().coordinates().starting();
+            nextToken();
+
+            ExpressionNode expr = Expression();
+            Colon();
+            BlockNode<Statement> block = Block();
+
+            return new CaseNode(expr, block, pos);
+        } catch(SyntaxException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonAnalysisException)new NonAnalysisException(ex)
+                    .initPosition(iterator.current().coordinates().starting())
+                    .Log("ru.bmstu.iu9.compiler.syntax");
+        }
+    }
+    
+    private BlockNode<Statement> Default() throws SyntaxException {
+        try {
+            nextToken();
+
+            Colon();
+            return Block();
+        } catch(SyntaxException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonAnalysisException)new NonAnalysisException(ex)
+                    .initPosition(iterator.current().coordinates().starting())
+                    .Log("ru.bmstu.iu9.compiler.syntax");
+        }
+    }
+    
+    private void Colon() throws SyntaxException {
+        if (checkTokens(iterator.current(), Token.Type.COLON)) {
+            nextToken();
+        } else {
+            throw (InvalidTokenException) new InvalidTokenException(
+                iterator.current(),
+                Token.Type.COLON
+            )
+            .initPosition(iterator.current().coordinates().starting())
+            .Log("ru.bmstu.iu9.compiler.syntax");
+        }
+    }
+    
+    private ReturnNode Return() throws SyntaxException {
+        try {
+            Position pos = iterator.current().coordinates().starting();
+            nextToken();
+
+            if (iterator.current().type().is(Token.Type.FirstOfExpression)) {
+                return new ReturnNode(Expression(), pos);
+            } else {            
+                return new ReturnNode(pos);
+            }
+        } catch(SyntaxException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonAnalysisException)new NonAnalysisException(ex)
+                    .initPosition(iterator.current().coordinates().starting())
+                    .Log("ru.bmstu.iu9.compiler.syntax");
         }
     }
     private BreakNode Break() {
-        Position pos = current.coordinates().starting();
+        Position pos = iterator.current().coordinates().starting();
         nextToken();
         return new BreakNode(pos);
     }
     private ContinueNode Continue() {
-        Position pos = current.coordinates().starting();
+        Position pos = iterator.current().coordinates().starting();
         nextToken();
         return new ContinueNode(pos);
     }
-    private LockNode Lock() {
-        Position pos = current.coordinates().starting();
-        nextToken();
-        return new LockNode(Code(), pos);
+    private LockNode Lock() throws SyntaxException {
+        try {
+            Position pos = iterator.current().coordinates().starting();
+            nextToken();
+            return new LockNode(Code(), pos);
+        } catch(SyntaxException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonAnalysisException)new NonAnalysisException(ex)
+                    .initPosition(iterator.current().coordinates().starting())
+                    .Log("ru.bmstu.iu9.compiler.syntax");
+        }    
     }
     private BarrierNode Barrier() {
-        Position pos = current.coordinates().starting();
+        Position pos = iterator.current().coordinates().starting();
         nextToken();
         return new BarrierNode(pos);
     }
@@ -730,481 +951,622 @@ public class Parser {
     
     
     
-    private ExpressionNode Expression() {
-        ExpressionNode result = BoolExpression();
-        
-        while (current.type().is(Token.Type.Assignment)) {
-            BinaryOperationNode.Operation operation = null;
-            Position pos = current.coordinates().starting();
-            switch (current.type()) {
-                case ASSIGN:
-                    operation = 
-                        BinaryOperationNode.Operation.ASSIGN;
-                    break;
-                case PLUS_ASSIGN:
-                    operation = 
-                        BinaryOperationNode.Operation.PLUS_ASSIGN;
-                    break;
-                case MINUS_ASSIGN:
-                    operation = 
-                        BinaryOperationNode.Operation.MINUS_ASSIGN;
-                    break;
-                case MUL_ASSIGN:
-                    operation = 
-                        BinaryOperationNode.Operation.MUL_ASSIGN;
-                    break;
-                case DIV_ASSIGN:
-                    operation = 
-                        BinaryOperationNode.Operation.DIV_ASSIGN;
-                    break;
-                case MOD_ASSIGN:
-                    operation = 
-                        BinaryOperationNode.Operation.MOD_ASSIGN;
-                    break;
-                case BITWISE_OR_ASSIGN:
-                    operation = 
-                        BinaryOperationNode.Operation.BITWISE_OR_ASSIGN;
-                    break;
-                case BITWISE_SHIFT_LEFT_ASSIGN:
-                    operation = 
-                        BinaryOperationNode.Operation.BITWISE_SHIFT_LEFT_ASSIGN;
-                    break;
-                case BITWISE_SHIFT_RIGHT_ASSIGN:
-                    operation = 
-                        BinaryOperationNode.Operation.BITWISE_SHIFT_RIGHT_ASSIGN;
-                    break;
-                case BITWISE_XOR_ASSIGN:
-                    operation =
-                        BinaryOperationNode.Operation.BITWISE_XOR_ASSIGN;
-                    break;
-                case BITWISE_AND_ASSIGN:
-                    operation = 
-                        BinaryOperationNode.Operation.BITWISE_AND_ASSIGN;
-                    break;
-                default:
-                    return BinaryOperationNode.InvalidNode(pos);
+    private ExpressionNode Expression() throws SyntaxException {
+        try {
+            ExpressionNode result = BoolExpression();
+
+            while (iterator.current().type().is(Token.Type.Assignment)) {
+                BinaryOperationNode.Operation operation = null;
+                Position pos = iterator.current().coordinates().starting();
+                switch (iterator.current().type()) {
+                    case ASSIGN:
+                        operation = 
+                            BinaryOperationNode.Operation.ASSIGN;
+                        break;
+                    case PLUS_ASSIGN:
+                        operation = 
+                            BinaryOperationNode.Operation.PLUS_ASSIGN;
+                        break;
+                    case MINUS_ASSIGN:
+                        operation = 
+                            BinaryOperationNode.Operation.MINUS_ASSIGN;
+                        break;
+                    case MUL_ASSIGN:
+                        operation = 
+                            BinaryOperationNode.Operation.MUL_ASSIGN;
+                        break;
+                    case DIV_ASSIGN:
+                        operation = 
+                            BinaryOperationNode.Operation.DIV_ASSIGN;
+                        break;
+                    case MOD_ASSIGN:
+                        operation = 
+                            BinaryOperationNode.Operation.MOD_ASSIGN;
+                        break;
+                    case BITWISE_OR_ASSIGN:
+                        operation = 
+                            BinaryOperationNode.Operation.BITWISE_OR_ASSIGN;
+                        break;
+                    case BITWISE_SHIFT_LEFT_ASSIGN:
+                        operation = 
+                            BinaryOperationNode.Operation.BITWISE_SHIFT_LEFT_ASSIGN;
+                        break;
+                    case BITWISE_SHIFT_RIGHT_ASSIGN:
+                        operation = 
+                            BinaryOperationNode.Operation.BITWISE_SHIFT_RIGHT_ASSIGN;
+                        break;
+                    case BITWISE_XOR_ASSIGN:
+                        operation =
+                            BinaryOperationNode.Operation.BITWISE_XOR_ASSIGN;
+                        break;
+                    case BITWISE_AND_ASSIGN:
+                        operation = 
+                            BinaryOperationNode.Operation.BITWISE_AND_ASSIGN;
+                        break;
+                    default:
+                        return BinaryOperationNode.InvalidNode(pos);
+                }
+                nextToken();
+
+                ExpressionNode right = BoolExpression();
+
+                result = new BinaryOperationNode(operation, result, right, pos);
             }
-            nextToken();
-            
-            ExpressionNode right = BoolExpression();
-            
-            result = new BinaryOperationNode(operation, result, right, pos);
+
+            return result;
+        } catch(SyntaxException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonAnalysisException)new NonAnalysisException(ex)
+                    .initPosition(iterator.current().coordinates().starting())
+                    .Log("ru.bmstu.iu9.compiler.syntax");
         }
-        
-        return result;
     }
     
-    private ExpressionNode BoolExpression() {
-        ExpressionNode result = ABoolExpression();
-        
-        while (current.type().is(Token.Type.BOOL_OR)) {
-            Position pos = current.coordinates().starting();
-            nextToken();
-            ExpressionNode right = ABoolExpression();
-            result = 
-                new BinaryOperationNode(
-                    BinaryOperationNode.Operation.BOOL_OR, 
-                    result, 
-                    right, 
-                    pos
-                );
-        }
-        
-        return result;
-    }
-    private ExpressionNode ABoolExpression() {
-        ExpressionNode result = BBoolExpression();
-        
-        while (current.type().is(Token.Type.BOOL_AND)) {
-            Position pos = current.coordinates().starting();
-            nextToken();
-            ExpressionNode right = BBoolExpression();
-            result = 
-                new BinaryOperationNode(
-                    BinaryOperationNode.Operation.BOOL_AND, 
-                    result, 
-                    right, 
-                    pos
-                );
-        }
-        
-        return result;
-    }
-    private ExpressionNode BBoolExpression() {
-        ExpressionNode result = GExpression();
-        
-        while (current.type().is(Token.Type.BITWISE_OR)) {
-            Position pos = current.coordinates().starting();
-            nextToken();
-            ExpressionNode right = GExpression();
-            result = 
-                new BinaryOperationNode(
-                    BinaryOperationNode.Operation.BITWISE_OR, 
-                    result, 
-                    right, 
-                    pos
-                );
-        }
-        
-        return result;
-    }
-    private ExpressionNode GExpression() {
-        ExpressionNode result = HExpression();
+    private ExpressionNode BoolExpression() throws SyntaxException {
+        try {
+            ExpressionNode result = ABoolExpression();
 
-        while (current.type().is(Token.Type.BITWISE_XOR)) {
-            Position pos = current.coordinates().starting();
-            nextToken();
-            ExpressionNode right = HExpression();
-            result = 
-                new BinaryOperationNode(
-                    BinaryOperationNode.Operation.BITWISE_XOR, 
-                    result, 
-                    right, 
-                    pos
-                );
-        }
-        
-        return result;
-    }
-    private ExpressionNode HExpression() {
-        ExpressionNode result = IExpression();
-        
-        while (current.type().is(Token.Type.AMPERSAND)) {
-            Position pos = current.coordinates().starting();
-            nextToken();
-            ExpressionNode right = IExpression();
-            result = 
-                new BinaryOperationNode(
-                    BinaryOperationNode.Operation.BITWISE_AND,
-                    result, 
-                    right,
-                    pos
-                );
-        }
-        
-        return result;
-    }
-    private ExpressionNode IExpression() {
-        ExpressionNode result = CBoolExpression();
-        
-        while (current.type().is(Token.Type.Equality)) {
-            BinaryOperationNode.Operation operation = null;
-            Position pos = current.coordinates().starting();
-            switch (current.type()) {
-                case EQUAL:
-                    operation = BinaryOperationNode.Operation.EQUAL;
-                    break;
-                case NOT_EQUAL:
-                    operation = BinaryOperationNode.Operation.NOT_EQUAL;
-                    break;
-                default:
-                    return ExpressionNode.InvalidNode(pos);
-            }
-            nextToken();
-            ExpressionNode right = CBoolExpression();
-            
-            result = new BinaryOperationNode(operation, result, right, pos);
-        }
-        
-        return result;
-    }
-    private ExpressionNode CBoolExpression() {
-        ExpressionNode result = DboolExpression();
-        
-        while (current.type().is(Token.Type.OrderRelation)) {
-            BinaryOperationNode.Operation operation = null;
-            Position pos = current.coordinates().starting();
-            switch (current.type()) {
-                case RIGHT_ANGLE_BRACKET:
-                    operation = BinaryOperationNode.Operation.GREATER;
-                    break;
-                case GREATER_OR_EQUAL:
-                    operation = BinaryOperationNode.Operation.GREATER_OR_EQUAL;
-                    break;
-                case LEFT_ANGLE_BRACKET:
-                    operation = BinaryOperationNode.Operation.LESS;
-                    break;
-                case LESS_OR_EQUAL:
-                    operation = BinaryOperationNode.Operation.LESS_OR_EUQAL;
-                    break;
-                default:
-                    return ExpressionNode.InvalidNode(pos);
-            }
-            nextToken();
-            
-            ExpressionNode right = DboolExpression();
-            result = new BinaryOperationNode(operation, result, right, pos);
-        }
-        
-        return result;
-    }
-    private ExpressionNode DboolExpression() {
-        ExpressionNode result = AExpression();
-        
-        while (current.type().is(Token.Type.BitwiseShift)) {
-            BinaryOperationNode.Operation operation = null;
-            Position pos = current.coordinates().starting();
-            switch (current.type()) {
-                case BITWISE_SHIFT_LEFT:
-                    operation = BinaryOperationNode.Operation.BITWISE_SHIFT_LEFT;
-                    break;
-                case BITWISE_SHIFT_RIGHT:
-                    operation = BinaryOperationNode.Operation.BITWISE_SHIFT_RIGHT;
-                    break;
-                default:
-                    return ExpressionNode.InvalidNode(pos);
-            }
-            nextToken();
-            ExpressionNode right = AExpression();
-            result = new BinaryOperationNode(operation, result, right, pos);
-        }
-        
-        return result;
-    }
-    private ExpressionNode AExpression() {
-        ExpressionNode result = BExpression();
-        
-        while (current.type().is(Token.Type.PlusMinus)) {
-            BinaryOperationNode.Operation operation = null;
-            Position pos = current.coordinates().starting();
-            switch (current.type()) {
-                case PLUS:
-                    operation = BinaryOperationNode.Operation.PLUS;
-                    break;
-                case MINUS:
-                    operation = BinaryOperationNode.Operation.MINUS;
-                    break;
-                default:
-                    return ExpressionNode.InvalidNode(pos);
-            }
-            nextToken();
-            ExpressionNode right = BExpression();
-            result = new BinaryOperationNode(operation, result, right, pos);
-        }
-        
-        return result;
-    }
-    private ExpressionNode BExpression() {
-        ExpressionNode result = CExpression();
-        
-        while (current.type().is(Token.Type.MulDivMod)) {
-            BinaryOperationNode.Operation operation;
-            Position pos = current.coordinates().starting();
-            switch (current.type()) {
-                case DIV:
-                    operation = BinaryOperationNode.Operation.DIV;
-                    break;
-                case ASTERISK:
-                    operation = BinaryOperationNode.Operation.MUL;
-                    break;
-                case MOD:
-                    operation = BinaryOperationNode.Operation.MOD;
-                    break;
-                default:
-                    return ExpressionNode.InvalidNode(pos);
-            }
-            nextToken();
-            ExpressionNode right = CExpression();
-            result = new BinaryOperationNode(operation, result, right, pos);
-        }
-        
-        return result;
-    }
-    private ExpressionNode CExpression() {
-        if (current.type() == Token.Type.LEFT_ANGLE_BRACKET) {
-            nextToken();
-            BaseTypeNode type = Type();
-            RightAngleBracket();
-            Position pos = current.coordinates().starting();
-
-            return new CastNode(type, DExpression(), pos);
-        } else {
-            return DExpression();
-        }
-    }
-    private ExpressionNode DExpression() {
-        Position pos = current.coordinates().starting();
-        if (current.type().is(Token.Type.PlusMinus)) {
-            switch (current.type()) {
-                case PLUS:
-                    nextToken();
-                    return EExpression();
-                case MINUS:
-                    nextToken();
-                    return new UnaryOperationNode(
-                        UnaryOperationNode.Operation.MINUS, 
-                        EExpression(), 
-                        pos);
-                default:
-                    nextToken();
-                    return ExpressionNode.InvalidNode(pos);
-            }
-        } else if (current.type().is(Token.Type.BITWISE_NOT)) {
-            nextToken();
-            ExpressionNode node = EExpression();
-            
-            return new UnaryOperationNode(
-                UnaryOperationNode.Operation.BITWISE_NOT,
-                node,
-                pos
-            );
-        } else if (current.type().is(Token.Type.BOOL_NOT)) {
-            nextToken();
-            ExpressionNode node = EExpression();
-            
-            return new UnaryOperationNode(
-                UnaryOperationNode.Operation.NOT,
-                node,
-                pos
-            );
-        } else if (current.type().is(Token.Type.IncDec)) {
-            UnaryOperationNode.Operation operation;
-            switch (current.type()) {
-                case INC:
-                    operation = UnaryOperationNode.Operation.PRE_INC;
-                    break;
-                case DEC:
-                    operation = UnaryOperationNode.Operation.PRE_DEC;
-                    break;
-                default:
-                    return ExpressionNode.InvalidNode(pos);
-            }
-            nextToken();
-            ExpressionNode node = EExpression();
-
-            return new UnaryOperationNode(operation, node, pos);
-        } else {
-            return RefDeref();
-        }
-    }
-    private ExpressionNode RefDeref() {
-        Position pos = current.coordinates().starting();
-        
-        if (current.type().is(new Token.Type[] {
-            Token.Type.AMPERSAND, Token.Type.ASTERISK
-        })) {
-            UnaryOperationNode.Operation operation;
-            switch (current.type()) {
-                case AMPERSAND:
-                    operation = UnaryOperationNode.Operation.REF;
-                    break;
-                case ASTERISK:
-                    operation = UnaryOperationNode.Operation.DEREF;
-                    break;
-                default:
-                    return ExpressionNode.InvalidNode(pos);
-            }
-            nextToken();
-            return new UnaryOperationNode(operation, DExpression(), pos);
-        } else {
-            return EExpression();
-        }
-    }
-    private ExpressionNode EExpression() {
-        ExpressionNode node = FExpression();
-        
-        if (current.type().is(Token.Type.IncDec)) {
-            UnaryOperationNode.Operation operation;
-            Position pos = current.coordinates().starting();
-            switch (current.type()) {
-                case INC:
-                    operation = UnaryOperationNode.Operation.POST_INC;
-                    break;
-                case DEC:
-                    operation = UnaryOperationNode.Operation.POST_DEC;
-                    break;
-                default:
-                    return ExpressionNode.InvalidNode(pos);
-            }
-            nextToken();
-            node = new UnaryOperationNode(operation, node, pos);
-        }
-        
-        return node;
-    }
-    private ExpressionNode FExpression() {
-        ExpressionNode node = JExpression();
-        
-        while (current.type().is(
-            new Token.Type[] {
-                Token.Type.MEMBER_SELECT, 
-                Token.Type.LEFT_BRACKET,
-                Token.Type.LEFT_SQUARE_BRACKET
-            })
-        ) {
-            if (current.type().is(Token.Type.MEMBER_SELECT)) {
-                Position pos = current.coordinates().starting();
+            while (iterator.current().type().is(Token.Type.BOOL_OR)) {
+                Position pos = iterator.current().coordinates().starting();
                 nextToken();
-                Position varPos = current.coordinates().starting();
-                String fieldName = Identifier();
-
-                node = new BinaryOperationNode(
-                        BinaryOperationNode.Operation.MEMBER_SELECT,
-                        node,
-                        new VariableLeaf(fieldName, varPos), pos);
-            } else if (current.type().is(Token.Type.LEFT_BRACKET)) {
-                Position pos = current.coordinates().starting();
-                LeftBracket();
-                
-                BlockNode<ExpressionNode> args = new BlockNode<ExpressionNode>();
-                if (current.type().is(Token.Type.FirstOfExpression)) {           
-                    args.addChild(Expression());
-                    while (current.type() == Token.Type.COMMA) {
-                        nextToken();
-                        args.addChild(Expression());
-                    }
-                }
-                RightBracket();
-
-                node = new CallNode(node, args, pos);
-            } else {
-                LeftSquareBracket();
-                Position pos = current.coordinates().starting();
-                node = new BinaryOperationNode(
-                        BinaryOperationNode.Operation.ARRAY_ELEMENT, 
-                        node, Expression(), pos);
-                RightSquareBracket();
+                ExpressionNode right = ABoolExpression();
+                result = 
+                    new BinaryOperationNode(
+                        BinaryOperationNode.Operation.BOOL_OR, 
+                        result, 
+                        right, 
+                        pos
+                    );
             }
+
+            return result;
+        } catch(SyntaxException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonAnalysisException)new NonAnalysisException(ex)
+                    .initPosition(iterator.current().coordinates().starting())
+                    .Log("ru.bmstu.iu9.compiler.syntax");
         }
-        
-        return node;
-    }    
-    private ExpressionNode JExpression() {
-        if (current.type().is(Token.Type.Constant)) {
-            return Const();
-        } else if (current.type().is(Token.Type.LEFT_BRACKET)) {
-            nextToken();
-            ExpressionNode node = Expression();
-            RightBracket();
+    }
+    private ExpressionNode ABoolExpression() throws SyntaxException {
+        try {
+            ExpressionNode result = BBoolExpression();
+
+            while (iterator.current().type().is(Token.Type.BOOL_AND)) {
+                Position pos = iterator.current().coordinates().starting();
+                nextToken();
+                ExpressionNode right = BBoolExpression();
+                result = 
+                    new BinaryOperationNode(
+                        BinaryOperationNode.Operation.BOOL_AND, 
+                        result, 
+                        right, 
+                        pos
+                    );
+            }
+
+            return result;
+        } catch(SyntaxException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonAnalysisException)new NonAnalysisException(ex)
+                    .initPosition(iterator.current().coordinates().starting())
+                    .Log("ru.bmstu.iu9.compiler.syntax");
+        }
+    }
+    private ExpressionNode BBoolExpression() throws SyntaxException {
+        try {
+            ExpressionNode result = GExpression();
+
+            while (iterator.current().type().is(Token.Type.BITWISE_OR)) {
+                Position pos = iterator.current().coordinates().starting();
+                nextToken();
+                ExpressionNode right = GExpression();
+                result = 
+                    new BinaryOperationNode(
+                        BinaryOperationNode.Operation.BITWISE_OR, 
+                        result, 
+                        right, 
+                        pos
+                    );
+            }
+
+            return result;
+        } catch(SyntaxException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonAnalysisException)new NonAnalysisException(ex)
+                    .initPosition(iterator.current().coordinates().starting())
+                    .Log("ru.bmstu.iu9.compiler.syntax");
+        }
+    }
+    private ExpressionNode GExpression() throws SyntaxException {
+        try {
+            ExpressionNode result = HExpression();
+
+            while (iterator.current().type().is(Token.Type.BITWISE_XOR)) {
+                Position pos = iterator.current().coordinates().starting();
+                nextToken();
+                ExpressionNode right = HExpression();
+                result = 
+                    new BinaryOperationNode(
+                        BinaryOperationNode.Operation.BITWISE_XOR, 
+                        result, 
+                        right, 
+                        pos
+                    );
+            }
+
+            return result;
+        } catch(SyntaxException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonAnalysisException)new NonAnalysisException(ex)
+                    .initPosition(iterator.current().coordinates().starting())
+                    .Log("ru.bmstu.iu9.compiler.syntax");
+        }
+    }
+    private ExpressionNode HExpression() throws SyntaxException {
+        try {
+            ExpressionNode result = IExpression();
+
+            while (iterator.current().type().is(Token.Type.AMPERSAND)) {
+                Position pos = iterator.current().coordinates().starting();
+                nextToken();
+                ExpressionNode right = IExpression();
+                result = 
+                    new BinaryOperationNode(
+                        BinaryOperationNode.Operation.BITWISE_AND,
+                        result, 
+                        right,
+                        pos
+                    );
+            }
+
+            return result;
+        } catch(SyntaxException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonAnalysisException)new NonAnalysisException(ex)
+                    .initPosition(iterator.current().coordinates().starting())
+                    .Log("ru.bmstu.iu9.compiler.syntax");
+        }
+    }
+    private ExpressionNode IExpression() throws SyntaxException {
+        try {
+            ExpressionNode result = CBoolExpression();
+
+            while (iterator.current().type().is(Token.Type.Equality)) {
+                BinaryOperationNode.Operation operation = null;
+                Position pos = iterator.current().coordinates().starting();
+                switch (iterator.current().type()) {
+                    case EQUAL:
+                        operation = BinaryOperationNode.Operation.EQUAL;
+                        break;
+                    case NOT_EQUAL:
+                        operation = BinaryOperationNode.Operation.NOT_EQUAL;
+                        break;
+                    default:
+                        return ExpressionNode.InvalidNode(pos);
+                }
+                nextToken();
+                ExpressionNode right = CBoolExpression();
+
+                result = new BinaryOperationNode(operation, result, right, pos);
+            }
+
+            return result;
+        } catch(SyntaxException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonAnalysisException)new NonAnalysisException(ex)
+                    .initPosition(iterator.current().coordinates().starting())
+                    .Log("ru.bmstu.iu9.compiler.syntax");
+        }
+    }
+    private ExpressionNode CBoolExpression() throws SyntaxException {
+        try {
+            ExpressionNode result = DboolExpression();
+
+            while (iterator.current().type().is(Token.Type.OrderRelation)) {
+                BinaryOperationNode.Operation operation = null;
+                Position pos = iterator.current().coordinates().starting();
+                switch (iterator.current().type()) {
+                    case RIGHT_ANGLE_BRACKET:
+                        operation = BinaryOperationNode.Operation.GREATER;
+                        break;
+                    case GREATER_OR_EQUAL:
+                        operation = BinaryOperationNode.Operation.GREATER_OR_EQUAL;
+                        break;
+                    case LEFT_ANGLE_BRACKET:
+                        operation = BinaryOperationNode.Operation.LESS;
+                        break;
+                    case LESS_OR_EQUAL:
+                        operation = BinaryOperationNode.Operation.LESS_OR_EUQAL;
+                        break;
+                    default:
+                        return ExpressionNode.InvalidNode(pos);
+                }
+                nextToken();
+
+                ExpressionNode right = DboolExpression();
+                result = new BinaryOperationNode(operation, result, right, pos);
+            }
+
+            return result;
+        } catch(SyntaxException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonAnalysisException)new NonAnalysisException(ex)
+                    .initPosition(iterator.current().coordinates().starting())
+                    .Log("ru.bmstu.iu9.compiler.syntax");
+        }
+    }
+    
+    private ExpressionNode DboolExpression() throws SyntaxException {
+        try {
+            ExpressionNode result = AExpression();
+
+            while (iterator.current().type().is(Token.Type.BitwiseShift)) {
+                BinaryOperationNode.Operation operation = null;
+                Position pos = iterator.current().coordinates().starting();
+                switch (iterator.current().type()) {
+                    case BITWISE_SHIFT_LEFT:
+                        operation = BinaryOperationNode.Operation.BITWISE_SHIFT_LEFT;
+                        break;
+                    case BITWISE_SHIFT_RIGHT:
+                        operation = BinaryOperationNode.Operation.BITWISE_SHIFT_RIGHT;
+                        break;
+                    default:
+                        return ExpressionNode.InvalidNode(pos);
+                }
+                nextToken();
+                ExpressionNode right = AExpression();
+                result = new BinaryOperationNode(operation, result, right, pos);
+            }
+
+            return result;
+        } catch(SyntaxException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonAnalysisException)new NonAnalysisException(ex)
+                    .initPosition(iterator.current().coordinates().starting())
+                    .Log("ru.bmstu.iu9.compiler.syntax");
+        }
+    }
+    
+    private ExpressionNode AExpression() throws SyntaxException {
+        try {
+            ExpressionNode result = BExpression();
+
+            while (iterator.current().type().is(Token.Type.PlusMinus)) {
+                BinaryOperationNode.Operation operation = null;
+                Position pos = iterator.current().coordinates().starting();
+                switch (iterator.current().type()) {
+                    case PLUS:
+                        operation = BinaryOperationNode.Operation.PLUS;
+                        break;
+                    case MINUS:
+                        operation = BinaryOperationNode.Operation.MINUS;
+                        break;
+                    default:
+                        return ExpressionNode.InvalidNode(pos);
+                }
+                nextToken();
+                ExpressionNode right = BExpression();
+                result = new BinaryOperationNode(operation, result, right, pos);
+            }
+
+            return result;
+        } catch(SyntaxException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonAnalysisException)new NonAnalysisException(ex)
+                    .initPosition(iterator.current().coordinates().starting())
+                    .Log("ru.bmstu.iu9.compiler.syntax");
+        }
+    }
+    
+    private ExpressionNode BExpression() throws SyntaxException {
+        try {
+            ExpressionNode result = CExpression();
+
+            while (iterator.current().type().is(Token.Type.MulDivMod)) {
+                BinaryOperationNode.Operation operation;
+                Position pos = iterator.current().coordinates().starting();
+                switch (iterator.current().type()) {
+                    case DIV:
+                        operation = BinaryOperationNode.Operation.DIV;
+                        break;
+                    case ASTERISK:
+                        operation = BinaryOperationNode.Operation.MUL;
+                        break;
+                    case MOD:
+                        operation = BinaryOperationNode.Operation.MOD;
+                        break;
+                    default:
+                        return ExpressionNode.InvalidNode(pos);
+                }
+                nextToken();
+                ExpressionNode right = CExpression();
+                result = new BinaryOperationNode(operation, result, right, pos);
+            }
+
+            return result;
+        } catch(SyntaxException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonAnalysisException)new NonAnalysisException(ex)
+                    .initPosition(iterator.current().coordinates().starting())
+                    .Log("ru.bmstu.iu9.compiler.syntax");
+        }
+    }
+    private ExpressionNode CExpression() throws SyntaxException {
+        try {
+            if (iterator.current().type() == Token.Type.LEFT_ANGLE_BRACKET) {
+                nextToken();
+                BaseTypeNode type = Type();
+                RightAngleBracket();
+                Position pos = iterator.current().coordinates().starting();
+
+                return new CastNode(type, DExpression(), pos);
+            } else {
+                return DExpression();
+            }
+        } catch(SyntaxException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonAnalysisException)new NonAnalysisException(ex)
+                    .initPosition(iterator.current().coordinates().starting())
+                    .Log("ru.bmstu.iu9.compiler.syntax");
+        }
+    }
+    
+    private ExpressionNode DExpression() throws SyntaxException {
+        try {
+            Position pos = iterator.current().coordinates().starting();
+            if (iterator.current().type().is(Token.Type.PlusMinus)) {
+                switch (iterator.current().type()) {
+                    case PLUS:
+                        nextToken();
+                        return EExpression();
+                    case MINUS:
+                        nextToken();
+                        return new UnaryOperationNode(
+                            UnaryOperationNode.Operation.MINUS, 
+                            EExpression(), 
+                            pos);
+                    default:
+                        nextToken();
+                        return ExpressionNode.InvalidNode(pos);
+                }
+            } else if (iterator.current().type().is(Token.Type.BITWISE_NOT)) {
+                nextToken();
+                ExpressionNode node = EExpression();
+
+                return new UnaryOperationNode(
+                    UnaryOperationNode.Operation.BITWISE_NOT,
+                    node,
+                    pos
+                );
+            } else if (iterator.current().type().is(Token.Type.BOOL_NOT)) {
+                nextToken();
+                ExpressionNode node = EExpression();
+
+                return new UnaryOperationNode(
+                    UnaryOperationNode.Operation.NOT,
+                    node,
+                    pos
+                );
+            } else if (iterator.current().type().is(Token.Type.IncDec)) {
+                UnaryOperationNode.Operation operation;
+                switch (iterator.current().type()) {
+                    case INC:
+                        operation = UnaryOperationNode.Operation.PRE_INC;
+                        break;
+                    case DEC:
+                        operation = UnaryOperationNode.Operation.PRE_DEC;
+                        break;
+                    default:
+                        return ExpressionNode.InvalidNode(pos);
+                }
+                nextToken();
+                ExpressionNode node = EExpression();
+
+                return new UnaryOperationNode(operation, node, pos);
+            } else {
+                return RefDeref();
+            }
+        } catch(SyntaxException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonAnalysisException)new NonAnalysisException(ex)
+                    .initPosition(iterator.current().coordinates().starting())
+                    .Log("ru.bmstu.iu9.compiler.syntax");
+        }
+    }
+    private ExpressionNode RefDeref() throws SyntaxException {
+        try {
+            Position pos = iterator.current().coordinates().starting();
+
+            if (iterator.current().type().is(new Token.Type[] {
+                Token.Type.AMPERSAND, Token.Type.ASTERISK
+            })) {
+                UnaryOperationNode.Operation operation;
+                switch (iterator.current().type()) {
+                    case AMPERSAND:
+                        operation = UnaryOperationNode.Operation.REF;
+                        break;
+                    case ASTERISK:
+                        operation = UnaryOperationNode.Operation.DEREF;
+                        break;
+                    default:
+                        return ExpressionNode.InvalidNode(pos);
+                }
+                nextToken();
+                return new UnaryOperationNode(operation, DExpression(), pos);
+            } else {
+                return EExpression();
+            }
+        } catch(SyntaxException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonAnalysisException)new NonAnalysisException(ex)
+                    .initPosition(iterator.current().coordinates().starting())
+                    .Log("ru.bmstu.iu9.compiler.syntax");
+        }
+    }
+    private ExpressionNode EExpression() throws SyntaxException {
+        try {
+            ExpressionNode node = FExpression();
+
+            if (iterator.current().type().is(Token.Type.IncDec)) {
+                UnaryOperationNode.Operation operation;
+                Position pos = iterator.current().coordinates().starting();
+                switch (iterator.current().type()) {
+                    case INC:
+                        operation = UnaryOperationNode.Operation.POST_INC;
+                        break;
+                    case DEC:
+                        operation = UnaryOperationNode.Operation.POST_DEC;
+                        break;
+                    default:
+                        return ExpressionNode.InvalidNode(pos);
+                }
+                nextToken();
+                node = new UnaryOperationNode(operation, node, pos);
+            }
+
             return node;
-        } else {
-            Position pos = current.coordinates().starting();
-            return new VariableLeaf(Identifier(), pos);
+        } catch(SyntaxException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonAnalysisException)new NonAnalysisException(ex)
+                    .initPosition(iterator.current().coordinates().starting())
+                    .Log("ru.bmstu.iu9.compiler.syntax");
+        }
+    }
+    
+    private ExpressionNode FExpression() throws SyntaxException {
+        try {
+            ExpressionNode node = JExpression();
+
+            while (iterator.current().type().is(
+                new Token.Type[] {
+                    Token.Type.MEMBER_SELECT, 
+                    Token.Type.LEFT_BRACKET,
+                    Token.Type.LEFT_SQUARE_BRACKET
+                })
+            ) {
+                if (iterator.current().type().is(Token.Type.MEMBER_SELECT)) {
+                    Position pos = iterator.current().coordinates().starting();
+                    nextToken();
+                    Position varPos = iterator.current().coordinates().starting();
+                    String fieldName = Identifier();
+
+                    node = new BinaryOperationNode(
+                            BinaryOperationNode.Operation.MEMBER_SELECT,
+                            node,
+                            new VariableLeaf(fieldName, varPos), pos);
+                } else if (iterator.current().type().is(Token.Type.LEFT_BRACKET)) {
+                    Position pos = iterator.current().coordinates().starting();
+                    LeftBracket();
+
+                    BlockNode<ExpressionNode> args = new BlockNode<ExpressionNode>();
+                    if (iterator.current().type().is(Token.Type.FirstOfExpression)) {           
+                        args.addChild(Expression());
+                        while (iterator.current().type() == Token.Type.COMMA) {
+                            nextToken();
+                            args.addChild(Expression());
+                        }
+                    }
+                    RightBracket();
+
+                    node = new CallNode(node, args, pos);
+                } else {
+                    LeftSquareBracket();
+                    Position pos = iterator.current().coordinates().starting();
+                    node = new BinaryOperationNode(
+                            BinaryOperationNode.Operation.ARRAY_ELEMENT, 
+                            node, Expression(), pos);
+                    RightSquareBracket();
+                }
+            }
+
+            return node;
+        } catch(SyntaxException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonAnalysisException)new NonAnalysisException(ex)
+                    .initPosition(iterator.current().coordinates().starting())
+                    .Log("ru.bmstu.iu9.compiler.syntax");
+        }
+    }    
+    private ExpressionNode JExpression() throws SyntaxException {
+        try {
+            if (iterator.current().type().is(Token.Type.Constant)) {
+                return Const();
+            } else if (iterator.current().type().is(Token.Type.LEFT_BRACKET)) {
+                nextToken();
+                ExpressionNode node = Expression();
+                RightBracket();
+                return node;
+            } else {
+                Position pos = iterator.current().coordinates().starting();
+                return new VariableLeaf(Identifier(), pos);
+            }
+        } catch(SyntaxException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonAnalysisException)new NonAnalysisException(ex)
+                    .initPosition(iterator.current().coordinates().starting())
+                    .Log("ru.bmstu.iu9.compiler.syntax");
         }
     }    
     
     private ExpressionNode Const() {
         ExpressionNode node;
-        Position pos = current.coordinates().starting();
-        switch (current.type()) {
+        Position pos = iterator.current().coordinates().starting();
+        switch (iterator.current().type()) {
             case CONST_CHAR:
                 node = 
                     new CharConstantLeaf(
-                        ((CharConstantToken)current).value(), 
+                        ((CharConstantToken)iterator.current()).value(), 
                         pos
                     );
                 break;
             case CONST_DOUBLE:
                 node = 
                     new DoubleConstantLeaf(
-                        ((DoubleConstantToken)current).value(), 
+                        ((DoubleConstantToken)iterator.current()).value(), 
                         pos
                     );
                 break;
             case CONST_INT:
                 node = 
                     new IntegerConstantLeaf(
-                        ((IntegerConstantToken)current).value(), 
+                        ((IntegerConstantToken)iterator.current()).value(), 
                         pos
                     );
                 break;
@@ -1222,126 +1584,217 @@ public class Parser {
         return node;
     }
 
-    private StructDeclNode StructDecl() {
-        Position pos = current.coordinates().starting();
-        nextToken();
-        
-        String structName = Identifier();
-        BlockDeclNode decls = new BlockDeclNode();
-        
-        LeftBrace();
-        while (current.type().is(Token.Type.IDENTIFIER)) {
-            decls.addChildren(FieldDecl());
+    private StructDeclNode StructDecl() throws SyntaxException {
+        try {
+            Position pos = iterator.current().coordinates().starting();
+            nextToken();
+
+            String structName = Identifier();
+            BlockDeclNode decls = new BlockDeclNode();
+
+            LeftBrace();
+            while (iterator.current().type().is(Token.Type.IDENTIFIER)) {
+                decls.addChildren(FieldDecl());
+            }
+            RightBrace();
+
+            return new StructDeclNode(
+                    structName, 
+                    new StructTypeNode(structName, false, pos),
+                    decls,
+                    pos);
+        } catch(SyntaxException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonAnalysisException)new NonAnalysisException(ex)
+                    .initPosition(iterator.current().coordinates().starting())
+                    .Log("ru.bmstu.iu9.compiler.syntax");
         }
-        RightBrace();
-        
-        return new StructDeclNode(
-                structName, 
-                new StructTypeNode(structName, false, pos),
-                decls,
-                pos);
     }
-    private List<VariableDeclNode> FieldDecl() {
-        List<VariableDeclNode> fields = FieldsList();
-        Semicolon();
-        
-        return fields;
+    
+    private List<VariableDeclNode> FieldDecl() throws SyntaxException {
+        try {
+            List<VariableDeclNode> fields = FieldsList();
+            Semicolon();
+
+            return fields;
+        } catch(SyntaxException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonAnalysisException)new NonAnalysisException(ex)
+                    .initPosition(iterator.current().coordinates().starting())
+                    .Log("ru.bmstu.iu9.compiler.syntax");
+        }
     }
    
-    private BlockDeclNode VariableDecl() {        
-        nextToken();
-        
-        if (current.type().is(Token.Type.LEFT_BRACKET)) {
-            LeftBracket();
-            BlockDeclNode decls = new BlockDeclNode();
-            decls.addChildren(VariableSpec());
-            Semicolon();
-            
-            while (current.type().is(Token.Type.IDENTIFIER)) {
+    private BlockDeclNode VariableDecl() throws SyntaxException {
+        try {
+            nextToken();
+
+            if (iterator.current().type().is(Token.Type.LEFT_BRACKET)) {
+                LeftBracket();
+                BlockDeclNode decls = new BlockDeclNode();
                 decls.addChildren(VariableSpec());
                 Semicolon();
+
+                while (iterator.current().type().is(Token.Type.IDENTIFIER)) {
+                    decls.addChildren(VariableSpec());
+                    Semicolon();
+                }
+
+                RightBracket();
+
+                return decls;
+            } else {
+                return new BlockDeclNode(VariableSpec());
             }
-            
-            RightBracket();
-            
-            return decls;
-        } else {
-            return new BlockDeclNode(VariableSpec());
+        } catch(SyntaxException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonAnalysisException)new NonAnalysisException(ex)
+                    .initPosition(iterator.current().coordinates().starting())
+                    .Log("ru.bmstu.iu9.compiler.syntax");
         }
     }
     
-    private List<VariableDeclNode> VariableSpec() {
-        List<VariableDeclNode> nodes = new LinkedList<VariableDeclNode>();
-        
-        Position declPos = current.coordinates().starting();
-        String name = Identifier();
-        BaseTypeNode type;
-        
-        if (current.type().is(Token.Type.ASSIGN)) {
-            nextToken();
-            ExpressionNode expr = Expression();
-            
-            if (current.type().is(Token.Type.COMMA)) {
+    private List<VariableDeclNode> VariableSpec() throws SyntaxException {
+        try {
+            List<VariableDeclNode> nodes = new LinkedList<VariableDeclNode>();
+
+            Position declPos = iterator.current().coordinates().starting();
+            String name = Identifier();
+            BaseTypeNode type;
+
+            if (iterator.current().type().is(Token.Type.ASSIGN)) {
+                nextToken();
+                ExpressionNode expr = Expression();
+
+                if (iterator.current().type().is(Token.Type.COMMA)) {
+                    nextToken();
+                    nodes.addAll(VariableSpec());
+
+                    type = ((VariableDeclNode)nodes.get(nodes.size() - 1)).type;
+                } else if (iterator.current().type().is(Token.Type.COLON)) {
+                    nextToken();
+                    type = Type();
+                } else {
+                    throw new InvalidTokenException(
+                            iterator.current(),
+                            new Token.Type[] {
+                                Token.Type.COLON,
+                                Token.Type.COMMA
+                            }
+                        )
+                        .initPosition(iterator.current().coordinates().starting())
+                        .Log("ru.bmstu.iu9.compiler.syntax");
+                }
+                nodes.add(0, new VariableDeclNode(name, type, declPos, expr));
+            } else if (iterator.current().type().is(Token.Type.COMMA)) {
                 nextToken();
                 nodes.addAll(VariableSpec());
-                
                 type = ((VariableDeclNode)nodes.get(nodes.size() - 1)).type;
-            } else if (current.type().is(Token.Type.COLON)) {
+
+                nodes.add(0, new VariableDeclNode(name, type, declPos));
+            } else if (iterator.current().type().is(Token.Type.COLON)){
                 nextToken();
                 type = Type();
-            } else {
-                type = null;
-                // @todo Report an error
+                return Arrays.asList(new VariableDeclNode(name, type, declPos));
             }
-            nodes.add(0, new VariableDeclNode(name, type, declPos, expr));
-        } else if (current.type().is(Token.Type.COMMA)) {
-            nextToken();
-            nodes.addAll(VariableSpec());
-            type = ((VariableDeclNode)nodes.get(nodes.size() - 1)).type;
-            
-            nodes.add(0, new VariableDeclNode(name, type, declPos));
-        } else if (current.type().is(Token.Type.COLON)){
-            nextToken();
-            type = Type();
-            return Arrays.asList(new VariableDeclNode(name, type, declPos));
+
+            return nodes;
+        } catch(SyntaxException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonAnalysisException)new NonAnalysisException(ex)
+                    .initPosition(iterator.current().coordinates().starting())
+                    .Log("ru.bmstu.iu9.compiler.syntax");
         }
-        
-        return nodes;
     }
     
-    private void LeftSquareBracket() {
-        if (checkTokens(current, Token.Type.LEFT_SQUARE_BRACKET)) {
+    
+    
+    private void LeftSquareBracket() throws SyntaxException {
+        if (checkTokens(iterator.current(), Token.Type.LEFT_SQUARE_BRACKET)) {
             nextToken();
+        } else {
+            throw (InvalidTokenException)new InvalidTokenException(
+                iterator.current(), 
+                Token.Type.LEFT_ANGLE_BRACKET
+            )
+            .initPosition(iterator.current().coordinates().starting())
+            .Log("ru.bmstu.iu9.compiler.syntax");
         }
     }
-    private void RightSquareBracket() {
-        if (checkTokens(current, Token.Type.RIGHT_SQUARE_BRACKET)) {
+    private void RightSquareBracket() throws SyntaxException {
+        if (checkTokens(iterator.current(), Token.Type.RIGHT_SQUARE_BRACKET)) {
             nextToken();
+        } else {
+            throw (InvalidTokenException)new InvalidTokenException(
+                iterator.current(), 
+                Token.Type.RIGHT_SQUARE_BRACKET
+            )
+            .initPosition(iterator.current().coordinates().starting())
+            .Log("ru.bmstu.iu9.compiler.syntax");
         }
     }
-    private void LeftBracket() {
-        if (checkTokens(current, Token.Type.LEFT_BRACKET)) {
+    private void LeftBracket() throws SyntaxException {
+        if (checkTokens(iterator.current(), Token.Type.LEFT_BRACKET)) {
             nextToken();
+        } else {
+            throw (InvalidTokenException)new InvalidTokenException(
+                iterator.current(), 
+                Token.Type.LEFT_BRACKET
+            )
+            .initPosition(iterator.current().coordinates().starting())
+            .Log("ru.bmstu.iu9.compiler.syntax");
         }
     }
-    private void RightBracket() {
-        if (checkTokens(current, Token.Type.RIGHT_BRACKET)) {
+    private void RightBracket() throws SyntaxException {
+        if (checkTokens(iterator.current(), Token.Type.RIGHT_BRACKET)) {
             nextToken();
+        } else {
+            throw (InvalidTokenException)new InvalidTokenException(
+                iterator.current(), 
+                Token.Type.RIGHT_BRACKET
+            )
+            .initPosition(iterator.current().coordinates().starting())
+            .Log("ru.bmstu.iu9.compiler.syntax");
         }
     }
-    private void LeftBrace() {
-        if (checkTokens(current, Token.Type.LEFT_BRACE)) {
+    private void LeftBrace() throws SyntaxException {
+        if (checkTokens(iterator.current(), Token.Type.LEFT_BRACE)) {
             nextToken();
+        } else {
+            throw (InvalidTokenException)new InvalidTokenException(
+                iterator.current(), 
+                Token.Type.LEFT_BRACE
+            )
+            .initPosition(iterator.current().coordinates().starting())
+            .Log("ru.bmstu.iu9.compiler.syntax");
         }
     }
-    private void RightBrace() {
-        if (checkTokens(current, Token.Type.RIGHT_BRACE)) {
+    private void RightBrace() throws SyntaxException {
+        if (checkTokens(iterator.current(), Token.Type.RIGHT_BRACE)) {
             nextToken();
+        } else {
+            throw (InvalidTokenException)new InvalidTokenException(
+                iterator.current(), 
+                Token.Type.RIGHT_BRACE
+            )
+            .initPosition(iterator.current().coordinates().starting())
+            .Log("ru.bmstu.iu9.compiler.syntax");
         }
     }
-    private void RightAngleBracket() {
-        if (checkTokens(current, Token.Type.RIGHT_ANGLE_BRACKET)) {
+    private void RightAngleBracket() throws SyntaxException {
+        if (checkTokens(iterator.current(), Token.Type.RIGHT_ANGLE_BRACKET)) {
             nextToken();
+        } else {
+            throw (InvalidTokenException)new InvalidTokenException(
+                iterator.current(), 
+                Token.Type.RIGHT_ANGLE_BRACKET
+            )
+            .initPosition(iterator.current().coordinates().starting())
+            .Log("ru.bmstu.iu9.compiler.syntax");
         }
     }
 }

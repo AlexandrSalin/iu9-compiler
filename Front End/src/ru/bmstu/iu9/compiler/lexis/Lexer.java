@@ -94,11 +94,11 @@ public class Lexer {
     }
     
     public static void main(String[] args) {
-        Lexer lex = new Lexer("C:\\Users\\maggot\\Documents\\IntelliJ IDEA " +
-                              "Projects\\iu9-compiler\\Front End\\src\\input.src");
+        Lexer lex = new Lexer("C:\\Users\\maggot\\Documents\\NetBeansProjects" +
+                "\\ru.bmstu.iu9.compiler\\Front End\\src\\input.src");
         lex.run();
-        lex.toJson("C:\\Users\\maggot\\Documents\\IntelliJ IDEA " +
-                   "Projects\\iu9-compiler\\Front End\\src\\output.json");
+        lex.toJson("C:\\Users\\maggot\\Documents\\NetBeansProjects" + 
+                "\\ru.bmstu.iu9.compiler\\Front End\\src\\output.json");
     }
     
     /**

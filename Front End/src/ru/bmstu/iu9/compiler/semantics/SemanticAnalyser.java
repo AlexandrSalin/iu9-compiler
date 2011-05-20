@@ -55,8 +55,8 @@ public class SemanticAnalyser {
     
     public static void main(String[] args) {
         SemanticAnalyser analyser = 
-            new SemanticAnalyser("C:\\Users\\maggot\\Documents\\IntelliJ IDEA" +
-                                 " Projects\\iu9-compiler\\Front End\\src\\parse_tree.json");
+            new SemanticAnalyser("C:\\Users\\maggot\\Documents\\NetBeansProjects" +
+                "\\ru.bmstu.iu9.compiler\\Front End\\src\\parse_tree.json");
         analyser.Analyse();
 
         return;

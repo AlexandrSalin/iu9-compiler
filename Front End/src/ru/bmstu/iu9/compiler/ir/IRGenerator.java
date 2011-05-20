@@ -7,18 +7,12 @@ package ru.bmstu.iu9.compiler.ir;
 import com.google.gson.*;
 import java.io.*;
 import java.util.*;
-
-import ru.bmstu.iu9.compiler.CompilerException;
 import ru.bmstu.iu9.compiler.Position;
 import ru.bmstu.iu9.compiler.ir.type.*;
 import ru.bmstu.iu9.compiler.semantics.*;
 import ru.bmstu.iu9.compiler.syntax.tree.*;
 
 /**
- *
- * @todo добавить start_lock, end_lock и barrier
- * @todo call
- * @todo проблема goto'а за пределы функции
  *
  * @author anton.bobukh
  */
@@ -45,7 +39,7 @@ public class IRGenerator {
             
             reader = new BufferedReader(
                         new FileReader("C:\\Users\\maggot\\Documents" +
-                                       "\\IntelliJ IDEA Projects\\iu9-compiler\\Front End\\src\\parse_tree.json"));
+                                       "\\NetBeansProjects\\ru.bmstu.iu9.compiler\\Front End\\src\\parse_tree.json"));
             
             BlockNode<BaseNode> tree = gson.fromJson(reader, BlockNode.class);
             SemanticAnalyser analyser = new SemanticAnalyser(tree);
@@ -149,8 +143,8 @@ public class IRGenerator {
         } catch(IRException ex) {
             throw ex;
         } catch(Exception ex) {
-            throw (NonGenerationException)new NonGenerationException()
-                    .initCause(ex);
+            throw (NonGenerationException)new NonGenerationException(ex)
+                    .Log("ru.bmstu.iu9.compiler.ir");
         }
     }
     
@@ -246,8 +240,8 @@ public class IRGenerator {
         } catch(IRException ex) {
             throw ex;
         } catch(Exception ex) {
-            throw (NonGenerationException)new NonGenerationException()
-                    .initCause(ex);
+            throw (NonGenerationException)new NonGenerationException(ex)
+                    .Log("ru.bmstu.iu9.compiler.ir");
         }
     }
     
