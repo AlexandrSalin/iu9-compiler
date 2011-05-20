@@ -71,6 +71,7 @@ final public class BinaryOperationNode extends ExpressionNode {
         this.right = right;
     }
     
+    @Override
     public boolean is(Operation operation) {
         return this.operation().is(operation);
     }

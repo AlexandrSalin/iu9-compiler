@@ -9,15 +9,18 @@ import java.util.logging.Logger;
  *
  * @author anton.bobukh
  */
-public class LoggingException extends CompilerException {
-    public LoggingException() {
+public class LoggedException
+        extends CompilerException {
+    public LoggedException(String module) {
         super();
+        this.logger = Logger.getLogger(module);
         logger.log(Level.WARNING, "", this); // this.getMessage());
     }
-    public LoggingException(String message) {
+    public LoggedException(String message, String module) {
         super(message);
+        this.logger = Logger.getLogger(module);
         logger.log(Level.WARNING, "", this); // this.getMessage());
     }
 
-    private static Logger logger = Logger.getLogger("ru.bmstu.iu9.compiler");
+    private Logger logger;
 }

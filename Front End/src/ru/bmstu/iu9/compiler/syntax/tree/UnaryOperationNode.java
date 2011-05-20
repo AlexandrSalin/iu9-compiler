@@ -37,6 +37,7 @@ public class UnaryOperationNode extends ExpressionNode {
         this.node = node;
     }
     
+    @Override
     public boolean is(Operation operation) {
         return this.operation().equals(operation);
     }

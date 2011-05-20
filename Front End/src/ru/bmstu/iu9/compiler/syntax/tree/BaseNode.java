@@ -21,6 +21,16 @@ public class BaseNode {
     protected BaseNode(NodeType nodeType) {
         this.nodeType = nodeType.ordinal();
     }
+
+    public boolean is(NodeType type) {
+        return nodeType().equals(type);
+    }
+    public boolean is(BinaryOperationNode.Operation operation) {
+        return this.is(NodeType.BINARY_OPERATION);
+    }
+    public boolean is(UnaryOperationNode.Operation operation) {
+        return this.is(NodeType.UNARY_OPERATION);
+    }
     
     public NodeType nodeType() {
         return NodeType.values()[this.nodeType]; 
@@ -632,7 +642,7 @@ public class BaseNode {
                     BlockNode arguments = 
                         context.deserialize(obj, BlockNode.class);
                     
-                    obj = object.getAsJsonObject("function");
+                    obj = object.getAsJsonObject("functionPointer");
                     assert obj == null;
                     ExpressionNode function = 
                             context.deserialize(obj, ExpressionNode.class);

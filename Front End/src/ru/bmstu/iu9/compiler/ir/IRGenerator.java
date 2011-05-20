@@ -8,6 +8,8 @@ import com.google.gson.*;
 import java.io.*;
 import java.util.*;
 
+import ru.bmstu.iu9.compiler.CompilerException;
+import ru.bmstu.iu9.compiler.Position;
 import ru.bmstu.iu9.compiler.ir.type.*;
 import ru.bmstu.iu9.compiler.semantics.*;
 import ru.bmstu.iu9.compiler.syntax.tree.*;
@@ -65,12 +67,20 @@ public class IRGenerator {
     }
     
     public void generate() {
-        generate(this.parseTree);
+        for(BaseNode node : parseTree) {
+            try {
+                generate(node);
+            } catch(IRException ex) {
+                continue;
+            }
+        }
         return;
     }
     
     
-    private VariableOperand generateArrayIndex(BinaryOperationNode node) {
+    private VariableOperand generateArrayIndex(BinaryOperationNode node)
+            throws IRException {
+
         VariableOperand array = (VariableOperand) generate(node.leftChild());
         Operand index = generate(node.rightChild());
 
@@ -110,29 +120,38 @@ public class IRGenerator {
         return address;
     }
     
-    private VariableOperand generateStructField(BinaryOperationNode node) {
-        VariableOperand struct = (VariableOperand) generate(node.leftChild());
-//        VariableOperand field = (VariableOperand) generate(node.rightChild());
-        String fieldName = ((VariableLeaf) node.rightChild()).name;
+    private VariableOperand generateStructField(BinaryOperationNode node)
+            throws IRException {
 
-        long offset = ((StructType) struct.type()).getFieldOffset(fieldName);
+        try {
+            VariableOperand struct = (VariableOperand) generate(node.leftChild());
+    //        VariableOperand field = (VariableOperand) generate(node.rightChild());
+            String fieldName = ((VariableLeaf) node.rightChild()).name;
 
-        TmpVariableOperand address = 
-            new TmpVariableOperand(new PointerType(node.realType()), varTable);
+            long offset = ((StructType) struct.type()).getFieldOffset(fieldName);
 
-        code.addStatement(
-            new BinaryOperationStatement(
-                struct,
-                new ConstantOperand<Long>(
-                    new PrimitiveType(PrimitiveType.Type.LONG),
-                    offset
-                ),
-                address,
-                BinaryOperationStatement.Operation.PLUS
-            )
-        );
+            TmpVariableOperand address =
+                new TmpVariableOperand(new PointerType(node.realType()), varTable);
 
-        return address;
+            code.addStatement(
+                new BinaryOperationStatement(
+                    struct,
+                    new ConstantOperand<Long>(
+                        new PrimitiveType(PrimitiveType.Type.LONG),
+                        offset
+                    ),
+                    address,
+                    BinaryOperationStatement.Operation.PLUS
+                )
+            );
+
+            return address;
+        } catch(IRException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonGenerationException)new NonGenerationException()
+                    .initCause(ex);
+        }
     }
     
     
@@ -165,88 +184,124 @@ public class IRGenerator {
      * @param node Узел, соответствующий левой части присваивания
      * @return Операнд, в который помещена переменная или адрес в памяти
      */
-    private VariableOperand generateLeftHandValue(BaseNode node) {
-        switch(node.nodeType()) {
-            case VARIABLE:
-            {
-                VariableLeaf l = (VariableLeaf) node;
-                
-                return 
-                    new NamedVariableOperand(varTable, varTable.get(l.name));
-            }
-            case BINARY_OPERATION:
-            {
-                BinaryOperationNode o = (BinaryOperationNode) node;
-                
-                switch(o.operation()) {
-                    case ARRAY_ELEMENT:
-                        return generateArrayIndex(o);
-                    case MEMBER_SELECT:
-                        return generateStructField(o);
-                    default:
-                        // @todo Report an error
-                        break;
+    private VariableOperand generateLeftHandValue(BaseNode node)
+            throws IRException {
+
+        try {
+            switch(node.nodeType()) {
+                case VARIABLE:
+                {
+                    VariableLeaf l = (VariableLeaf) node;
+
+                    return
+                        new NamedVariableOperand(varTable, varTable.get(l.name));
                 }
-                
-                break;
-            }
-            case UNARY_OPERATION:
-            {
-                UnaryOperationNode o = (UnaryOperationNode) node;
-                
-                if(o.is(UnaryOperationNode.Operation.DEREF)) {
-                    VariableOperand variable = 
-                        (VariableOperand) generate(o.node);
-                    
-                    return variable;
-                } else {
-                    // @todo Report an error
+                case BINARY_OPERATION:
+                {
+                    BinaryOperationNode o = (BinaryOperationNode) node;
+
+                    switch(o.operation()) {
+                        case ARRAY_ELEMENT:
+                            return generateArrayIndex(o);
+                        case MEMBER_SELECT:
+                            return generateStructField(o);
+                        default:
+                            throw new InvalidLeftHandValueException(
+                                o.operation(),
+                                o.dInfo.position
+                            );
+                    }
                 }
-                
-                break;
+                case UNARY_OPERATION:
+                {
+                    UnaryOperationNode o = (UnaryOperationNode) node;
+
+                    if (o.is(UnaryOperationNode.Operation.DEREF)) {
+                        if(o.node.is(UnaryOperationNode.Operation.DEREF)) {
+                            TmpVariableOperand tmp =
+                                new TmpVariableOperand(o.node.realType(), varTable);
+
+                            code.addStatement(
+                                new UnaryOperationStatement(
+                                    tmp,
+                                    generateLeftHandValue(o.node),
+                                    UnaryOperationStatement.Operation.DEREF
+                                )
+                            );
+
+                            return tmp;
+                        } else {
+                            generate(o.node);
+                        }
+                    } else {
+                        throw new InvalidLeftHandValueException(
+                            o.operation(),
+                            o.dInfo.position
+                        );
+                    }
+                }
+                default:
+                    throw new InvalidLeftHandValueException(
+                        node.nodeType(),
+                        new Position(-1, -1, -1)
+                    );
             }
-            default:
-                // @todo Report an error
-                break;
+        } catch(IRException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonGenerationException)new NonGenerationException()
+                    .initCause(ex);
         }
-        return null;
     }
     
-    private Operand generateRightHandValue(BaseNode node) {
+    private Operand generateRightHandValue(BaseNode node)
+            throws IRException {
+
         return generate(node);
     }
     
     
-    private VariableOperand generateAssignment(BinaryOperationNode node) {
-        VariableOperand lhv = generateLeftHandValue(node.leftChild());
-        Operand rhv = generateRightHandValue(node.rightChild());
-        
-        if(node.leftChild() instanceof VariableLeaf) {
-            code.addStatement(new AssignmentStatement(lhv, rhv));
-            
-            return lhv;
-        } else {
-            code.addStatement(new IndirectAssignmentStatement(lhv, rhv));
-            
-            TmpVariableOperand value = 
-                new TmpVariableOperand(
-                    ((PointerType)lhv.type()).pointerType,
-                    varTable);
-            
-            code.addStatement(
-                new UnaryOperationStatement(
-                    value, 
-                    lhv,
-                    UnaryOperationStatement.Operation.DEREF)
-            );
-            
-            return value;
-        }       
+    private VariableOperand generateAssignment(BinaryOperationNode node)
+            throws IRException {
+
+        try {
+            VariableOperand lhv = generateLeftHandValue(node.leftChild());
+            Operand rhv = generateRightHandValue(node.rightChild());
+
+            if(node.leftChild() instanceof VariableLeaf) {
+                code.addStatement(new AssignmentStatement(lhv, rhv));
+
+                return lhv;
+            } else {
+                code.addStatement(new IndirectAssignmentStatement(lhv, rhv));
+
+                TmpVariableOperand value =
+                    new TmpVariableOperand(
+                        ((PointerType)lhv.type()).pointerType,
+                        varTable);
+
+                code.addStatement(
+                    new UnaryOperationStatement(
+                        value,
+                        lhv,
+                        UnaryOperationStatement.Operation.DEREF)
+                );
+
+                return value;
+            }
+        } catch(IRException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonGenerationException)new NonGenerationException()
+                    .initCause(ex);
+        }
     }
     
     
     
-    private void generateReturn(ReturnNode node) {
+    private void generateReturn(ReturnNode node)
+            throws IRException {
+
         if (node.returnExpr != null) {
             Operand value = generate(node.returnExpr);
             code.addStatement(new ReturnStatement(value));
@@ -254,7 +309,9 @@ public class IRGenerator {
             code.addStatement(new ReturnStatement());
         }
     }
+
     private void generateFunction(FunctionDeclNode node) {
+
         code = new Code();
         codes.add(code);
 
@@ -266,680 +323,764 @@ public class IRGenerator {
         }
 
         for(ru.bmstu.iu9.compiler.syntax.tree.Statement n : node.block) {
-            generate(n.getNode());
+            try {
+                generate(n.getNode());
+            } catch (IRException ex) {
+
+            }
         }
 
         scopes.leaveBlock();
 
         code.print();
     }
-    private void generateBlock(BlockNode<BaseNode> node) {
+
+    private void generateBlock(BlockNode<BaseNode> node)
+            throws IRException {
+
         for(BaseNode n : (BlockNode<BaseNode>)node) {
             generate(n);
         }
     }
     
-    private Operand generateBoolExpression(BinaryOperationNode node) {
-        if (node.is(BinaryOperationNode.Operation.Bool)) {
-            Label rightCond = new Label();
-            Label trueL = new Label();
-            Label falseL = new Label();
-            Label next = new Label();
-                    
-            switch(node.operation()) {
-                /**
-                 * a && b раскрывает в:
-                 *  
-                 *        tmp1 = generate(a);
-                 *        tmp2 = generate(b);
-                 *  
-                 *        tmp3 = NOT tmp1;
-                 *        tmp4 = NOT tmp2;
-                 *  
-                 *        if(tmp3) 
-                 *          goto false;
-                 *        else 
-                 *          goto cond;
-                 * cond:  if(tmp4) 
-                 *          goto false;
-                 *        else
-                 *          goto true;
-                 * true:  tmp5 = TRUE;
-                 *        goto next;
-                 * false: tmp5 = FALSE;
-                 * next:  usage of tmp5
-                 */
-                case BOOL_AND:
-                {
-                    Operand left = generate(node.leftChild());   // tmp1
-                    Operand right = generate(node.rightChild()); // tmp2
-                    
-                    // tmp3
-                    TmpVariableOperand first = 
-                        new TmpVariableOperand(
-                            new PrimitiveType(
-                                PrimitiveType.Type.BOOL,
-                                true
-                            ),
-                            varTable
-                        );
-                    
-                    // tmp4
-                    TmpVariableOperand second = 
-                        new TmpVariableOperand(
-                            new PrimitiveType(
-                                PrimitiveType.Type.BOOL, 
-                                true
-                            ),
-                            varTable
-                        );
-                    
-                    // tmp3 = !a
-                    code.addStatement(
-                        new UnaryOperationStatement(
-                            first, 
-                            left,
-                            UnaryOperationStatement.Operation.NOT)
-                    );
-                    // tmp4 = !b
-                    code.addStatement(
-                        new UnaryOperationStatement(
-                            second, 
-                            right,
-                            UnaryOperationStatement.Operation.NOT)
-                    );
-                    
-                    // !a ? goto false : goto nextCondition
-                    code.addStatement(
-                        new IfGoToStatement(first, falseL, rightCond)
-                    );
-                    // !b ? goto false : goto true
-                    rightCond.setIndex(code.nextIndex());
-                    code.addStatement(
-                        new IfGoToStatement(second, falseL, trueL)
-                    );
-                    
-                    // tmp5
-                    TmpVariableOperand result = 
-                        new TmpVariableOperand(
-                            new PrimitiveType(PrimitiveType.Type.BOOL, true),
-                            varTable
-                        );
-                    
-                    // trueL:
-                    trueL.setIndex(code.nextIndex());
-                    
-                    // trueL: tmp5 = true
-                    code.addStatement(
-                        new AssignmentStatement(
-                            result,
-                            new ConstantOperand(
-                                new PrimitiveType(PrimitiveType.Type.BOOL),
-                                Boolean.TRUE
-                            )
-                        )
-                    );
-                    
-                    // goto next
-                    code.addStatement(new GoToStatement(next));
-                    
-                    // falseL:
-                    falseL.setIndex(code.nextIndex());
-                    
-                    // falseL: tmp5 = false
-                    code.addStatement(
-                        new AssignmentStatement(
-                            result,
-                            new ConstantOperand(
-                                new PrimitiveType(PrimitiveType.Type.BOOL),
-                                Boolean.FALSE
-                            )
-                        )
-                    );
-                    
-                    // next:
-                    next.setIndex(code.nextIndex());
-                    
-                    return result;
-                }
-                case BOOL_OR:
-                {
-                    Operand left = generate(node.leftChild());
-                    Operand right = generate(node.rightChild());
-                    
-                    code.addStatement(
-                        new IfGoToStatement(left, trueL, rightCond)
-                    );
-                    rightCond.setIndex(code.nextIndex());
-                    code.addStatement(
-                        new IfGoToStatement(right, trueL, falseL)
-                    );
-                    
-                    TmpVariableOperand result = 
-                        new TmpVariableOperand(
-                            new PrimitiveType(PrimitiveType.Type.BOOL, true),
-                            varTable
-                        );
-                    
-                    trueL.setIndex(code.nextIndex());
-                    
-                    code.addStatement(
-                        new AssignmentStatement(
-                            result,
-                            new ConstantOperand(
-                                new PrimitiveType(PrimitiveType.Type.BOOL),
-                                Boolean.TRUE
-                            )
-                        )
-                    );
-                    
-                    code.addStatement(new GoToStatement(next));
-                    
-                    falseL.setIndex(code.nextIndex());
-                    
-                    code.addStatement(
-                        new AssignmentStatement(
-                            result,
-                            new ConstantOperand(
-                                new PrimitiveType(PrimitiveType.Type.BOOL),
-                                Boolean.FALSE
-                            )
-                        )
-                    );
-                    
-                    next.setIndex(code.nextIndex());
-                    
-                    return result;
-                }
-                default:
-                    // @todo Report an error
-                    return null;
-            }
-        } else {
-            // @todo Report an error
-            return null;
-        }
-    }
-    
-    private void declareVariable(VariableDeclNode node) {
-        NamedVariable variable = new NamedVariable(node.name, node.realType());
-        scopes.addVariable(variable);
+    private Operand generateBoolExpression(BinaryOperationNode node)
+            throws IRException {
 
-        varTable.add(variable);
+        try {
+            if (node.is(BinaryOperationNode.Operation.Bool)) {
+                Label rightCond = new Label();
+                Label trueL = new Label();
+                Label falseL = new Label();
+                Label next = new Label();
 
-        if(node.value != null) {
-            Operand value = generate(node.value);
-
-            code.addStatement(
-                new AssignmentStatement(
-                    new NamedVariableOperand(
-                        varTable,
-                        varTable.get(variable.name)
-                    ),
-                    value
-                )
-            );
-        }
-    }
-    
-    
-    private Operand generate(BaseNode node) {
-        switch(node.nodeType()) {
-            case BREAK:
-            {
-                code.addStatement(
-                    new GoToStatement(csi.endOfBlockLabel)
-                );
-                break;
-            }
-            case CONTINUE:
-            {
-                code.addStatement(
-                    new GoToStatement(csi.conditionLabel)
-                );
-                break;
-            }
-            case RETURN:
-            {
-                generateReturn((ReturnNode) node);
-                break;
-            }
-            case FUNCTION_DECL:
-            {
-                FunctionDeclNode function = (FunctionDeclNode) node;
-                varTable.add(new NamedVariable(
-                    function.name,
-                    function.realType()
-                ));
-                generateFunction(function);
-                
-                break;
-            }
-            case BLOCK:
-            {
-                scopes.enterBlock();
-                generateBlock((BlockNode<BaseNode>) node);
-                scopes.leaveBlock();
-                break;
-            }
-            case BLOCK_DECL:
-            {
-                for(VariableDeclNode decl : 
-                        (BlockDeclNode<VariableDeclNode>) node) {
-                    
-                    generate(decl);
-                }
-                break;
-            }
-            case VARIABLE:
-            {
-                return new NamedVariableOperand(
-                    varTable, 
-                    varTable.get(((VariableLeaf)node).name)
-                );
-            }
-            case VAR_DECL:
-            {
-                declareVariable((VariableDeclNode) node);
-                
-                break;
-            }
-            case UNARY_OPERATION:
-            {
-                UnaryOperationNode u = (UnaryOperationNode)node;
-                
-                Operand op = generate(u.node);
-                
-                TmpVariableOperand result = 
-                    new TmpVariableOperand(
-                        u.realType(),
-                        varTable
-                    );
-                
-                code.addStatement(
-                    new UnaryOperationStatement(
-                        result,
-                        op,
-                        UnaryOperationStatement.operation(u.operation()))
-                );
-                
-                return result;
-            }
-            case BINARY_OPERATION:
-            {
-                BinaryOperationNode b = (BinaryOperationNode)node;
-                
-                switch(b.operation()) {
-                    case ARRAY_ELEMENT:
-                    {
-                        return generateArrayIndex(b);
-                    }
+                switch(node.operation()) {
                     /**
-                     * tmp1 = ((a.i).j);
-                     * a - address or value?
-                     * a [MEMBER_SELECT] i - address or value?
-                     * (a.i) [MEMBER_SELECT] j - address or value?
+                     * a && b раскрывает в:
+                     *
+                     *        tmp1 = generate(a);
+                     *        tmp2 = generate(b);
+                     *
+                     *        tmp3 = NOT tmp1;
+                     *        tmp4 = NOT tmp2;
+                     *
+                     *        if(tmp3)
+                     *          goto false;
+                     *        else
+                     *          goto cond;
+                     * cond:  if(tmp4)
+                     *          goto false;
+                     *        else
+                     *          goto true;
+                     * true:  tmp5 = TRUE;
+                     *        goto next;
+                     * false: tmp5 = FALSE;
+                     * next:  usage of tmp5
                      */
-                    case MEMBER_SELECT:
-                    {
-                        return generateStructField(b);
-                    }
-                    case MINUS: 
-                    case DIV:
-                    case MUL:
-                    case MOD:
-                    case PLUS: 
-                    case BITWISE_SHIFT_RIGHT:
-                    case BITWISE_SHIFT_LEFT:
-                    case GREATER:
-                    case GREATER_OR_EQUAL:
-                    case LESS:
-                    case LESS_OR_EUQAL:
-                    case NOT_EQUAL:
-                    case EQUAL:
-                    case BITWISE_AND:
-                    case BITWISE_XOR:
-                    case BITWISE_OR:
-                    {
-                        Operand left =
-                            generate(b.leftChild());
-                        Operand right =
-                            generate(b.rightChild());
-                        
-                        return generateBinaryOperation(
-                            left,
-                            right,
-                            b.realType(),
-                            BinaryOperationStatement.operation(b.operation()));
-                    }
                     case BOOL_AND:
-                    case BOOL_OR:
                     {
-                        return generateBoolExpression(b);
-                    }
-                    case BITWISE_AND_ASSIGN:
-                    case BITWISE_XOR_ASSIGN: 
-                    case BITWISE_SHIFT_RIGHT_ASSIGN:
-                    case BITWISE_SHIFT_LEFT_ASSIGN:
-                    case BITWISE_OR_ASSIGN:
-                    case MOD_ASSIGN:
-                    case DIV_ASSIGN:
-                    case MUL_ASSIGN:
-                    case MINUS_ASSIGN: 
-                    case PLUS_ASSIGN:
-                    {
-                        VariableOperand lhv = 
-                            generateLeftHandValue(b.leftChild());
-                        
-                        VariableOperand left =
-                            (VariableOperand)generate(b.leftChild());
-                        VariableOperand right = 
-                            (VariableOperand) generate(b.rightChild());
-                        
-                        if (left.type().is(PrimitiveType.Type.POINTER)) {
-                            TmpVariableOperand value = 
-                                new TmpVariableOperand(
-                                    ((PointerType)left.type()).pointerType,
-                                    varTable);
-                            
-                            code.addStatement(
-                                new UnaryOperationStatement(
-                                    left, 
-                                    value,
-                                    UnaryOperationStatement.Operation.DEREF
-                                )
+                        Operand left = generate(node.leftChild());   // tmp1
+                        Operand right = generate(node.rightChild()); // tmp2
+
+                        // tmp3
+                        TmpVariableOperand first =
+                            new TmpVariableOperand(
+                                new PrimitiveType(
+                                    PrimitiveType.Type.BOOL,
+                                    true
+                                ),
+                                varTable
                             );
-                            
-                            left = value;
-                        }
-                        
-                        Operand result = generateBinaryOperation(
-                            left,
-                            right,
-                            b.realType(),
-                            BinaryOperationStatement.operation(b.operation())
+
+                        // tmp4
+                        TmpVariableOperand second =
+                            new TmpVariableOperand(
+                                new PrimitiveType(
+                                    PrimitiveType.Type.BOOL,
+                                    true
+                                ),
+                                varTable
+                            );
+
+                        // tmp3 = !a
+                        code.addStatement(
+                            new UnaryOperationStatement(
+                                first,
+                                left,
+                                UnaryOperationStatement.Operation.NOT)
                         );
-                        
-                        
-                        if(b.leftChild() instanceof VariableLeaf) {
-                            code.addStatement(
-                                new AssignmentStatement(lhv, result)
+                        // tmp4 = !b
+                        code.addStatement(
+                            new UnaryOperationStatement(
+                                second,
+                                right,
+                                UnaryOperationStatement.Operation.NOT)
+                        );
+
+                        // !a ? goto false : goto nextCondition
+                        code.addStatement(
+                            new IfGoToStatement(first, falseL, rightCond)
+                        );
+                        // !b ? goto false : goto true
+                        rightCond.setIndex(code.nextIndex());
+                        code.addStatement(
+                            new IfGoToStatement(second, falseL, trueL)
+                        );
+
+                        // tmp5
+                        TmpVariableOperand result =
+                            new TmpVariableOperand(
+                                new PrimitiveType(PrimitiveType.Type.BOOL, true),
+                                varTable
                             );
-                        } else {
-                            code.addStatement(
-                                new IndirectAssignmentStatement(lhv, result)
-                            );
-                        }
-                        
+
+                        // trueL:
+                        trueL.setIndex(code.nextIndex());
+
+                        // trueL: tmp5 = true
+                        code.addStatement(
+                            new AssignmentStatement(
+                                result,
+                                new ConstantOperand(
+                                    new PrimitiveType(PrimitiveType.Type.BOOL),
+                                    Boolean.TRUE
+                                )
+                            )
+                        );
+
+                        // goto next
+                        code.addStatement(new GoToStatement(next));
+
+                        // falseL:
+                        falseL.setIndex(code.nextIndex());
+
+                        // falseL: tmp5 = false
+                        code.addStatement(
+                            new AssignmentStatement(
+                                result,
+                                new ConstantOperand(
+                                    new PrimitiveType(PrimitiveType.Type.BOOL),
+                                    Boolean.FALSE
+                                )
+                            )
+                        );
+
+                        // next:
+                        next.setIndex(code.nextIndex());
+
                         return result;
                     }
-                    case ASSIGN:
+                    case BOOL_OR:
                     {
-                        return generateAssignment(b);
-                    }
-                    
-                }
-                
-                break;
-            }
-            case IF:
-                generateIf((IfNode) node);
-                break;
-            case FOR:
-                generateFor((ForNode) node);
-                break;
-            case WHILE:
-                generateWhile((WhileNode) node);
-                break;
-            case DO_WHILE:
-                generateDoWhile((DoWhileNode) node);
-                break;
-            case SWITCH:
-                generateSwitch((SwitchNode) node);
-                break;
-            case ELSE:
-            {
-                ElseNode e = (ElseNode) node;
-                for(ru.bmstu.iu9.compiler.syntax.tree.Statement stmt : 
-                        e.block) {
-                    
-                    generate(stmt.getNode());
-                }
-                break;
-            }
-            case CONSTANT:
-            {
-                ConstantLeaf constant = (ConstantLeaf)node;
-                
-                switch(constant.constantType()) {
-                    case INT:
-                    {
-                        return new ConstantOperand(
-                            constant.realType(),
-                            ((IntegerConstantLeaf)constant).value);
-                    }
-                    case DOUBLE:
-                    {
-                        return new ConstantOperand(
-                            constant.realType(),
-                            ((DoubleConstantLeaf)constant).value);
-                    }
-                    case CHAR:
-                    {
-                        return new ConstantOperand(
-                            constant.realType(),
-                            ((CharConstantLeaf)constant).value);
-                    }
-                    case BOOL:
-                    {
-                        return new ConstantOperand(
-                            constant.realType(),
-                            ((BoolConstantLeaf)constant).value);
+                        Operand left = generate(node.leftChild());
+                        Operand right = generate(node.rightChild());
+
+                        code.addStatement(
+                            new IfGoToStatement(left, trueL, rightCond)
+                        );
+                        rightCond.setIndex(code.nextIndex());
+                        code.addStatement(
+                            new IfGoToStatement(right, trueL, falseL)
+                        );
+
+                        TmpVariableOperand result =
+                            new TmpVariableOperand(
+                                new PrimitiveType(PrimitiveType.Type.BOOL, true),
+                                varTable
+                            );
+
+                        trueL.setIndex(code.nextIndex());
+
+                        code.addStatement(
+                            new AssignmentStatement(
+                                result,
+                                new ConstantOperand(
+                                    new PrimitiveType(PrimitiveType.Type.BOOL),
+                                    Boolean.TRUE
+                                )
+                            )
+                        );
+
+                        code.addStatement(new GoToStatement(next));
+
+                        falseL.setIndex(code.nextIndex());
+
+                        code.addStatement(
+                            new AssignmentStatement(
+                                result,
+                                new ConstantOperand(
+                                    new PrimitiveType(PrimitiveType.Type.BOOL),
+                                    Boolean.FALSE
+                                )
+                            )
+                        );
+
+                        next.setIndex(code.nextIndex());
+
+                        return result;
                     }
                     default:
-                        // @todo Report an error
-                        break;
+                        throw new UnexpectedOperationException(node.dInfo.position);
+                }
+            } else {
+                throw new UnexpectedOperationException(node.dInfo.position);
+            }
+        } catch(IRException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonGenerationException)new NonGenerationException()
+                    .initCause(ex);
+        }
+    }
+    
+    private void declareVariable(VariableDeclNode node)
+            throws IRException {
+
+        try {
+            NamedVariable variable = new NamedVariable(node.name, node.realType());
+            scopes.addVariable(variable);
+
+            varTable.add(variable);
+
+            if(node.value != null) {
+                Operand value = generate(node.value);
+
+                code.addStatement(
+                    new AssignmentStatement(
+                        new NamedVariableOperand(
+                            varTable,
+                            varTable.get(variable.name)
+                        ),
+                        value
+                    )
+                );
+            }
+        } catch(IRException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonGenerationException)new NonGenerationException()
+                    .initCause(ex);
+        }
+    }
+    
+    
+    private Operand generate(BaseNode node) throws IRException {
+        try {
+            switch(node.nodeType()) {
+                case BREAK:
+                {
+                    code.addStatement(
+                        new GoToStatement(csi.endOfBlockLabel)
+                    );
+                    break;
+                }
+                case CONTINUE:
+                {
+                    code.addStatement(
+                        new GoToStatement(csi.conditionLabel)
+                    );
+                    break;
+                }
+                case RETURN:
+                {
+                    generateReturn((ReturnNode) node);
+                    break;
+                }
+                case FUNCTION_DECL:
+                {
+                    FunctionDeclNode function = (FunctionDeclNode) node;
+                    varTable.add(new NamedVariable(
+                        function.name,
+                        function.realType()
+                    ));
+                    generateFunction(function);
+
+                    break;
+                }
+                case BLOCK:
+                {
+                    scopes.enterBlock();
+                    generateBlock((BlockNode<BaseNode>) node);
+                    scopes.leaveBlock();
+                    break;
+                }
+                case BLOCK_DECL:
+                {
+                    for(VariableDeclNode decl :
+                            (BlockDeclNode<VariableDeclNode>) node) {
+
+                        generate(decl);
+                    }
+                    break;
+                }
+                case VARIABLE:
+                {
+                    return new NamedVariableOperand(
+                        varTable,
+                        varTable.get(((VariableLeaf)node).name)
+                    );
+                }
+                case VAR_DECL:
+                {
+                    declareVariable((VariableDeclNode) node);
+
+                    break;
+                }
+                case UNARY_OPERATION:
+                {
+                    UnaryOperationNode u = (UnaryOperationNode)node;
+
+                    Operand op = generate(u.node);
+
+                    TmpVariableOperand result =
+                        new TmpVariableOperand(
+                            u.realType(),
+                            varTable
+                        );
+
+                    code.addStatement(
+                        new UnaryOperationStatement(
+                            result,
+                            op,
+                            UnaryOperationStatement.operation(u.operation()))
+                    );
+
+                    return result;
+                }
+                case BINARY_OPERATION:
+                {
+                    BinaryOperationNode b = (BinaryOperationNode)node;
+
+                    switch(b.operation()) {
+                        case ARRAY_ELEMENT:
+                        {
+                            return generateArrayIndex(b);
+                        }
+                        /**
+                         * tmp1 = ((a.i).j);
+                         * a - address or value?
+                         * a [MEMBER_SELECT] i - address or value?
+                         * (a.i) [MEMBER_SELECT] j - address or value?
+                         */
+                        case MEMBER_SELECT:
+                        {
+                            return generateStructField(b);
+                        }
+                        case MINUS:
+                        case DIV:
+                        case MUL:
+                        case MOD:
+                        case PLUS:
+                        case BITWISE_SHIFT_RIGHT:
+                        case BITWISE_SHIFT_LEFT:
+                        case GREATER:
+                        case GREATER_OR_EQUAL:
+                        case LESS:
+                        case LESS_OR_EUQAL:
+                        case NOT_EQUAL:
+                        case EQUAL:
+                        case BITWISE_AND:
+                        case BITWISE_XOR:
+                        case BITWISE_OR:
+                        {
+                            Operand left =
+                                generate(b.leftChild());
+                            Operand right =
+                                generate(b.rightChild());
+
+                            return generateBinaryOperation(
+                                left,
+                                right,
+                                b.realType(),
+                                BinaryOperationStatement.operation(b.operation()));
+                        }
+                        case BOOL_AND:
+                        case BOOL_OR:
+                        {
+                            return generateBoolExpression(b);
+                        }
+                        case BITWISE_AND_ASSIGN:
+                        case BITWISE_XOR_ASSIGN:
+                        case BITWISE_SHIFT_RIGHT_ASSIGN:
+                        case BITWISE_SHIFT_LEFT_ASSIGN:
+                        case BITWISE_OR_ASSIGN:
+                        case MOD_ASSIGN:
+                        case DIV_ASSIGN:
+                        case MUL_ASSIGN:
+                        case MINUS_ASSIGN:
+                        case PLUS_ASSIGN:
+                        {
+                            VariableOperand lhv =
+                                generateLeftHandValue(b.leftChild());
+
+                            VariableOperand left =
+                                (VariableOperand)generate(b.leftChild());
+                            VariableOperand right =
+                                (VariableOperand) generate(b.rightChild());
+
+                            if (left.type().is(PrimitiveType.Type.POINTER)) {
+                                TmpVariableOperand value =
+                                    new TmpVariableOperand(
+                                        ((PointerType)left.type()).pointerType,
+                                        varTable);
+
+                                code.addStatement(
+                                    new UnaryOperationStatement(
+                                        left,
+                                        value,
+                                        UnaryOperationStatement.Operation.DEREF
+                                    )
+                                );
+
+                                left = value;
+                            }
+
+                            Operand result = generateBinaryOperation(
+                                left,
+                                right,
+                                b.realType(),
+                                BinaryOperationStatement.operation(b.operation())
+                            );
+
+
+                            if(b.leftChild() instanceof VariableLeaf) {
+                                code.addStatement(
+                                    new AssignmentStatement(lhv, result)
+                                );
+                            } else {
+                                code.addStatement(
+                                    new IndirectAssignmentStatement(lhv, result)
+                                );
+                            }
+
+                            return result;
+                        }
+                        case ASSIGN:
+                        {
+                            return generateAssignment(b);
+                        }
+
+                    }
+
+                    break;
+                }
+                case IF:
+                    generateIf((IfNode) node);
+                    break;
+                case FOR:
+                    generateFor((ForNode) node);
+                    break;
+                case WHILE:
+                    generateWhile((WhileNode) node);
+                    break;
+                case DO_WHILE:
+                    generateDoWhile((DoWhileNode) node);
+                    break;
+                case SWITCH:
+                    generateSwitch((SwitchNode) node);
+                    break;
+                case ELSE:
+                {
+                    ElseNode e = (ElseNode) node;
+                    for(ru.bmstu.iu9.compiler.syntax.tree.Statement stmt :
+                            e.block) {
+
+                        generate(stmt.getNode());
+                    }
+                    break;
+                }
+                case CONSTANT:
+                {
+                    ConstantLeaf constant = (ConstantLeaf)node;
+
+                    switch(constant.constantType()) {
+                        case INT:
+                        {
+                            return new ConstantOperand(
+                                constant.realType(),
+                                ((IntegerConstantLeaf)constant).value);
+                        }
+                        case DOUBLE:
+                        {
+                            return new ConstantOperand(
+                                constant.realType(),
+                                ((DoubleConstantLeaf)constant).value);
+                        }
+                        case CHAR:
+                        {
+                            return new ConstantOperand(
+                                constant.realType(),
+                                ((CharConstantLeaf)constant).value);
+                        }
+                        case BOOL:
+                        {
+                            return new ConstantOperand(
+                                constant.realType(),
+                                ((BoolConstantLeaf)constant).value);
+                        }
+                        default:
+                            // @todo Report an error
+                            break;
+                    }
+                }
+                case CALL:
+                {
+                    generateCall((CallNode) node);
+                    break;
+                }
+                default:
+                {
+                    // @todo Report an error
+                    break;
                 }
             }
-            case CALL:
-            {
-                generateCall((CallNode) node);
-                break;
-            }
-            default:
-            {
-                // @todo Report an error
-                break;
-            }
+        } catch(IRException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonGenerationException)new NonGenerationException()
+                    .initCause(ex);
         }
         return null;
     }
 
-    private Operand generateCall(CallNode node) {
-        List<Operand> args = new LinkedList<Operand>();
+    private Operand generateCall(CallNode node)
+            throws IRException {
 
-        for(ExpressionNode arg : node.arguments) {
-            args.add(generate(arg));
-        }
+        try {
+            List<Operand> args = new LinkedList<Operand>();
 
-        VariableOperand function = (VariableOperand) generate(node.function);
+            for(ExpressionNode arg : node.arguments) {
+                args.add(generate(arg));
+            }
 
-        for(Operand arg : args) {
-            code.addStatement(new ParamStatement(arg));
-        }
+            VariableOperand function = (VariableOperand) generate(node.function);
 
-        if (!node.realType().is(PrimitiveType.Type.VOID)) {
-            TmpVariableOperand result =
-                new TmpVariableOperand(node.realType(), varTable);
+            for(Operand arg : args) {
+                code.addStatement(new ParamStatement(arg));
+            }
 
-            code.addStatement(new CallStatement(function, args.size(), result));
+            if (!node.realType().is(PrimitiveType.Type.VOID)) {
+                TmpVariableOperand result =
+                    new TmpVariableOperand(node.realType(), varTable);
 
-            return result;
-        } else {
-            code.addStatement(new CallStatement(function, args.size()));
+                code.addStatement(new CallStatement(function, args.size(), result));
 
-            return null;
+                return result;
+            } else {
+                code.addStatement(new CallStatement(function, args.size()));
+
+                return null;
+            }
+        } catch(IRException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonGenerationException)new NonGenerationException()
+                    .initCause(ex);
         }
     }
 
-    private void generateFor(ForNode node) {
-        scopes.enterBlock();
+    private void generateFor(ForNode node)
+            throws IRException {
 
-        generate(node.initialization);
-        Operand condition = generate(node.expression);
+        try {
+            scopes.enterBlock();
 
-        csi.renew();
+            generate(node.initialization);
+            Operand condition = generate(node.expression);
 
-        Label block = new Label();
+            csi.renew();
 
-        csi.conditionLabel.setIndex(code.nextIndex());
-        code.addStatement(
-            new IfGoToStatement(condition, block, csi.endOfBlockLabel)
-        );
-        block.setIndex(code.nextIndex());
+            Label block = new Label();
 
-        generate(node.block);
-        generate(node.step);
-        code.addStatement(new GoToStatement(csi.conditionLabel));
-        csi.endOfBlockLabel.setIndex(code.nextIndex());
+            csi.conditionLabel.setIndex(code.nextIndex());
+            code.addStatement(
+                new IfGoToStatement(condition, block, csi.endOfBlockLabel)
+            );
+            block.setIndex(code.nextIndex());
 
-        scopes.leaveBlock();
+            generate(node.block);
+            generate(node.step);
+            code.addStatement(new GoToStatement(csi.conditionLabel));
+            csi.endOfBlockLabel.setIndex(code.nextIndex());
+
+            scopes.leaveBlock();
+        } catch(IRException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonGenerationException)new NonGenerationException()
+                    .initCause(ex);
+        }
     }
 
-    private void generateSwitch(SwitchNode node) {
-        scopes.enterBlock();
+    private void generateSwitch(SwitchNode node)
+            throws IRException {
 
-        Operand expr = generate(node.expression);
-        
-        csi.renew();
-        Label defaultLabel = new Label();
-        
-        for(CaseNode c : node.cases) {
-            Label caseL = new Label();
-            
-            Operand caseExpr = generate(c.expression);
-            
-            TmpVariableOperand condition = 
-                new TmpVariableOperand(
-                    new PrimitiveType(PrimitiveType.Type.BOOL),
-                    varTable
+        try {
+            scopes.enterBlock();
+
+            Operand expr = generate(node.expression);
+
+            csi.renew();
+            Label defaultLabel = new Label();
+
+            for(CaseNode c : node.cases) {
+                Label caseL = new Label();
+
+                Operand caseExpr = generate(c.expression);
+
+                TmpVariableOperand condition =
+                    new TmpVariableOperand(
+                        new PrimitiveType(PrimitiveType.Type.BOOL),
+                        varTable
+                    );
+
+                code.addStatement(
+                    new BinaryOperationStatement(
+                        expr,
+                        caseExpr,
+                        condition,
+                        BinaryOperationStatement.Operation.EQUAL)
                 );
-            
+
+                code.addStatement(
+                    new IfGoToStatement(condition, caseL, defaultLabel)
+                );
+
+                caseL.setIndex(code.nextIndex());
+
+                generate(c.block);
+
+                code.addStatement(new GoToStatement(defaultLabel));
+            }
+
+            if(node.defaultNode != null) {
+                defaultLabel.setIndex(code.nextIndex());
+
+                generate(node.defaultNode.block);
+                csi.endOfBlockLabel.setIndex(code.nextIndex());
+            } else {
+                csi.endOfBlockLabel.setIndex(code.nextIndex());
+                defaultLabel.setIndex(code.nextIndex());
+            }
+
+            scopes.leaveBlock();
+        } catch(IRException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonGenerationException)new NonGenerationException()
+                    .initCause(ex);
+        }
+    }
+    
+    private void generateDoWhile(DoWhileNode node)
+            throws IRException {
+
+        try {
+            scopes.enterBlock();
+
+            Operand condition = generate(node.expression);
+
+            csi.renew();
+
+            Label blockLabel = new Label();
+            csi.conditionLabel.setIndex(code.nextIndex());
+
+            generate(node.block);
+
             code.addStatement(
-                new BinaryOperationStatement(
-                    expr,
-                    caseExpr,
+                new IfGoToStatement(
                     condition,
-                    BinaryOperationStatement.Operation.EQUAL)
+                    blockLabel,
+                    csi.endOfBlockLabel
+                )
             );
-            
+
+            csi.endOfBlockLabel.setIndex(code.nextIndex());
+
+            scopes.leaveBlock();
+        } catch(IRException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonGenerationException)new NonGenerationException()
+                    .initCause(ex);
+        }
+    }
+    
+    private void generateWhile(WhileNode node)
+            throws IRException {
+
+        try {
+            scopes.enterBlock();
+
+            Operand condition = generate(node.expression);
+
+            csi.renew();
+            Label blockLabel = new Label();
+
+            csi.conditionLabel.setIndex(code.nextIndex());
+
             code.addStatement(
-                new IfGoToStatement(condition, caseL, defaultLabel)
+                new IfGoToStatement(
+                    condition,
+                    blockLabel,
+                    csi.endOfBlockLabel)
             );
 
-            caseL.setIndex(code.nextIndex());
+            blockLabel.setIndex(code.nextIndex());
 
-            generate(c.block);
-            
-            code.addStatement(new GoToStatement(defaultLabel));
-        }
-        
-        if(node.defaultNode != null) {
-            defaultLabel.setIndex(code.nextIndex());
-            
-            generate(node.defaultNode.block);
+            generate(node.block);
+
+            code.addStatement(
+                new GoToStatement(csi.conditionLabel));
+
             csi.endOfBlockLabel.setIndex(code.nextIndex());
-        } else {
-            csi.endOfBlockLabel.setIndex(code.nextIndex());
-            defaultLabel.setIndex(code.nextIndex());
+
+            scopes.leaveBlock();
+        } catch(IRException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonGenerationException)new NonGenerationException()
+                    .initCause(ex);
         }
-
-        scopes.leaveBlock();
     }
     
-    private void generateDoWhile(DoWhileNode node) {
-        scopes.enterBlock();
+    private void generateIf(IfNode node)
+            throws IRException {
 
-        Operand condition = generate(node.expression);
-        
-        csi.renew();
+        try {
+            scopes.enterBlock();
 
-        Label blockLabel = new Label();
-        csi.conditionLabel.setIndex(code.nextIndex());
-        
-        generate(node.block);
-        
-        code.addStatement(
-            new IfGoToStatement(
-                condition,
-                blockLabel,
-                csi.endOfBlockLabel
-            )
-        );
-        
-        csi.endOfBlockLabel.setIndex(code.nextIndex());
+            Operand condition = generate(node.condition);
 
-        scopes.leaveBlock();
-    }
-    
-    private void generateWhile(WhileNode node) {
-        scopes.enterBlock();
+            Label trueL = new Label();
+            Label falseL = new Label();
 
-        Operand condition = generate(node.expression);
-        
-        csi.renew();
-        Label blockLabel = new Label();
-        
-        csi.conditionLabel.setIndex(code.nextIndex());
-        
-        code.addStatement(
-            new IfGoToStatement(
-                condition, 
-                blockLabel, 
-                csi.endOfBlockLabel)
-        );
-        
-        blockLabel.setIndex(code.nextIndex());
-        
-        generate(node.block);
-        
-        code.addStatement(
-            new GoToStatement(csi.conditionLabel));
-        
-        csi.endOfBlockLabel.setIndex(code.nextIndex());
+            code.addStatement(
+                    new IfGoToStatement(condition, trueL, falseL)
+            );
 
-        scopes.leaveBlock();
-    }
-    
-    private void generateIf(IfNode node) {
-        scopes.enterBlock();
+            trueL.setIndex(code.nextIndex());
 
-        Operand condition = generate(node.condition);
-        
-        Label trueL = new Label();
-        Label falseL = new Label();
-        
-        code.addStatement(
-            new IfGoToStatement(condition, trueL, falseL)
-        );
-        
-        trueL.setIndex(code.nextIndex());
-        
-        generate(node.block);
-        
-        if(node.elseNode != null) {
-            Label endOfBlock = new Label();
-            code.addStatement(new GoToStatement(endOfBlock));
-            falseL.setIndex(code.nextIndex());
-            
-            generate(node.elseNode);
-            endOfBlock.setIndex(code.nextIndex());
-        } else {
-            falseL.setIndex(code.nextIndex());
+            generate(node.block);
+
+            if(node.elseNode != null) {
+                Label endOfBlock = new Label();
+                code.addStatement(new GoToStatement(endOfBlock));
+                falseL.setIndex(code.nextIndex());
+
+                generate(node.elseNode);
+                endOfBlock.setIndex(code.nextIndex());
+            } else {
+                falseL.setIndex(code.nextIndex());
+            }
+
+            scopes.leaveBlock();
+    //        code.addStatement(new ReturnStatement());
+        } catch(IRException ex) {
+            throw ex;
+        } catch(Exception ex) {
+            throw (NonGenerationException)new NonGenerationException()
+                    .initCause(ex);
         }
-
-        scopes.leaveBlock();
-//        code.addStatement(new ReturnStatement());
     }
     
     private Operand generateBinaryOperation(

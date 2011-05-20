@@ -255,6 +255,34 @@ final class CallStatement extends Statement {
     public final VariableOperand result;
 }
 
+final class IndirectCallStatement extends Statement {
+    public IndirectCallStatement(
+            VariableOperand functionPointer,
+            int argsNumber,
+            VariableOperand lhv) {
+
+        super(Operation.CALL);
+        this.functionPointer = functionPointer;
+        this.argsNumber =
+            new ConstantOperand(
+                new PrimitiveType(PrimitiveType.Type.INT, true),
+                argsNumber
+            );
+        this.result = lhv;
+    }
+
+    public IndirectCallStatement(
+            VariableOperand functionPointer,
+            int argsNumber) {
+
+        this(functionPointer, argsNumber, null);
+    }
+
+    public final VariableOperand functionPointer;
+    public final ConstantOperand argsNumber;
+    public final VariableOperand result;
+}
+
 final class UnaryOperationStatement extends Statement {
     public enum Operation {
         POST_INC, POST_DEC, MINUS, PLUS, REF, DEREF, PRE_DEC, PRE_INC, 

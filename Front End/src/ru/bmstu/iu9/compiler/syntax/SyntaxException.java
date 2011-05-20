@@ -1,7 +1,6 @@
 package ru.bmstu.iu9.compiler.syntax;
 
-import ru.bmstu.iu9.compiler.Position;
-import ru.bmstu.iu9.compiler.PositionedException;
+import ru.bmstu.iu9.compiler.*;
 import ru.bmstu.iu9.compiler.lexis.token.Token;
 
 /**
@@ -10,17 +9,35 @@ import ru.bmstu.iu9.compiler.lexis.token.Token;
  *
  * @author anton.bobukh
  */
-public class SyntaxException extends PositionedException {
-    protected SyntaxException(Position position) {
-        super(position);
+public class SyntaxException extends LoggedException {
+    protected SyntaxException() {
+        super("ru.bmtsu.iu9.compiler.syntax");
     }
 
-    protected SyntaxException(String message, Position position) {
-        super(message, position);
+    protected SyntaxException(String message) {
+        super("ru.bmtsu.iu9.compiler.syntax", message);
     }
 }
 
-class InvalidTokenException extends SyntaxException {
+class PositionedSyntaxException extends SyntaxException {
+    public PositionedSyntaxException(Position position) {
+        super();
+        this.position = position;
+    }
+    public PositionedSyntaxException(String message, Position position) {
+        super(message);
+        this.position = position;
+    }
+
+    @Override
+    public String getMessage() {
+        return super.getMessage() + " at " + position;
+    }
+
+    public final Position position;
+}
+
+class InvalidTokenException extends PositionedSyntaxException {
     public InvalidTokenException(
             Token found,
             Token required,
@@ -38,7 +55,7 @@ class InvalidTokenException extends SyntaxException {
     public final Token required;
 }
 
-class SkippingTokenException extends SyntaxException {
+class SkippingTokenException extends PositionedSyntaxException {
     public SkippingTokenException(Token token, Position position) {
         super("Skipping token " + token, position);
         this.token = token;

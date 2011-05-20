@@ -6,12 +6,15 @@ package ru.bmstu.iu9.compiler;
  *
  * @author anton.bobukh
  */
-public class PositionedException extends LoggingException {
-    public PositionedException(Position position) {
+class aPositionedException extends CompilerException {
+    public aPositionedException(Position position) {
         super();
         this.position = position;
     }
-    public PositionedException(String message, Position position) {
+    public aPositionedException(
+            String message,
+            Position position) {
+
         super(message);
         this.position = position;
     }

@@ -74,7 +74,7 @@ class CodePoint implements Cloneable {
  * а счетчик позиции в строке сбрасывает в 1.
  * <br/>
  * <pre>
- * Program program = new Program(
+ * Program text = new Program(
  *     "func foo(i, j int) int {" +
  *     "   var a, b int;" + 
  *     "   a = i + j;" +
@@ -85,7 +85,7 @@ class CodePoint implements Cloneable {
  * 
  * List<CodePoint> codePoints = new LinkedList<CodePoint>();
  * 
- * for(CodePoint codePoint : program) {
+ * for(CodePoint codePoint : text) {
  *     codePoints.add(codePoint);
  * }
  * </pre>
@@ -104,7 +104,7 @@ class Program implements Iterable<CodePoint> {
      */
     public Program(String program, int terminator) {
         this.terminator = terminator;
-        this.program = program + Character.toChars(this.terminator).toString();
+        this.text = program + Character.toChars(this.terminator).toString();
     }
     /**
      * Создает объект Program. При этом в конец программы будет приписан
@@ -115,19 +115,20 @@ class Program implements Iterable<CodePoint> {
      */
     public Program(String program) {
         this.terminator = '$';
-        this.program = program + '$';
+        this.text = program + '$';
     }
     
     /**
      * Класс CodePointIterator осуществляет итерирование по тексту программы.
      */
-    public class CodePointIterator implements Iterator<CodePoint> {
+    public static class CodePointIterator implements Iterator<CodePoint> {
         /**
          * Создает объект CodePointIterator, при этом текущим становится первый 
          * символ текста программы в позиции <1, 1, 0>.
          */
-        public CodePointIterator() {
-            current = new CodePoint(program.codePointAt(0), 
+        public CodePointIterator(Program program) {
+            this.program = program;
+            current = new CodePoint(program.text.codePointAt(0),
                     new Position(1, 1, 0));
         }
 
@@ -142,7 +143,7 @@ class Program implements Iterable<CodePoint> {
          *         в противном случае
          */
         public boolean hasNext() {
-            return program.codePointAt(index) != terminator;
+            return program.text.codePointAt(index) != program.terminator;
         }
 
         /**
@@ -156,15 +157,15 @@ class Program implements Iterable<CodePoint> {
          *         соответствующий символу в новой позиции
          */
         public CodePoint next() {
-            if(program.codePointAt(index) == '\n')
+            if(program.text.codePointAt(index) == '\n')
             {
                 ++line;
                 position = 0;
             }
             ++position;
-            index = program.offsetByCodePoints(index, 1);
+            index = program.text.offsetByCodePoints(index, 1);
             
-            current.setValue(program.codePointAt(index));
+            current.setValue(program.text.codePointAt(index));
             current.setPosition(new Position(line, position, index));
 
             return current;
@@ -181,16 +182,16 @@ class Program implements Iterable<CodePoint> {
          */
         public CodePoint watchNext() {
             int l = line, p = position;
-            if(program.codePointAt(index) == '\n')
+            if(program.text.codePointAt(index) == '\n')
             {
                 ++l;
                 p = 0;
             }
             ++p;
             
-            int i = program.offsetByCodePoints(index, 1);
+            int i = program.text.offsetByCodePoints(index, 1);
             
-            return new CodePoint(program.codePointAt(i), new Position(l, p, i));
+            return new CodePoint(program.text.codePointAt(i), new Position(l, p, i));
         }
 
         /**
@@ -224,16 +225,16 @@ class Program implements Iterable<CodePoint> {
          */
         public CodePoint advance(int count) {
             while (count > 0 && hasNext()) {
-                if(program.codePointAt(index) == '\n')
+                if(program.text.codePointAt(index) == '\n')
                 {
                     line++;
                     position = 0;
                 }
                 position++;
-                index = program.offsetByCodePoints(index, 1);
+                index = program.text.offsetByCodePoints(index, 1);
                 count--;
             }
-            current.setValue(program.codePointAt(index));
+            current.setValue(program.text.codePointAt(index));
             current.setPosition(new Position(line, position, index));
             
             return current;
@@ -248,6 +249,7 @@ class Program implements Iterable<CodePoint> {
         private int line = 1;
         private int position = 1;
         private final CodePoint current;
+        private Program program;
     }
     
     /**
@@ -257,14 +259,14 @@ class Program implements Iterable<CodePoint> {
      * @return Итератор по {@link ru.bmstu.iu9.compiler.lexis.CodePoint CodePoint}ам
      */
     public CodePointIterator iterator() {
-        return new CodePointIterator();
+        return new CodePointIterator(this);
     }
     @Override
     public String toString() {
-        return program;
+        return text;
     }
-    public int length() { return program.length(); }
+    public int length() { return text.length(); }
     
-    private final String program;
+    private final String text;
     private final int terminator;
 }

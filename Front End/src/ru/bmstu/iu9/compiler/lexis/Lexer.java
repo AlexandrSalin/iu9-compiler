@@ -147,12 +147,12 @@ class Scanner implements Iterable<Token> {
      * Создает объект Scanner, который будет итерировать по лексемам указанного 
      * текста программы.
      * 
-     * @param program текст программы, по лексемам которого будет производиться
+     * @param text текст программы, по лексемам которого будет производиться
      * итерирование
      */
-    public Scanner(String program) {
-        this.program = new Program(program);
-        this.iterator = this.program.iterator();
+    public Scanner(String text) {
+        this.text = text;
+        this.iterator = new Program(text).iterator();
     }
     
     /**
@@ -241,10 +241,10 @@ class Scanner implements Iterable<Token> {
             case '.':
                 Matcher matcher = 
                     Pattern.compile("\\.[0-9]+([eE][-+]?[0-9]+)?\\b").
-                        matcher(program.toString()).
+                        matcher(text).
                             region(
                                 current.position().index(), 
-                                program.toString().length());
+                                text.length());
 
                 if (matcher.lookingAt()) {
                     return new DoubleConstantToken(
@@ -447,10 +447,10 @@ class Scanner implements Iterable<Token> {
                 if(Character.isDigit(iterator.current().value())) {
                     Matcher matcherDouble = 
                         Pattern.compile("(([0-9]+\\.[0-9]*([eE][-+]?[0-9]+)?)|([0-9]+[eE][-+]?[0-9]+))\\b").
-                            matcher(program.toString()).
+                            matcher(text).
                                 region(
                                     current.position().index(), 
-                                    program.toString().length());
+                                    text.length());
 
                     if (matcherDouble.lookingAt()) {
                         double value = 0.0;
@@ -493,7 +493,7 @@ class Scanner implements Iterable<Token> {
                             
                             try {
                                 value = Integer.parseInt(
-                                    program.toString().substring(
+                                    text.substring(
                                         current.position().index(),
                                         iterator.current().position().index()
                                     ),
@@ -501,7 +501,7 @@ class Scanner implements Iterable<Token> {
                                 );
                             } catch(NumberFormatException ex) {
                                 throw new InvalidNumberFormatException(
-                                    program.toString().substring(
+                                    text.substring(
                                         current.position().index(),
                                         iterator.current().position().index()
                                     ),
@@ -517,7 +517,7 @@ class Scanner implements Iterable<Token> {
                             
                             try {
                                 value = Integer.parseInt(
-                                    program.toString().substring(
+                                    text.substring(
                                         current.position().index(),
                                         iterator.current().position().index()
                                     ),
@@ -525,7 +525,7 @@ class Scanner implements Iterable<Token> {
                                 );
                             } catch(NumberFormatException ex) {
                                 throw new InvalidNumberFormatException(
-                                    program.toString().substring(
+                                    text.substring(
                                         current.position().index(),
                                         iterator.current().position().index()
                                     ),
@@ -541,15 +541,15 @@ class Scanner implements Iterable<Token> {
                         
                         try {
                             value = Integer.parseInt(
-                                program.toString().substring(
+                                text.substring(
                                     current.position().index(), 
                                     iterator.current().position().index()
                             ));
                         } catch(NumberFormatException ex) {
                             throw new InvalidNumberFormatException(
-                                program.toString().substring(
-                                    current.position().index(),
-                                    iterator.current().position().index()
+                                text.substring(
+                                        current.position().index(),
+                                        iterator.current().position().index()
                                 ),
                                 iterator.current().position()
                             );
@@ -567,7 +567,7 @@ class Scanner implements Iterable<Token> {
                         iterator.next();
                     }
                     
-                    String keyword = program.toString().substring(
+                    String keyword = text.substring(
                         current.position().index(), 
                         iterator.current().position().index());
                     
@@ -716,9 +716,9 @@ class Scanner implements Iterable<Token> {
         }
         return !iterator.hasNext();
     }
-    
+
+    private String text;
     private CodePointIterator iterator;
-    private Program program;
     private final List<Character> reservedSymbols = Arrays.asList(
         '.', ',', ':', ';', '-', '+', '/', '\'', '%', '*', '&', '>', '<', '=',
         '[', ']', '{', '}', '(', ')', '|', '^', '!', '~'
