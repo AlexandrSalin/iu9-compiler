@@ -249,6 +249,12 @@ final class CallStatement extends Statement {
     public CallStatement(VariableOperand function, int argsNumber) {
         this(function, argsNumber, null);
     }
+
+    @Override
+    public String toString() {
+        return (result == null ? "" : result + " = ") +
+                "call " + function + " : " + argsNumber;
+    }
     
     public final VariableOperand function;
     public final ConstantOperand argsNumber;

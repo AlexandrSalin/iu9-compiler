@@ -642,7 +642,7 @@ public class BaseNode {
                     BlockNode arguments = 
                         context.deserialize(obj, BlockNode.class);
                     
-                    obj = object.getAsJsonObject("functionPointer");
+                    obj = object.getAsJsonObject("function");
                     assert obj == null;
                     ExpressionNode function = 
                             context.deserialize(obj, ExpressionNode.class);

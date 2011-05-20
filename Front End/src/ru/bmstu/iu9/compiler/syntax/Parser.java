@@ -1095,7 +1095,7 @@ public class Parser {
                     return ExpressionNode.InvalidNode(pos);
             }
             nextToken();
-            return new UnaryOperationNode(operation, RefDeref(), pos);
+            return new UnaryOperationNode(operation, DExpression(), pos);
         } else {
             return EExpression();
         }

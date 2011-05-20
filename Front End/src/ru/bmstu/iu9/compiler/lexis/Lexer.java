@@ -500,13 +500,16 @@ class Scanner implements Iterable<Token> {
                                     16
                                 );
                             } catch(NumberFormatException ex) {
-                                throw new InvalidNumberFormatException(
-                                    text.substring(
-                                        current.position().index(),
-                                        iterator.current().position().index()
-                                    ),
-                                    iterator.current().position()
-                                );
+                                throw (InvalidNumberFormatException)
+                                    new InvalidNumberFormatException(
+                                        text.substring(
+                                            current.position().index(),
+                                            iterator.current().position().index()
+                                        )
+                                    )
+                                    .initPosition(
+                                        iterator.current().position())
+                                    .Log("ru.bmstu.iu9.compiler.lexis");
                             }
                         } else {
                             while (iterator.hasNext() && 
@@ -524,13 +527,16 @@ class Scanner implements Iterable<Token> {
                                     8
                                 );
                             } catch(NumberFormatException ex) {
-                                throw new InvalidNumberFormatException(
-                                    text.substring(
-                                        current.position().index(),
-                                        iterator.current().position().index()
-                                    ),
-                                    iterator.current().position()
-                                );
+                                throw (InvalidNumberFormatException)
+                                    new InvalidNumberFormatException(
+                                        text.substring(
+                                            current.position().index(),
+                                            iterator.current().position().index()
+                                        )
+                                    )
+                                    .initPosition(
+                                        iterator.current().position())
+                                    .Log("ru.bmstu.iu9.compiler.lexis");
                             }
                         }
                     } else {
@@ -546,13 +552,16 @@ class Scanner implements Iterable<Token> {
                                     iterator.current().position().index()
                             ));
                         } catch(NumberFormatException ex) {
-                            throw new InvalidNumberFormatException(
-                                text.substring(
+                            throw (InvalidNumberFormatException)
+                                new InvalidNumberFormatException(
+                                    text.substring(
                                         current.position().index(),
                                         iterator.current().position().index()
-                                ),
-                                iterator.current().position()
-                            );
+                                    )
+                                )
+                                .initPosition(
+                                    iterator.current().position())
+                                .Log("ru.bmstu.iu9.compiler.lexis");
                         }
                     }
                     
@@ -651,18 +660,20 @@ class Scanner implements Iterable<Token> {
                             if (keyword.equals("true"))
                                 type = Token.Type.TRUE;
                             break;
-                        default:
-                            return new IdentifierToken(
-                                current.position(),
-                                iterator.current().position(),
-                                keyword
-                            );
                     }
-                    return new SpecialToken(
-                        current.position(),
-                        iterator.current().position(),
-                        type
-                    );
+
+                    if (type != null)
+                        return new SpecialToken(
+                            current.position(),
+                            iterator.current().position(),
+                            type
+                        );
+                    else
+                        return new IdentifierToken(
+                            current.position(),
+                            iterator.current().position(),
+                            keyword
+                        );
 
                     
                 } else {

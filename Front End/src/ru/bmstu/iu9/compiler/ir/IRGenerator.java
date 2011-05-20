@@ -206,10 +206,9 @@ public class IRGenerator {
                         case MEMBER_SELECT:
                             return generateStructField(o);
                         default:
-                            throw new InvalidLeftHandValueException(
-                                o.operation(),
-                                o.dInfo.position
-                            );
+                            throw
+                                new InvalidLeftHandValueException(o.operation())
+                                    .initPosition(o.dInfo.position);
                     }
                 }
                 case UNARY_OPERATION:
@@ -234,10 +233,8 @@ public class IRGenerator {
                             generate(o.node);
                         }
                     } else {
-                        throw new InvalidLeftHandValueException(
-                            o.operation(),
-                            o.dInfo.position
-                        );
+                        throw new InvalidLeftHandValueException(o.operation())
+                                .initPosition(o.dInfo.position);
                     }
                 }
                 default:
@@ -292,8 +289,8 @@ public class IRGenerator {
         } catch(IRException ex) {
             throw ex;
         } catch(Exception ex) {
-            throw (NonGenerationException)new NonGenerationException()
-                    .initCause(ex);
+            throw (NonGenerationException)new NonGenerationException(ex)
+                    .Log("ru.bmstu.iu9.compiler.ir");
         }
     }
     
@@ -304,42 +301,67 @@ public class IRGenerator {
 
         if (node.returnExpr != null) {
             Operand value = generate(node.returnExpr);
-            code.addStatement(new ReturnStatement(value));
+
+            if (returnValue == null)
+                returnValue =
+                    new TmpVariableOperand(value.type(), varTable);
+
+            // code.addStatement(new ReturnStatement(value));
+            code.addStatement(new AssignmentStatement(returnValue, value));
+            code.addStatement(new GoToStatement(returnLabel));
         } else {
-            code.addStatement(new ReturnStatement());
+            code.addStatement(new GoToStatement(returnLabel));
+            // code.addStatement(new ReturnStatement());
         }
     }
 
-    private void generateFunction(FunctionDeclNode node) {
+    private void generateFunction(FunctionDeclNode node) throws IRException {
+        try {
 
-        code = new Code();
-        codes.add(code);
+            returnLabel = new Label();
+            code = new Code();
+            codes.add(code);
 
-        scopes.enterBlock();
+            scopes.enterBlock();
 
-        FunctionType type = (FunctionType) node.realType();
-        for(FunctionType.Argument arg : type.arguments) {
-            varTable.add(new NamedVariable(arg.name, arg.type));
-        }
-
-        for(ru.bmstu.iu9.compiler.syntax.tree.Statement n : node.block) {
-            try {
-                generate(n.getNode());
-            } catch (IRException ex) {
-
+            FunctionType type = (FunctionType) node.realType();
+            for(FunctionType.Argument arg : type.arguments) {
+                varTable.add(new NamedVariable(arg.name, arg.type));
             }
+
+            for(ru.bmstu.iu9.compiler.syntax.tree.Statement n : node.block) {
+                try {
+                    generate(n.getNode());
+                } catch (IRException ex) {
+                    continue;
+                }
+            }
+
+            returnLabel.setIndex(code.nextIndex());
+
+            if (returnValue != null)
+                code.addStatement(new ReturnStatement(returnValue));
+            else
+                code.addStatement(new ReturnStatement());
+
+            scopes.leaveBlock();
+
+            code.print();
+        } catch(Exception ex) {
+            throw (NonGenerationException)new NonGenerationException(ex)
+                    .Log("ru.bmstu.iu9.compiler.ir");
         }
-
-        scopes.leaveBlock();
-
-        code.print();
     }
 
     private void generateBlock(BlockNode<BaseNode> node)
             throws IRException {
 
         for(BaseNode n : (BlockNode<BaseNode>)node) {
-            generate(n);
+            try {
+                generate(n);
+            } catch(IRException ex) {
+                continue;
+            }
         }
     }
     
@@ -519,16 +541,20 @@ public class IRGenerator {
                         return result;
                     }
                     default:
-                        throw new UnexpectedOperationException(node.dInfo.position);
+                        throw new UnexpectedOperationException()
+                                .initPosition(node.dInfo.position)
+                                .Log("ru.bmstu.iu9.compiler.ir");
                 }
             } else {
-                throw new UnexpectedOperationException(node.dInfo.position);
+                throw new UnexpectedOperationException()
+                        .initPosition(node.dInfo.position)
+                        .Log("ru.bmstu.iu9.compiler.ir");
             }
         } catch(IRException ex) {
             throw ex;
         } catch(Exception ex) {
-            throw (NonGenerationException)new NonGenerationException()
-                    .initCause(ex);
+            throw (NonGenerationException)new NonGenerationException(ex)
+                    .Log("ru.bmstu.iu9.compiler.ir");
         }
     }
     
@@ -536,7 +562,10 @@ public class IRGenerator {
             throws IRException {
 
         try {
-            NamedVariable variable = new NamedVariable(node.name, node.realType());
+            NamedVariable variable = new NamedVariable(
+                    node.name,
+                    node.realType()
+            );
             scopes.addVariable(variable);
 
             varTable.add(variable);
@@ -557,8 +586,8 @@ public class IRGenerator {
         } catch(IRException ex) {
             throw ex;
         } catch(Exception ex) {
-            throw (NonGenerationException)new NonGenerationException()
-                    .initCause(ex);
+            throw (NonGenerationException)new NonGenerationException(ex)
+                    .Log("ru.bmstu.iu9.compiler.ir");
         }
     }
     
@@ -691,7 +720,9 @@ public class IRGenerator {
                                 left,
                                 right,
                                 b.realType(),
-                                BinaryOperationStatement.operation(b.operation()));
+                                BinaryOperationStatement.operation(
+                                    b.operation()
+                            ));
                         }
                         case BOOL_AND:
                         case BOOL_OR:
@@ -824,8 +855,7 @@ public class IRGenerator {
                 }
                 case CALL:
                 {
-                    generateCall((CallNode) node);
-                    break;
+                    return generateCall((CallNode) node);
                 }
                 default:
                 {
@@ -836,8 +866,8 @@ public class IRGenerator {
         } catch(IRException ex) {
             throw ex;
         } catch(Exception ex) {
-            throw (NonGenerationException)new NonGenerationException()
-                    .initCause(ex);
+            throw (NonGenerationException)new NonGenerationException(ex)
+                    .Log("ru.bmstu.iu9.compiler.ir");
         }
         return null;
     }
@@ -862,7 +892,9 @@ public class IRGenerator {
                 TmpVariableOperand result =
                     new TmpVariableOperand(node.realType(), varTable);
 
-                code.addStatement(new CallStatement(function, args.size(), result));
+                code.addStatement(
+                    new CallStatement(function, args.size(), result)
+                );
 
                 return result;
             } else {
@@ -873,8 +905,8 @@ public class IRGenerator {
         } catch(IRException ex) {
             throw ex;
         } catch(Exception ex) {
-            throw (NonGenerationException)new NonGenerationException()
-                    .initCause(ex);
+            throw (NonGenerationException)new NonGenerationException(ex)
+                    .Log("ru.bmstu.iu9.compiler.ir");
         }
     }
 
@@ -885,13 +917,13 @@ public class IRGenerator {
             scopes.enterBlock();
 
             generate(node.initialization);
+            csi.conditionLabel.setIndex(code.nextIndex());
             Operand condition = generate(node.expression);
 
             csi.renew();
 
             Label block = new Label();
 
-            csi.conditionLabel.setIndex(code.nextIndex());
             code.addStatement(
                 new IfGoToStatement(condition, block, csi.endOfBlockLabel)
             );
@@ -906,8 +938,8 @@ public class IRGenerator {
         } catch(IRException ex) {
             throw ex;
         } catch(Exception ex) {
-            throw (NonGenerationException)new NonGenerationException()
-                    .initCause(ex);
+            throw (NonGenerationException)new NonGenerationException(ex)
+                    .Log("ru.bmstu.iu9.compiler.ir");
         }
     }
 
@@ -966,8 +998,8 @@ public class IRGenerator {
         } catch(IRException ex) {
             throw ex;
         } catch(Exception ex) {
-            throw (NonGenerationException)new NonGenerationException()
-                    .initCause(ex);
+            throw (NonGenerationException)new NonGenerationException(ex)
+                    .Log("ru.bmstu.iu9.compiler.ir");
         }
     }
     
@@ -982,7 +1014,7 @@ public class IRGenerator {
             csi.renew();
 
             Label blockLabel = new Label();
-            csi.conditionLabel.setIndex(code.nextIndex());
+            blockLabel.setIndex(code.nextIndex());
 
             generate(node.block);
 
@@ -1000,8 +1032,8 @@ public class IRGenerator {
         } catch(IRException ex) {
             throw ex;
         } catch(Exception ex) {
-            throw (NonGenerationException)new NonGenerationException()
-                    .initCause(ex);
+            throw (NonGenerationException)new NonGenerationException(ex)
+                    .Log("ru.bmstu.iu9.compiler.ir");
         }
     }
     
@@ -1038,8 +1070,8 @@ public class IRGenerator {
         } catch(IRException ex) {
             throw ex;
         } catch(Exception ex) {
-            throw (NonGenerationException)new NonGenerationException()
-                    .initCause(ex);
+            throw (NonGenerationException)new NonGenerationException(ex)
+                    .Log("ru.bmstu.iu9.compiler.ir");
         }
     }
     
@@ -1078,8 +1110,8 @@ public class IRGenerator {
         } catch(IRException ex) {
             throw ex;
         } catch(Exception ex) {
-            throw (NonGenerationException)new NonGenerationException()
-                    .initCause(ex);
+            throw (NonGenerationException)new NonGenerationException(ex)
+                    .Log("ru.bmstu.iu9.compiler.ir");
         }
     }
     
@@ -1107,6 +1139,9 @@ public class IRGenerator {
     private Code code;
     private ControlStructureInfo csi = this.new ControlStructureInfo();
     private Scopes scopes = this.new Scopes();
+
+    private Label returnLabel;
+    private TmpVariableOperand returnValue;
     
 
     private class Scopes {

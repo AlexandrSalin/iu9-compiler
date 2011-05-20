@@ -10,29 +10,28 @@ import ru.bmstu.iu9.compiler.syntax.tree.*;
  *
  * @author anton.bobukh
  */
-public class SymanticException extends PositionedException {
-    protected SymanticException(Position position) {
-        super(position);
+public class SymanticException extends CompilerException {
+    protected SymanticException() {
+        super();
     }
 
-    protected SymanticException(String message, Position position) {
-        super(message, position);
+    protected SymanticException(String message) {
+        super(message);
     }
 }
 
 class NonAnalysisErrorException extends SymanticException {
-    public NonAnalysisErrorException(Position position) {
-        super(position);
+    public NonAnalysisErrorException() {
+        super();
     }
 }
 
 class IncompatibleTypesInStatementException extends SymanticException {
     public IncompatibleTypesInStatementException(
             BaseType typeOne,
-            BaseType typeTwo,
-            Position position) {
+            BaseType typeTwo) {
 
-        super("Incompatible types: " + typeOne + ", " + typeTwo, position);
+        super("Incompatible types: " + typeOne + ", " + typeTwo);
         this.typeOne = typeOne;
         this.typeTwo = typeTwo;
     }
@@ -44,12 +43,10 @@ class IncompatibleTypesInStatementException extends SymanticException {
 class UnexpectedTypeException extends SymanticException {
     public UnexpectedTypeException(
             BaseType found,
-            BaseType expected,
-            Position position) {
+            BaseType expected) {
 
         super(
-            "Unexpected type. Found " + found + ", required " + expected,
-            position
+            "Unexpected type. Found " + found + ", required " + expected
         );
         this.found = found;
         this.expected = expected.toString();
@@ -57,12 +54,10 @@ class UnexpectedTypeException extends SymanticException {
 
     public UnexpectedTypeException(
             BaseType found,
-            BaseType.Type expected,
-            Position position) {
+            BaseType.Type expected) {
 
         super(
-            "Unexpected type. Found " + found + ", required " + expected,
-            position
+            "Unexpected type. Found " + found + ", required " + expected
         );
         this.found = found;
         this.expected = expected.toString();
@@ -70,12 +65,10 @@ class UnexpectedTypeException extends SymanticException {
 
     public UnexpectedTypeException(
             BaseType found,
-            PrimitiveType.Type expected,
-            Position position) {
+            PrimitiveType.Type expected) {
 
         super(
-            "Unexpected type. Found " + found + ", required " + expected,
-            position
+            "Unexpected type. Found " + found + ", required " + expected
         );
         this.found = found;
         this.expected = expected.toString();
@@ -88,12 +81,10 @@ class UnexpectedTypeException extends SymanticException {
 class OperationIncompatibleWithTypeException extends SymanticException {
     public OperationIncompatibleWithTypeException(
             BinaryOperationNode.Operation operation,
-            BaseType type,
-            Position position) {
+            BaseType type) {
 
         super(
-            "Operation " + operation + " is incompatible with type " + type,
-            position
+            "Operation " + operation + " is incompatible with type " + type
         );
 
         this.operation = operation.toString();
@@ -102,12 +93,10 @@ class OperationIncompatibleWithTypeException extends SymanticException {
 
     public OperationIncompatibleWithTypeException(
             UnaryOperationNode.Operation operation,
-            BaseType type,
-            Position position) {
+            BaseType type) {
 
         super(
-            "Operation " + operation + " is incompatible with type " + type,
-            position
+            "Operation " + operation + " is incompatible with type " + type
         );
 
         this.operation = operation.toString();
@@ -119,11 +108,9 @@ class OperationIncompatibleWithTypeException extends SymanticException {
 }
 
 class UseOfUndeclaredVariableException extends SymanticException {
-    public UseOfUndeclaredVariableException(
-            String name,
-            Position position) {
+    public UseOfUndeclaredVariableException(String name) {
 
-        super("Use of undeclared variable \"" + name + "\"", position);
+        super("Use of undeclared variable \"" + name + "\"");
         this.name = name;
     }
 
@@ -131,11 +118,9 @@ class UseOfUndeclaredVariableException extends SymanticException {
 }
 
 class UseOfUndeclaredTypeException extends SymanticException {
-    public UseOfUndeclaredTypeException(
-            String typename,
-            Position position) {
+    public UseOfUndeclaredTypeException(String typename) {
 
-        super("Use of undeclared type \"" + typename + "\"", position);
+        super("Use of undeclared type \"" + typename + "\"");
         this.typename = typename;
     }
 
@@ -143,7 +128,7 @@ class UseOfUndeclaredTypeException extends SymanticException {
 }
 
 class MissingReturnStatementException extends SymanticException {
-    public MissingReturnStatementException(Position position) {
-        super("Missing return statement", position);
+    public MissingReturnStatementException() {
+        super("Missing return statement");
     }
 }

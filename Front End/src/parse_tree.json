@@ -1261,8 +1261,8 @@
                     "dInfo": {
                       "position": {
                         "line": 96,
-                        "position": 20,
-                        "index": 1352
+                        "position": 19,
+                        "index": 1351
                       }
                     },
                     "nodeType": 20
@@ -1291,7 +1291,7 @@
                 "position": {
                   "line": 97,
                   "position": 5,
-                  "index": 1362
+                  "index": 1361
                 }
               },
               "nodeType": 13
@@ -1303,7 +1303,7 @@
                   "position": {
                     "line": 97,
                     "position": 13,
-                    "index": 1370
+                    "index": 1369
                   }
                 },
                 "nodeType": 13
@@ -1313,7 +1313,7 @@
                 "position": {
                   "line": 97,
                   "position": 12,
-                  "index": 1369
+                  "index": 1368
                 }
               },
               "nodeType": 1
@@ -1323,7 +1323,7 @@
               "position": {
                 "line": 97,
                 "position": 10,
-                "index": 1367
+                "index": 1366
               }
             },
             "nodeType": 0
@@ -1336,7 +1336,7 @@
                   "position": {
                     "line": 100,
                     "position": 8,
-                    "index": 1396
+                    "index": 1395
                   }
                 },
                 "nodeType": 13
@@ -1348,7 +1348,7 @@
                   "position": {
                     "line": 100,
                     "position": 13,
-                    "index": 1401
+                    "index": 1400
                   }
                 },
                 "nodeType": 14
@@ -1358,7 +1358,7 @@
                 "position": {
                   "line": 100,
                   "position": 10,
-                  "index": 1398
+                  "index": 1397
                 }
               },
               "nodeType": 0
@@ -1372,7 +1372,7 @@
                 "position": {
                   "line": 102,
                   "position": 7,
-                  "index": 1432
+                  "index": 1431
                 }
               },
               "nodeType": 3
@@ -1387,7 +1387,7 @@
                       "position": {
                         "line": 101,
                         "position": 16,
-                        "index": 1423
+                        "index": 1422
                       }
                     },
                     "nodeType": 14
@@ -1396,7 +1396,7 @@
                     "position": {
                       "line": 101,
                       "position": 9,
-                      "index": 1416
+                      "index": 1415
                     }
                   },
                   "nodeType": 23
@@ -1408,10 +1408,181 @@
               "position": {
                 "line": 100,
                 "position": 5,
-                "index": 1393
+                "index": 1392
               }
             },
             "nodeType": 7
+          },
+          {
+            "expression": {
+              "name": "a",
+              "dInfo": {
+                "position": {
+                  "line": 106,
+                  "position": 12,
+                  "index": 1476
+                }
+              },
+              "nodeType": 13
+            },
+            "cases": {
+              "children": [
+                {
+                  "expression": {
+                    "value": 1,
+                    "constantType": 0,
+                    "dInfo": {
+                      "position": {
+                        "line": 107,
+                        "position": 14,
+                        "index": 1494
+                      }
+                    },
+                    "nodeType": 14
+                  },
+                  "block": {
+                    "children": [
+                      {
+                        "returnExpr": {
+                          "value": 1,
+                          "constantType": 0,
+                          "dInfo": {
+                            "position": {
+                              "line": 108,
+                              "position": 20,
+                              "index": 1516
+                            }
+                          },
+                          "nodeType": 14
+                        },
+                        "dInfo": {
+                          "position": {
+                            "line": 108,
+                            "position": 13,
+                            "index": 1509
+                          }
+                        },
+                        "nodeType": 23
+                      },
+                      {
+                        "dInfo": {
+                          "position": {
+                            "line": 109,
+                            "position": 9,
+                            "index": 1527
+                          }
+                        },
+                        "nodeType": 22
+                      }
+                    ],
+                    "nodeType": 12
+                  },
+                  "dInfo": {
+                    "position": {
+                      "line": 107,
+                      "position": 9,
+                      "index": 1489
+                    }
+                  },
+                  "nodeType": 9
+                },
+                {
+                  "expression": {
+                    "value": 2,
+                    "constantType": 0,
+                    "dInfo": {
+                      "position": {
+                        "line": 110,
+                        "position": 14,
+                        "index": 1547
+                      }
+                    },
+                    "nodeType": 14
+                  },
+                  "block": {
+                    "children": [
+                      {
+                        "returnExpr": {
+                          "value": 2,
+                          "constantType": 0,
+                          "dInfo": {
+                            "position": {
+                              "line": 111,
+                              "position": 20,
+                              "index": 1569
+                            }
+                          },
+                          "nodeType": 14
+                        },
+                        "dInfo": {
+                          "position": {
+                            "line": 111,
+                            "position": 13,
+                            "index": 1562
+                          }
+                        },
+                        "nodeType": 23
+                      }
+                    ],
+                    "nodeType": 12
+                  },
+                  "dInfo": {
+                    "position": {
+                      "line": 110,
+                      "position": 9,
+                      "index": 1542
+                    }
+                  },
+                  "nodeType": 9
+                }
+              ],
+              "nodeType": 12
+            },
+            "defaultNode": {
+              "block": {
+                "children": [
+                  {
+                    "returnExpr": {
+                      "value": 3,
+                      "constantType": 0,
+                      "dInfo": {
+                        "position": {
+                          "line": 113,
+                          "position": 20,
+                          "index": 1608
+                        }
+                      },
+                      "nodeType": 14
+                    },
+                    "dInfo": {
+                      "position": {
+                        "line": 113,
+                        "position": 13,
+                        "index": 1601
+                      }
+                    },
+                    "nodeType": 23
+                  }
+                ],
+                "nodeType": 12
+              },
+              "dInfo": {
+                "position": {
+                  "line": 112,
+                  "position": 9,
+                  "index": 1580
+                }
+              },
+              "nodeType": 4
+            },
+            "dInfo": {
+              "position": {
+                "line": 106,
+                "position": 5,
+                "index": 1469
+              }
+            },
+            "nodeType": 8
           },
           {
             "expression": {
@@ -1419,9 +1590,9 @@
                 "name": "a",
                 "dInfo": {
                   "position": {
-                    "line": 108,
+                    "line": 118,
                     "position": 13,
-                    "index": 1505
+                    "index": 1657
                   }
                 },
                 "nodeType": 13
@@ -1430,9 +1601,9 @@
                 "name": "b",
                 "dInfo": {
                   "position": {
-                    "line": 108,
+                    "line": 118,
                     "position": 18,
-                    "index": 1510
+                    "index": 1662
                   }
                 },
                 "nodeType": 13
@@ -1440,9 +1611,9 @@
               "operation": 11,
               "dInfo": {
                 "position": {
-                  "line": 108,
+                  "line": 118,
                   "position": 15,
-                  "index": 1507
+                  "index": 1659
                 }
               },
               "nodeType": 0
@@ -1455,18 +1626,18 @@
                     "constantType": 0,
                     "dInfo": {
                       "position": {
-                        "line": 107,
+                        "line": 117,
                         "position": 16,
-                        "index": 1490
+                        "index": 1642
                       }
                     },
                     "nodeType": 14
                   },
                   "dInfo": {
                     "position": {
-                      "line": 107,
+                      "line": 117,
                       "position": 9,
-                      "index": 1483
+                      "index": 1635
                     }
                   },
                   "nodeType": 23
@@ -1476,9 +1647,9 @@
             },
             "dInfo": {
               "position": {
-                "line": 106,
+                "line": 116,
                 "position": 5,
-                "index": 1470
+                "index": 1622
               }
             },
             "nodeType": 11
@@ -1489,9 +1660,9 @@
                 "name": "a",
                 "dInfo": {
                   "position": {
-                    "line": 110,
+                    "line": 120,
                     "position": 8,
-                    "index": 1522
+                    "index": 1674
                   }
                 },
                 "nodeType": 13
@@ -1500,9 +1671,9 @@
                 "name": "b",
                 "dInfo": {
                   "position": {
-                    "line": 110,
+                    "line": 120,
                     "position": 12,
-                    "index": 1526
+                    "index": 1678
                   }
                 },
                 "nodeType": 13
@@ -1510,9 +1681,9 @@
               "operation": 8,
               "dInfo": {
                 "position": {
-                  "line": 110,
+                  "line": 120,
                   "position": 10,
-                  "index": 1524
+                  "index": 1676
                 }
               },
               "nodeType": 0
@@ -1526,9 +1697,9 @@
                       "constantType": 0,
                       "dInfo": {
                         "position": {
-                          "line": 111,
+                          "line": 121,
                           "position": 17,
-                          "index": 1547
+                          "index": 1699
                         }
                       },
                       "nodeType": 14
@@ -1536,18 +1707,18 @@
                     "operation": 2,
                     "dInfo": {
                       "position": {
-                        "line": 111,
+                        "line": 121,
                         "position": 16,
-                        "index": 1546
+                        "index": 1698
                       }
                     },
                     "nodeType": 1
                   },
                   "dInfo": {
                     "position": {
-                      "line": 111,
+                      "line": 121,
                       "position": 9,
-                      "index": 1539
+                      "index": 1691
                     }
                   },
                   "nodeType": 23
@@ -1557,9 +1728,9 @@
             },
             "dInfo": {
               "position": {
-                "line": 110,
+                "line": 120,
                 "position": 5,
-                "index": 1519
+                "index": 1671
               }
             },
             "nodeType": 7
@@ -1573,18 +1744,18 @@
                     "constantType": 0,
                     "dInfo": {
                       "position": {
-                        "line": 114,
+                        "line": 124,
                         "position": 17,
-                        "index": 1573
+                        "index": 1725
                       }
                     },
                     "nodeType": 14
                   },
                   "dInfo": {
                     "position": {
-                      "line": 114,
+                      "line": 124,
                       "position": 13,
-                      "index": 1569
+                      "index": 1721
                     }
                   },
                   "name": "i",
@@ -1594,9 +1765,9 @@
                     "constancy": false,
                     "dInfo": {
                       "position": {
-                        "line": 114,
+                        "line": 124,
                         "position": 21,
-                        "index": 1577
+                        "index": 1729
                       }
                     },
                     "nodeType": 20
@@ -1613,9 +1784,9 @@
                     "name": "i",
                     "dInfo": {
                       "position": {
-                        "line": 114,
+                        "line": 124,
                         "position": 37,
-                        "index": 1593
+                        "index": 1745
                       }
                     },
                     "nodeType": 13
@@ -1623,9 +1794,9 @@
                   "operation": 7,
                   "dInfo": {
                     "position": {
-                      "line": 114,
+                      "line": 124,
                       "position": 35,
-                      "index": 1591
+                      "index": 1743
                     }
                   },
                   "nodeType": 1
@@ -1638,9 +1809,9 @@
                 "name": "i",
                 "dInfo": {
                   "position": {
-                    "line": 114,
+                    "line": 124,
                     "position": 26,
-                    "index": 1582
+                    "index": 1734
                   }
                 },
                 "nodeType": 13
@@ -1650,9 +1821,9 @@
                 "constantType": 0,
                 "dInfo": {
                   "position": {
-                    "line": 114,
+                    "line": 124,
                     "position": 31,
-                    "index": 1587
+                    "index": 1739
                   }
                 },
                 "nodeType": 14
@@ -1660,9 +1831,9 @@
               "operation": 11,
               "dInfo": {
                 "position": {
-                  "line": 114,
+                  "line": 124,
                   "position": 28,
-                  "index": 1584
+                  "index": 1736
                 }
               },
               "nodeType": 0
@@ -1675,9 +1846,9 @@
                       "name": "i",
                       "dInfo": {
                         "position": {
-                          "line": 115,
+                          "line": 125,
                           "position": 12,
-                          "index": 1609
+                          "index": 1761
                         }
                       },
                       "nodeType": 13
@@ -1687,9 +1858,9 @@
                       "constantType": 0,
                       "dInfo": {
                         "position": {
-                          "line": 115,
+                          "line": 125,
                           "position": 16,
-                          "index": 1613
+                          "index": 1765
                         }
                       },
                       "nodeType": 14
@@ -1697,9 +1868,9 @@
                     "operation": 8,
                     "dInfo": {
                       "position": {
-                        "line": 115,
+                        "line": 125,
                         "position": 14,
-                        "index": 1611
+                        "index": 1763
                       }
                     },
                     "nodeType": 0
@@ -1712,9 +1883,9 @@
                             "name": "b",
                             "dInfo": {
                               "position": {
-                                "line": 118,
+                                "line": 128,
                                 "position": 15,
-                                "index": 1666
+                                "index": 1818
                               }
                             },
                             "nodeType": 13
@@ -1722,9 +1893,9 @@
                           "operation": 6,
                           "dInfo": {
                             "position": {
-                              "line": 118,
+                              "line": 128,
                               "position": 13,
-                              "index": 1664
+                              "index": 1816
                             }
                           },
                           "nodeType": 1
@@ -1734,9 +1905,9 @@
                     },
                     "dInfo": {
                       "position": {
-                        "line": 117,
+                        "line": 127,
                         "position": 11,
-                        "index": 1645
+                        "index": 1797
                       }
                     },
                     "nodeType": 3
@@ -1748,9 +1919,9 @@
                           "name": "a",
                           "dInfo": {
                             "position": {
-                              "line": 116,
+                              "line": 126,
                               "position": 13,
-                              "index": 1630
+                              "index": 1782
                             }
                           },
                           "nodeType": 13
@@ -1758,9 +1929,9 @@
                         "operation": 0,
                         "dInfo": {
                           "position": {
-                            "line": 116,
+                            "line": 126,
                             "position": 14,
-                            "index": 1631
+                            "index": 1783
                           }
                         },
                         "nodeType": 1
@@ -1770,9 +1941,9 @@
                   },
                   "dInfo": {
                     "position": {
-                      "line": 115,
+                      "line": 125,
                       "position": 9,
-                      "index": 1606
+                      "index": 1758
                     }
                   },
                   "nodeType": 7
@@ -1782,9 +1953,9 @@
             },
             "dInfo": {
               "position": {
-                "line": 114,
+                "line": 124,
                 "position": 5,
-                "index": 1561
+                "index": 1713
               }
             },
             "nodeType": 6

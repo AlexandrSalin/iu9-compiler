@@ -6,40 +6,20 @@ import ru.bmstu.iu9.compiler.*;
  * Created by IntelliJ IDEA. User: maggot Date: 19.05.11 Time: 20:49 To change
  * this template use File | Settings | File Templates.
  */
-public class LexisException extends LoggedException {
+public class LexisException extends CompilerException {
     protected LexisException() {
-        super("ru.bmstu.iu9.compiler.lexis");
+        super();
     }
 
     protected LexisException(String message) {
-        super(message, "ru.bmstu.iu9.compiler.lexis");
-    }
-}
-
-class PositionedLexisException extends LexisException {
-    protected PositionedLexisException(Position position) {
-        super();
-        this.position = position;
-    }
-
-    protected PositionedLexisException(String message, Position position) {
         super(message);
-        this.position = position;
     }
-
-    @Override
-    public String getMessage() {
-        return super.getMessage() + " at " + position;
-    }
-
-    public final Position position;
 }
 
-class InvalidCodePointException extends PositionedLexisException {
+class InvalidCodePointException extends LexisException {
     public InvalidCodePointException(CodePoint codePoint) {
         super(
-            "Invalid code point found '" + codePoint.asChar() + "'",
-            codePoint.position()
+            "Invalid code point found '" + codePoint.asChar() + "'"
         );
         this.codePoint = codePoint;
     }
@@ -47,9 +27,9 @@ class InvalidCodePointException extends PositionedLexisException {
     public final CodePoint codePoint;
 }
 
-class InvalidNumberFormatException extends PositionedLexisException {
-    public InvalidNumberFormatException(String number, Position position) {
-        super("Invalid number constant \"" + number + "\"", position);
+class InvalidNumberFormatException extends LexisException {
+    public InvalidNumberFormatException(String number) {
+        super("Invalid number constant \"" + number + "\"");
         this.number = number;
     }
 
