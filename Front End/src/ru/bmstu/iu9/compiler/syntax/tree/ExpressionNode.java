@@ -26,6 +26,11 @@ public class ExpressionNode extends BaseNode implements Statement {
         return this;
     }
     
+    @Override
+    public String toString() {
+        return super.toString();
+    }
+    
     public BaseType realType() { return this.realType; }
     public void setRealType(BaseType type) { this.realType = type; }
     

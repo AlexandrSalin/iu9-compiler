@@ -36,10 +36,16 @@ public class BaseNode {
         return NodeType.values()[this.nodeType]; 
     }
     
+    @Override
+    public String toString() {
+        return nodeType().name() + "_NODE";
+    }
+    
     protected int nodeType;
     
 
     public static class BaseNodeAdapter implements JsonDeserializer<BaseNode> {
+        
         public BaseNode deserialize(
                 JsonElement json, 
                 Type typeOfNode,

@@ -22,22 +22,21 @@ public class SemanticAnalyser {
     public SemanticAnalyser(String filename) {
         BufferedReader reader = null;
         
+        Gson gson = 
+            new GsonBuilder().
+                registerTypeHierarchyAdapter(
+                    BaseNode.class, 
+                    new BaseNode.BaseNodeAdapter()).
+                registerTypeHierarchyAdapter(
+                    BaseType.class, 
+                    new BaseType.TypeAdapter()).
+                create();
+        
         try {
-            Gson gson = 
-                    new GsonBuilder().
-                        registerTypeHierarchyAdapter(
-                            BaseNode.class, 
-                            new BaseNode.BaseNodeAdapter()).
-                        registerTypeHierarchyAdapter(
-                            BaseType.class, 
-                            new BaseType.TypeAdapter()).
-                        create();
-            
             reader = new BufferedReader(new FileReader(filename));
-            
             this.parseTree = gson.fromJson(reader, BlockNode.class);
         } catch(java.io.IOException ex) {
-//            ex.printStackTrace();
+//            this.parseTree = null;
         } finally {
             try {
                 reader.close();
@@ -47,17 +46,20 @@ public class SemanticAnalyser {
         }
     }
     
-    public void Analyse() {
-        resolveNames(parseTree);
-        resolveTypes(parseTree);
-        processNode(parseTree);
+    public void analyse() {
+        try {
+            resolveNames(parseTree);
+            resolveTypes(parseTree);
+            processNode(parseTree);
+        } catch(SemanticException ex) {
+            return;
+        }
     }
     
     public static void main(String[] args) {
         SemanticAnalyser analyser = 
-            new SemanticAnalyser("C:\\Users\\maggot\\Documents\\NetBeansProjects" +
-                "\\ru.bmstu.iu9.compiler\\Front End\\src\\parse_tree.json");
-        analyser.Analyse();
+            new SemanticAnalyser("C:\\Users\\Bobukh\\Documents\\NetBeansProjects\\Front End\\src\\parse_tree.json");
+        analyser.analyse();
 
         return;
     }
@@ -182,6 +184,21 @@ public class SemanticAnalyser {
                 ArrayTypeNode a = (ArrayTypeNode)type;
 
                 processType(a.element);
+                try {
+                    processNode(a.length);
+                    a.setRealType(
+                        new ArrayType(
+                            a.element.realType(),
+                            a.length.value,
+                            a.constancy)
+                        );
+                } catch(SemanticException ex) {
+                    a.setRealType(
+                        new ArrayType(
+                            a.element.realType(),
+                            a.constancy)
+                        );
+                }/*
                 if(a.length != null) {
                     processNode(a.length);
 
@@ -197,7 +214,7 @@ public class SemanticAnalyser {
                             a.element.realType(),
                             a.constancy)
                         );
-                }
+                }*/
 
                 break;
             }
@@ -335,510 +352,605 @@ public class SemanticAnalyser {
     
     
     
-    private void processNode(BaseNode node) {
-        switch (node.nodeType()) {
-            case BINARY_OPERATION:
-            {
-                BinaryOperationNode bNode = (BinaryOperationNode)node;
-                
-                switch(bNode.operation()) {
-                    case ARRAY_ELEMENT:
-                    {
-                        processNode(bNode.leftChild());
-                        processNode(bNode.rightChild());
-                
-                        TypeChecker.check(
-                                bNode.leftChild().realType(), 
-                                BaseType.Type.ARRAY,
-                                bNode.dInfo);
-                        
-                        ArrayType array =
-                                (ArrayType)bNode.leftChild().realType();
-                        bNode.setRealType(array.element);
-                        
-                        break;
-                    }
-                    case MEMBER_SELECT:
-                    {
-                        processNode(bNode.leftChild());
-                        
-                        BaseType type = bNode.leftChild().realType();
-                        
-                        while(type.is(PrimitiveType.Type.POINTER)) {
-                            
-                            type = ((PointerType)type).pointerType;
-                        }
-                        
-                        if(TypeChecker.check(
-                                type, 
-                                BaseType.Type.STRUCT, 
-                                bNode.dInfo)
-                        ) {
-                            
-                            context.enterStruct((StructType) type);
+    private void processNode(BaseNode node) throws SemanticException {
+        try {
+            switch (node.nodeType()) {
+                case BINARY_OPERATION:
+                {
+                    BinaryOperationNode bNode = (BinaryOperationNode)node;
 
+                    switch(bNode.operation()) {
+                        case ARRAY_ELEMENT:
+                        {
+                            processNode(bNode.leftChild());
                             processNode(bNode.rightChild());
 
-                            VariableLeaf fieldName = 
-                                (VariableLeaf) bNode.rightChild();
+                            TypeChecker.check(
+                                    bNode.leftChild().realType(), 
+                                    BaseType.Type.ARRAY,
+                                    bNode.dInfo);
 
-                            Symbol field = context.get(fieldName.name);
-                            if (field == null) {
-                                Logger.logUndeclaredVarialbe(
-                                        fieldName.name, 
-                                        bNode.rightChild().dInfo.position);
-                                bNode.setRealType(new InvalidType());
-                            } else {
-                                bNode.setRealType(field.type);
+                            ArrayType array =
+                                    (ArrayType)bNode.leftChild().realType();
+                            bNode.setRealType(array.element);
+
+                            break;
+                        }
+                        case MEMBER_SELECT:
+                        {
+                            processNode(bNode.leftChild());
+
+                            BaseType type = bNode.leftChild().realType();
+
+                            while(type.is(PrimitiveType.Type.POINTER)) {
+
+                                type = ((PointerType)type).pointerType;
                             }
 
-                            context.leaveStruct();
-                        } else {
-                            Logger.logIncompatibleTypes(
-                                    type.toString(), 
-                                    BaseType.Type.STRUCT.toString(), 
-                                    bNode.dInfo.position);
-                        }
-                        
-                        break;
-                    }
-                    default:
-                    {
-                        processNode(bNode.leftChild());
-                        processNode(bNode.rightChild());
-                        
-                        TypeChecker.check(
-                                bNode.leftChild().realType(), 
-                                bNode.rightChild().realType(),
-                                bNode.dInfo);
+                            if(TypeChecker.check(
+                                    type, 
+                                    BaseType.Type.STRUCT, 
+                                    bNode.dInfo)
+                            ) {
 
-                        if (bNode.is(BinaryOperationNode.Operation.Bitwise)) {
+                                context.enterStruct((StructType) type);
+
+                                processNode(bNode.rightChild());
+
+                                VariableLeaf fieldName = 
+                                    (VariableLeaf) bNode.rightChild();
+
+                                Symbol field = context.get(fieldName.name);
+                                if (field == null) {
+                                    Logger.logUndeclaredVarialbe(
+                                            fieldName.name, 
+                                            bNode.rightChild().dInfo.position);
+                                    bNode.setRealType(new InvalidType());
+                                } else {
+                                    bNode.setRealType(field.type);
+                                }
+
+                                context.leaveStruct();
+                            } else {
+                                Logger.logIncompatibleTypes(
+                                        type.toString(), 
+                                        BaseType.Type.STRUCT.toString(), 
+                                        bNode.dInfo.position);
+                            }
+
+                            break;
+                        }
+                        case ASSIGN:
+                        {
+                            processNode(bNode.leftChild());
+                            processNode(bNode.rightChild());
+                            
+                            ExpressionNode lhv = bNode.leftChild();
+
+                            // lhv check
+                            if (!lhv.is(BaseNode.NodeType.VARIABLE) &&
+                                !lhv.is(BinaryOperationNode.Operation.MEMBER_SELECT) &&
+                                !lhv.is(BinaryOperationNode.Operation.ARRAY_ELEMENT) &&
+                                !lhv.is(UnaryOperationNode.Operation.DEREF)) {
+
+                                throw (SemanticException)new InvalidLeftHandValueException(bNode)
+                                        .initPosition(bNode.dInfo.position)
+                                        .Log("ru.bmstu.iu9.compiler.semantics");
+                            }
+
+                            break;
+                        }
+                        default:
+                        {
+                            processNode(bNode.leftChild());
+                            processNode(bNode.rightChild());
 
                             TypeChecker.check(
-                                bNode.realType(), 
-                                PrimitiveType.Type.INT, 
-                                bNode.dInfo);
+                                    bNode.leftChild().realType(), 
+                                    bNode.rightChild().realType(),
+                                    bNode.dInfo);
+
+                            if (bNode.is(BinaryOperationNode.Operation.Bitwise)) {
+
+                                TypeChecker.check(
+                                    bNode.realType(), 
+                                    PrimitiveType.Type.INT, 
+                                    bNode.dInfo);
+                            }
+
+                            if (bNode.is(BinaryOperationNode.Operation.Comparison)) {
+
+                                bNode.setRealType(
+                                    new PrimitiveType(
+                                        PrimitiveType.Type.BOOL, 
+                                        true)
+                                    );
+                            } else {
+                                bNode.setRealType(bNode.leftChild().realType());
+                            }
+                            break;
                         }
+                    }
 
-                        if (bNode.is(BinaryOperationNode.Operation.Comparison)) {
+                    break;
 
-                            bNode.setRealType(
+                }
+                case UNARY_OPERATION:
+                {
+                    UnaryOperationNode uNode = ((UnaryOperationNode) node);
+
+                    processNode(uNode.node);
+                    switch (uNode.operation()) {
+                        case NOT:
+                        {
+                            TypeChecker.check(
+                                    uNode.node.realType(), 
+                                    PrimitiveType.Type.BOOL, 
+                                    uNode.dInfo);
+
+                            uNode.setRealType(uNode.node.realType());
+                            break;
+                        }
+                        case POST_INC:
+                        case POST_DEC:
+                        case PRE_INC:
+                        case PRE_DEC:
+                        case BITWISE_NOT:
+                            TypeChecker.check(
+                                    uNode.node.realType(), 
+                                    new PrimitiveType.Type[] {
+                                        PrimitiveType.Type.INT, 
+                                        PrimitiveType.Type.CHAR
+                                    }, 
+                                    uNode.dInfo);
+
+                            uNode.setRealType(uNode.node.realType());
+                            break;
+                        case MINUS:
+                        case PLUS:
+                            TypeChecker.check(uNode.node.realType(),
+                                    new PrimitiveType.Type[] {
+                                        PrimitiveType.Type.INT, 
+                                        PrimitiveType.Type.DOUBLE,
+                                        PrimitiveType.Type.FLOAT
+                                    }, uNode.dInfo);
+
+                            uNode.setRealType(uNode.node.realType());
+                            break;
+                        case DEREF:
+                            TypeChecker.check(
+                                    uNode.node.realType(), 
+                                    PrimitiveType.Type.POINTER, 
+                                    uNode.dInfo);
+
+                            uNode.setRealType(
+                                ((PointerType)uNode.node.realType()).pointerType);
+                            break;
+                        case CAST:
+                            CastNode c = (CastNode) node;
+
+                            processNode(c.castingType);
+                            uNode.setRealType(c.castingType.realType());
+
+                            break;
+                        case REF:
+                            uNode.setRealType(
+                                new PointerType(uNode.node.realType(), false));
+                            break;
+                    }
+                    break;
+
+                }
+                case VAR_DECL:
+                {
+                    VariableDeclNode leaf = (VariableDeclNode)node;
+                    processNode(leaf.type);
+                    BaseType t = leaf.type.realType();
+
+                    VariableSymbol symbol = new VariableSymbol(leaf.name, t);
+
+                    Symbol declaredSymbol = context.get(leaf.name);
+                    if (declaredSymbol != null) {
+                        throw (SemanticException)new VariableRedefinitionException(
+                                    leaf.name
+                                )
+                                .initPosition(leaf.dInfo.position)
+                                .Log("ru.bmstu.iu9.semantics");
+                    }
+
+                    context.add(symbol);
+
+                    leaf.setRealType(t);
+
+                    if(leaf.value != null) {
+                        processNode(leaf.value);
+
+                        TypeChecker.check(t, leaf.value.realType(), leaf.dInfo);
+                    }
+
+                    break;
+                }
+                case FOR:
+                {
+                    ForNode forNode = (ForNode)node;
+
+                    context.pushScope();
+                    processNode(forNode.initialization);
+                    processNode(forNode.expression);
+                    processNode(forNode.step);
+                    processNode(forNode.block);
+                    context.popScope();
+
+                    TypeChecker.check(
+                            forNode.expression.realType(), 
+                            PrimitiveType.Type.BOOL,
+                            ((ExpressionNode)forNode.expression).dInfo);
+                    break;
+                }
+                case IF:
+                {
+                    boolean returnsBefore = context.returns;
+                    context.returns = false;
+
+                    IfNode ifNode = (IfNode)node;
+
+                    context.pushScope();
+                    processNode(ifNode.condition);
+                    processNode(ifNode.block);
+                    context.popScope();
+
+                    if(ifNode.elseNode != null) {
+                        boolean returns = context.returns;
+                        context.returns = false;
+
+                        processNode(ifNode.elseNode);
+
+                        context.returns = context.returns && returns;
+                    } else {
+                        context.returns = false;
+                    }
+
+                    TypeChecker.check(
+                            ifNode.condition.realType(), 
+                            PrimitiveType.Type.BOOL, 
+                            ((ExpressionNode)ifNode.condition).dInfo);
+
+                    context.returns = context.returns || returnsBefore;
+
+                    break;
+                }
+                // @todo Протестировать
+                case SWITCH:
+                {
+                    boolean returnsBefore = context.returns;
+                    context.returns = false;
+
+                    context.enterSwitch();
+
+                    SwitchNode switchNode = ((SwitchNode)node);
+
+                    context.pushScope();
+                    processNode(switchNode.expression);
+
+                    boolean returns = true;
+
+                    for(CaseNode child : switchNode.cases) {
+                        context.returns = false;
+                        processNode(child);
+                        returns = context.returns && returns;
+                    }
+                    if(switchNode.defaultNode != null) {
+                        context.returns = false;
+                        processNode(switchNode.defaultNode);
+                        context.returns = context.returns && returns;
+                    } else {
+                        context.returns = false;
+                    }
+                    context.popScope();
+
+                    for (CaseNode caseNode : switchNode.cases) {
+                        TypeChecker.check(
+                                switchNode.expression.realType(), 
+                                caseNode.expression.realType(), 
+                                ((ExpressionNode)switchNode.expression).dInfo);
+                    }
+
+                    context.leaveSwitch();
+
+                    context.returns = returnsBefore || context.returns;
+                    break;
+                }
+                case CASE:
+                {
+                    context.pushScope();
+                    processNode(((CaseNode)node).expression);
+                    processNode(((CaseNode)node).block);
+                    context.popScope();
+                    break;
+                }
+                case WHILE:
+                {
+                    context.enterLoop();
+                    WhileNode cbNode = (WhileNode)node;
+
+                    context.pushScope();
+                    processNode(cbNode.expression);
+                    processNode(cbNode.block);
+                    context.popScope();
+
+                    TypeChecker.check(
+                            cbNode.expression.realType(), 
+                            PrimitiveType.Type.BOOL,
+                            ((ExpressionNode)cbNode.expression).dInfo);
+
+                    context.leaveLoop();
+                    break;
+                }
+                case DO_WHILE:
+                {
+                    boolean returnsBefore = context.returns;
+                    context.returns = false;
+                    context.enterLoop();
+
+                    DoWhileNode cbNode = (DoWhileNode)node;
+
+                    context.pushScope();
+                    processNode(cbNode.block);
+                    processNode(cbNode.expression);
+                    context.popScope();
+
+                    TypeChecker.check(
+                            cbNode.expression.realType(), 
+                            PrimitiveType.Type.BOOL,
+                            ((ExpressionNode)cbNode.expression).dInfo);
+
+                    context.leaveLoop();
+
+                    context.returns = context.returns || returnsBefore;
+                    break;
+                }
+                    // @todo unstable. test
+                case BLOCK:
+                {
+                    BlockNode<BaseNode> block = (BlockNode<BaseNode>) node;
+                    for(BaseNode child : block) {
+                        try {
+                            processNode(child);
+                        } catch(SemanticException ex) {
+                            // block.removeNode(child);
+                            continue;
+                        }
+                    }
+                    break;
+                }
+                    // @todo unstable. test
+                case BLOCK_DECL:
+                {
+                    context.pushScope();
+
+                    BlockDeclNode<DeclNode> declarations = 
+                        (BlockDeclNode<DeclNode>) node;
+
+                    for(DeclNode child : declarations) {
+                        try {
+                            processNode(child);
+                        } catch(SemanticException ex) {
+                            // declarations.removeNode(child);
+                            continue;
+                        }
+                    }
+                    break;
+                }
+                case VARIABLE:
+                {
+                    VariableLeaf var = (VariableLeaf)node;
+                    Symbol symbol = context.get(var.name);
+
+                    if (symbol != null) {
+                        var.setRealType(symbol.type());
+                    } else {
+                        //Logger.logUndeclaredVarialbe(var.name, var.dInfo.position);
+                        throw new UseOfUndeclaredVariableException(var.name)
+                                .initPosition(var.dInfo.position)
+                                .Log("ru.bmstu.iu9.compiler.semantics");
+                    }
+                    break;
+                }
+                case CONSTANT:
+                {
+                    ConstantLeaf c = (ConstantLeaf)node;
+
+                    switch(c.constantType()) {
+                        case INT:
+                            c.setRealType(
+                                new PrimitiveType(
+                                    PrimitiveType.Type.INT, 
+                                    true)
+                                );
+                            break;
+                        case DOUBLE:
+                            c.setRealType(
+                                new PrimitiveType(
+                                    PrimitiveType.Type.DOUBLE, 
+                                    true)
+                                );
+                            break;
+                        case BOOL:
+                            c.setRealType(
                                 new PrimitiveType(
                                     PrimitiveType.Type.BOOL, 
                                     true)
                                 );
-                        } else {
-                            bNode.setRealType(bNode.leftChild().realType());
-                        }
-                        break;
+                            break;
+                        case CHAR:
+                            c.setRealType(
+                                new PrimitiveType(
+                                    PrimitiveType.Type.CHAR, 
+                                    true)
+                                );
+                            break;
                     }
+
+                    break;
                 }
-                
-                break;
-                
-            }
-            case UNARY_OPERATION:
-            {
-                UnaryOperationNode uNode = ((UnaryOperationNode) node);
-                
-                processNode(uNode.node);
-                switch (uNode.operation()) {
-                    case NOT:
-                    {
-                        TypeChecker.check(
-                                uNode.node.realType(), 
-                                PrimitiveType.Type.BOOL, 
-                                uNode.dInfo);
-                        
-                        uNode.setRealType(uNode.node.realType());
-                        break;
+                case FUNCTION_DECL:
+                {
+                    FunctionDeclNode function = (FunctionDeclNode)node;
+
+                    context.enterFunction(function);
+
+                    boolean returns = context.returns = false;
+
+                    for(Statement child : function.block) {
+                        processNode(child.getNode());
+ //                       returns = returns || context.returns;
                     }
-                    case POST_INC:
-                    case POST_DEC:
-                    case PRE_INC:
-                    case PRE_DEC:
-                    case BITWISE_NOT:
+
+                    if(!(context.returnValue().is(PrimitiveType.Type.VOID))/* &&
+                       !returns*/) {
+                        
+                        context.leaveFunction();
+                        throw new MissingReturnStatementException()
+                                .Log("ru.bmstu.iu9.compiler.semantics");
+                    }
+
+                    context.leaveFunction();
+                    break;
+                }
+                case RETURN:
+                {
+                    ReturnNode ret = (ReturnNode)node;
+
+                    context.returns = true;
+
+                    if(ret.returnExpr != null) {
+                        processNode(ret.returnExpr);
                         TypeChecker.check(
-                                uNode.node.realType(), 
-                                new PrimitiveType.Type[] {
-                                    PrimitiveType.Type.INT, 
-                                    PrimitiveType.Type.CHAR
-                                }, 
-                                uNode.dInfo);
-                        
-                        uNode.setRealType(uNode.node.realType());
-                        break;
-                    case MINUS:
-                    case PLUS:
-                        TypeChecker.check(uNode.node.realType(),
-                                new PrimitiveType.Type[] {
-                                    PrimitiveType.Type.INT, 
-                                    PrimitiveType.Type.DOUBLE,
-                                    PrimitiveType.Type.FLOAT
-                                }, uNode.dInfo);
-                        
-                        uNode.setRealType(uNode.node.realType());
-                        break;
-                    case DEREF:
+                                ret.returnExpr.realType(), 
+                                context.returnValue(), 
+                                ret.dInfo);
+                    } else {
                         TypeChecker.check(
-                                uNode.node.realType(), 
-                                PrimitiveType.Type.POINTER, 
-                                uNode.dInfo);
-                        
-                        uNode.setRealType(
-                            ((PointerType)uNode.node.realType()).pointerType);
-                        break;
-                    case CAST:
-                        CastNode c = (CastNode) node;
+                                PrimitiveType.Type.VOID, 
+                                context.returnValue(), 
+                                ret.dInfo);
+                    }
 
-                        processNode(c.castingType);
-                        uNode.setRealType(c.castingType.realType());
+                    break;
+                }
+                case CALL:
+                {
+                    CallNode call = (CallNode)node;
 
-                        break;
-                    case REF:
-                        uNode.setRealType(
-                            new PointerType(uNode.node.realType(), false));
-                        break;
-                }
-                break;
-                
-            }
-            case VAR_DECL:
-            {
-                VariableDeclNode leaf = (VariableDeclNode)node;
-                processNode(leaf.type);
-                BaseType t = leaf.type.realType();
-                
-                VariableSymbol symbol = new VariableSymbol(leaf.name, t);
-                context.add(symbol);
-                
-                leaf.setRealType(t);
+                    processNode(call.function);
+                    processNode(call.arguments);
 
-                if(leaf.value != null) {
-                    processNode(leaf.value);
+                    if (TypeChecker.check(
+                            call.function.realType(), 
+                            BaseType.Type.FUNCTION, 
+                            call.dInfo)) {
 
-                    TypeChecker.check(t, leaf.value.realType(), leaf.dInfo);
-                }
-                
-                break;
-            }
-            case FOR:
-            {
-                ForNode forNode = (ForNode)node;
-                
-                context.pushScope();
-                processNode(forNode.initialization);
-                processNode(forNode.expression);
-                processNode(forNode.step);
-                processNode(forNode.block);
-                context.popScope();
-                
-                TypeChecker.check(
-                        forNode.expression.realType(), 
-                        PrimitiveType.Type.BOOL,
-                        ((ExpressionNode)forNode.expression).dInfo);
-                break;
-            }
-            case IF:
-            {
-                context.returns = false;
-                
-                IfNode ifNode = (IfNode)node;
-                
-                context.pushScope();
-                processNode(ifNode.condition);
-                processNode(ifNode.block);
-                context.popScope();
-                
-                if(ifNode.elseNode != null) {
-                    boolean returns = context.returns;
-                    context.returns = false;
-                    
-                    processNode(ifNode.elseNode);
-                    
-                    context.returns = context.returns && returns;
-                } else {
-                    context.returns = false;
-                }
-                
-                TypeChecker.check(
-                        ifNode.condition.realType(), 
-                        PrimitiveType.Type.BOOL, 
-                        ((ExpressionNode)ifNode.condition).dInfo);
-                break;
-            }
-            // @todo Протестировать
-            case SWITCH:
-            {
-                context.returns = false;
-                
-                SwitchNode switchNode = ((SwitchNode)node);
-                        
-                context.pushScope();
-                processNode(switchNode.expression);
-                
-                boolean returns = true;
-                
-                for(CaseNode child : switchNode.cases) {
-                    context.returns = false;
-                    processNode(child);
-                    context.returns = context.returns && returns;
-                }
-                if(switchNode.defaultNode != null) {
-                    context.returns = false;
-                    processNode(switchNode.defaultNode);
-                    context.returns = context.returns && returns;
-                } else {
-                    context.returns = false;
-                }
-                context.popScope();
-                
-                for (CaseNode caseNode : switchNode.cases) {
-                    TypeChecker.check(
-                            switchNode.expression.realType(), 
-                            caseNode.expression.realType(), 
-                            ((ExpressionNode)switchNode.expression).dInfo);
-                }
-                break;
-            }
-            case CASE:
-            {
-                context.pushScope();
-                processNode(((CaseNode)node).expression);
-                processNode(((CaseNode)node).block);
-                context.popScope();
-                break;
-            }
-            case WHILE:
-            {
-                WhileNode cbNode = (WhileNode)node;
-                
-                context.pushScope();
-                processNode(cbNode.expression);
-                processNode(cbNode.block);
-                context.popScope();
-                
-                TypeChecker.check(
-                        cbNode.expression.realType(), 
-                        PrimitiveType.Type.BOOL,
-                        ((ExpressionNode)cbNode.expression).dInfo);
-                break;
-            }
-            case DO_WHILE:
-            {
-                context.returns = false;
-                
-                DoWhileNode cbNode = (DoWhileNode)node;
-                
-                context.pushScope();
-                processNode(cbNode.block);
-                processNode(cbNode.expression);
-                context.popScope();
-                
-                TypeChecker.check(
-                        cbNode.expression.realType(), 
-                        PrimitiveType.Type.BOOL,
-                        ((ExpressionNode)cbNode.expression).dInfo);
-                break;
-            }
-            case BLOCK:
-            {
-                for(BaseNode child : (BlockNode<BaseNode>)node) {
-                    processNode(child);
-                }
-                break;
-            }
-            case BLOCK_DECL:
-            {
-                context.pushScope();
-                for(DeclNode child : (BlockDeclNode<?>)node) {
-                    processNode(child);
-                }
-                break;
-            }
-            case VARIABLE:
-            {
-                VariableLeaf var = (VariableLeaf)node;
-                Symbol symbol = context.get(var.name);
-                
-                if (symbol != null) {
-                    var.setRealType(symbol.type());
-                } else {
-                    Logger.logUndeclaredVarialbe(var.name, var.dInfo.position);
-                }
-                break;
-            }
-            case CONSTANT:
-            {
-                ConstantLeaf c = (ConstantLeaf)node;
-                
-                switch(c.constantType()) {
-                    case INT:
-                        c.setRealType(
-                            new PrimitiveType(
-                                PrimitiveType.Type.INT, 
-                                true)
-                            );
-                        break;
-                    case DOUBLE:
-                        c.setRealType(
-                            new PrimitiveType(
-                                PrimitiveType.Type.DOUBLE, 
-                                true)
-                            );
-                        break;
-                    case BOOL:
-                        c.setRealType(
-                            new PrimitiveType(
-                                PrimitiveType.Type.BOOL, 
-                                true)
-                            );
-                        break;
-                    case CHAR:
-                        c.setRealType(
-                            new PrimitiveType(
-                                PrimitiveType.Type.CHAR, 
-                                true)
-                            );
-                        break;
-                }
-                
-                break;
-            }
-            case FUNCTION_DECL:
-            {
-                FunctionDeclNode function = (FunctionDeclNode)node;
-                
-                context.enterFunction(function);
-              
-                boolean returns = context.returns = false;
-                
-                for(Statement child : function.block) {
-                    processNode(child.getNode());
-                    returns = returns || context.returns;
-                }
-                
-                if(!(context.returnValue().is(PrimitiveType.Type.VOID)) &&
-                   !returns) {
-                    
-                    Logger.log(
-                        "Not all code paths return value", 
-                        function.dInfo.position);
-                }
+                        FunctionType func = (FunctionType)call.function.realType();
 
-                context.leaveFunction();
-                break;
-            }
-            case RETURN:
-            {
-                ReturnNode ret = (ReturnNode)node;
-                
-                context.returns = true;
-                
-                if(ret.returnExpr != null) {
-                    processNode(ret.returnExpr);
-                    TypeChecker.check(
-                            ret.returnExpr.realType(), 
-                            context.returnValue(), 
-                            ret.dInfo);
-                } else {
-                    TypeChecker.check(
-                            PrimitiveType.Type.VOID, 
-                            context.returnValue(), 
-                            ret.dInfo);
-                }
-                
-                break;
-            }
-            case CALL:
-            {
-                CallNode call = (CallNode)node;
-                
-                processNode(call.function);
-                processNode(call.arguments);
-                
-                if (TypeChecker.check(
-                        call.function.realType(), 
-                        BaseType.Type.FUNCTION, 
-                        call.dInfo)) {
-                    
-                    FunctionType func = (FunctionType)call.function.realType();
-                    
-                    if (func.arguments.size() ==
-                            call.arguments.children().size()) {
-                        
-                        for (int i = 0; i < func.arguments.size(); ++i) {
-                            TypeChecker.check(
-                                    func.arguments.get(i).type,
-                                    call.arguments.children().get(i).realType(), 
-                                    call.dInfo);
+                        if (func.arguments.size() ==
+                                call.arguments.children().size()) {
+
+                            for (int i = 0; i < func.arguments.size(); ++i) {
+                                TypeChecker.check(
+                                        func.arguments.get(i).type,
+                                        call.arguments.children().get(i).realType(), 
+                                        call.dInfo);
+                            }
                         }
                     }
+
+                    call.setRealType(
+                        ((FunctionType)call.function.realType()).returnValue);
+                    break;
                 }
-                
-                call.setRealType(
-                    ((FunctionType)call.function.realType()).returnValue);
-                break;
-            }
-            case ELSE:
-            {
-                ElseNode n = (ElseNode)node;
-                
-                if(n.block != null) {
-                    context.pushScope();
+                case ELSE:
+                {
+                    ElseNode n = (ElseNode)node;
+
+                    if(n.block != null) {
+                        context.pushScope();
+                        processNode(n.block);
+                        context.popScope();
+                    }
+
+                    break;
+                }
+                case DEFAULT:
+                {
+                    DefaultNode n = (DefaultNode)node;
+
                     processNode(n.block);
-                    context.popScope();
+
+                    break;
                 }
-                
-                break;
+                case RUN:
+                {
+                    RunNode n = (RunNode)node;
+
+                    processNode(n.expression);
+                    TypeChecker.check(
+                            n.expression.realType(), 
+                            BaseType.Type.FUNCTION, 
+                            n.dInfo);
+
+                    break;
+                }
+                case INVALID:
+                {
+                    break;
+                }
+                case LOCK:
+                {
+                    LockNode n = (LockNode)node;
+
+                    processNode(n.block);
+
+                    break;
+                }
+                case TYPE:
+                {
+                    processType((BaseTypeNode)node);
+                    break;
+                }
+                case BREAK:
+                {
+                    if (!context.isInSwitch() && !context.isInLoop()) {
+                        BreakNode b = (BreakNode) node;
+
+                        throw new InvalidJumpStatementException()
+                                .initPosition(b.dInfo.position)
+                                .Log("ru.bmstu.iu9.compiler.semantics");
+                    }
+                    break;
+                }
+                case CONTINUE:
+                    if (!context.isInLoop()) {
+                        ContinueNode b = (ContinueNode) node;
+
+                        throw new InvalidJumpStatementException()
+                                .initPosition(b.dInfo.position)
+                                .Log("ru.bmstu.iu9.compiler.semantics");
+                    }
+                    break;
+                case BARRIER:
+                    break;
             }
-            case DEFAULT:
-            {
-                DefaultNode n = (DefaultNode)node;
-                
-                processNode(n.block);
-                
-                break;
-            }
-            case RUN:
-            {
-                RunNode n = (RunNode)node;
-                
-                processNode(n.expression);
-                TypeChecker.check(
-                        n.expression.realType(), 
-                        BaseType.Type.FUNCTION, 
-                        n.dInfo);
-                
-                break;
-            }
-            case INVALID:
-            {
-                break;
-            }
-            case LOCK:
-            {
-                LockNode n = (LockNode)node;
-                
-                processNode(n.block);
-                
-                break;
-            }
-            case TYPE:
-            {
-                processType((BaseTypeNode)node);
-                break;
-            }
-            case BREAK:
-            case CONTINUE:
-            case BARRIER:
-                break;
+        } catch (SemanticException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw (SemanticException)new NonAnalysisErrorException(ex)
+                    .Log("ru.bmstu.iu9.compiler.semantics");
         }
-    }
+    }  
     
     public BlockNode<BaseNode> tree() {
-        return this.parseTree;
-    }    
+        return parseTree;
+    }
     
     private BlockNode<BaseNode> parseTree;
     private Context context = new Context();
@@ -904,6 +1016,25 @@ final class Context {
     public SymbolTable global() {
         return this.global;
     }
+    
+    public void enterLoop() {
+        inLoop = true;
+    }
+    public void leaveLoop() {
+        inLoop = false;
+    }
+    public void enterSwitch() {
+        inSwitch = true;
+    }
+    public void leaveSwitch() {
+        inSwitch = false;
+    }
+    public boolean isInLoop() {
+        return inLoop;
+    }
+    public boolean isInSwitch() {
+        return inSwitch;
+    }
 
     private SymbolTable global;
     private FunctionTypeNode function;
@@ -911,4 +1042,8 @@ final class Context {
     private boolean inFunction;
     
     public boolean returns = false;
+    
+    
+    private boolean inLoop = false;
+    private boolean inSwitch = false;
 }

@@ -7,9 +7,7 @@ TypeName      ::= "int" | "bool" | "double" | "float" | "void"
 TypeLit       ::= ArrayType | StructType | PointerType | FunctionType
 
 ArrayType     ::= "[" DecimalLit "]" Type
-
 StructType    ::= "struct" Identifier
-
 PointerType   ::= "*" Type
 
 FunctionType  ::= "func" Signature
@@ -17,7 +15,7 @@ Signature     ::= Parameters Type
 Parameters    ::= "(" [ ParameterList [ "," ] ] ")"
 ParameterList ::= ParameterDecl { "," ParameterDecl }
 ParameterDecl ::= [ IdentifierList ] Type
-
+IdentifierList::= Identifier "," { Identifier }
 
 
 Identifier    ::= Letter { Letter | UnicodeDigit } 
@@ -42,7 +40,7 @@ BitwiseNot    ::= "~"
 BoolNot       ::= "!" 
 PlusMinus     ::= "+" | "-"
 Asterisk      ::= "*"
-TypeConv      ::= "(" Type ")" 
+TypeConv      ::= "<" Type ">" 
 Mul           ::= "/" | "%"
 BitwiseShift  ::= ">>" | "<<" 
 OrderRelation ::= ">=" | "<=" | ">" | "<" 
@@ -60,7 +58,8 @@ Program       ::= { FunctionDef | VariableDef ";" | StructDef ";" }
 
 FunctionDecl  ::= "func" Identifier Signature Block
 
-VariableDef   ::= "var" Variable { "," Variable } ":" Type
+VariableDef   ::= "var" Variable { "," Variable } ":" Type |
+                        "(" { Variable { "," Variable } ":" Type ";" } ")"
 Variable      ::= Identifier [ "=" Expression ]
 
 StructDef ::= "struct" Identifier "{" { VariableDef ";" } "}"
@@ -80,8 +79,8 @@ CBoolExpression ::= DboolExpression { OrderRelation DboolExpression }
 DboolExpression ::= AExpression { BitwiseShift AExpression } 
 AExpression ::= BExpression { PlusMinus BExpression } 
 BExpression ::= CExpression { ( Div | Asterisk | Mod ) CExpression } 
-CExpression ::= [ "<" Type ">" ] DExpression
-DExpression ::= ([ PlusMinus ] | { Ampersand | Asterisk } | [ IncDec ]) EExpression 
+CExpression ::= [ "<" ( Type ">" ] DExpression
+DExpression ::= ( [ PlusMinus ] | [ Ampersand ] { Asterisk } | [ IncDec ] ) EExpression 
 EExpression ::= FExpression [ IncDec ] 
 FExpression ::= JExpression { ArrayElement | MemberSelect Identifier | FuncArgs }
 JExpression ::= "(" Expression ")" | Const | Identifier 
@@ -92,7 +91,7 @@ FuncArgs    ::= "(" [ Expression { "," Expression }] ")"
 For         ::= "for" "(" 
                 [ VariableDef | Expression ] ";" 
                 [ Expression ] ";" 
-                [ Expression { Sequencing Expression }] ")" Code 
+                [ Expression ] ")" Code 
 If          ::= "if" "(" Expression ")" Code [ "else" ( If | Code )] 
 While       ::= "while" "(" Expression ")" Code 
 DoWhile     ::= "do" Code "while" "(" Expression ")" 

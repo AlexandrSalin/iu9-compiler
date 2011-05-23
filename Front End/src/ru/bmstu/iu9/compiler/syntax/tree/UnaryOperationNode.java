@@ -42,6 +42,11 @@ public class UnaryOperationNode extends ExpressionNode {
         return this.operation().equals(operation);
     }
     
+    @Override
+    public String toString() {
+        return super.toString() + " " + operation().name();
+    }
+    
     public Operation operation() { 
         return Operation.values()[this.operation]; 
     }

@@ -75,6 +75,10 @@ final public class BinaryOperationNode extends ExpressionNode {
     public boolean is(Operation operation) {
         return this.operation().is(operation);
     }
+    @Override
+    public String toString() {
+        return super.toString() + " " + operation().name();
+    }
     
     public Operation operation() { 
         return Operation.values()[this.operation]; 

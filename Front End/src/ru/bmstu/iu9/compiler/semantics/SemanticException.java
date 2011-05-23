@@ -10,23 +10,27 @@ import ru.bmstu.iu9.compiler.syntax.tree.*;
  *
  * @author anton.bobukh
  */
-public class SymanticException extends CompilerException {
-    protected SymanticException() {
+public class SemanticException extends CompilerException {
+    protected SemanticException() {
         super();
     }
+    
+    protected SemanticException(Throwable cause) {
+        super(cause);
+    }
 
-    protected SymanticException(String message) {
+    protected SemanticException(String message) {
         super(message);
     }
 }
 
-class NonAnalysisErrorException extends SymanticException {
-    public NonAnalysisErrorException() {
-        super();
+class NonAnalysisErrorException extends SemanticException {
+    public NonAnalysisErrorException(Throwable cause) {
+        super(cause);
     }
 }
 
-class IncompatibleTypesInStatementException extends SymanticException {
+class IncompatibleTypesInStatementException extends SemanticException {
     public IncompatibleTypesInStatementException(
             BaseType typeOne,
             BaseType typeTwo) {
@@ -40,7 +44,7 @@ class IncompatibleTypesInStatementException extends SymanticException {
     public final BaseType typeTwo;
 }
 
-class UnexpectedTypeException extends SymanticException {
+class UnexpectedTypeException extends SemanticException {
     public UnexpectedTypeException(
             BaseType found,
             BaseType expected) {
@@ -78,7 +82,7 @@ class UnexpectedTypeException extends SymanticException {
     public final String expected;
 }
 
-class OperationIncompatibleWithTypeException extends SymanticException {
+class OperationIncompatibleWithTypeException extends SemanticException {
     public OperationIncompatibleWithTypeException(
             BinaryOperationNode.Operation operation,
             BaseType type) {
@@ -107,7 +111,7 @@ class OperationIncompatibleWithTypeException extends SymanticException {
     public final BaseType type;
 }
 
-class UseOfUndeclaredVariableException extends SymanticException {
+class UseOfUndeclaredVariableException extends SemanticException {
     public UseOfUndeclaredVariableException(String name) {
 
         super("Use of undeclared variable \"" + name + "\"");
@@ -117,7 +121,31 @@ class UseOfUndeclaredVariableException extends SymanticException {
     public final String name;
 }
 
-class UseOfUndeclaredTypeException extends SymanticException {
+class InvalidJumpStatementException extends SemanticException {
+    public InvalidJumpStatementException() {
+        super("Unexpected jump statement");
+    }
+}
+
+class VariableRedefinitionException extends SemanticException {
+    public VariableRedefinitionException(String name) {
+        super("Variable " + name + " is already defined");
+        this.name = name;
+    }
+    
+    public final String name;
+}
+
+class InvalidLeftHandValueException extends SemanticException {
+    public InvalidLeftHandValueException(BaseNode node) {
+        super("Invalid laft hand value: " + node.toString());
+        this.node = node;
+    }
+    
+    public final BaseNode node;
+}
+
+class UseOfUndeclaredTypeException extends SemanticException {
     public UseOfUndeclaredTypeException(String typename) {
 
         super("Use of undeclared type \"" + typename + "\"");
@@ -127,7 +155,7 @@ class UseOfUndeclaredTypeException extends SymanticException {
     public final String typename;
 }
 
-class MissingReturnStatementException extends SymanticException {
+class MissingReturnStatementException extends SemanticException {
     public MissingReturnStatementException() {
         super("Missing return statement");
     }

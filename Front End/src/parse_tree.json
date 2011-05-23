@@ -1,14 +1,1333 @@
 {
   "children": [
     {
+      "block": {
+        "children": [
+          {
+            "children": [
+              {
+                "value": {
+                  "value": true,
+                  "constantType": 3,
+                  "dInfo": {
+                    "position": {
+                      "line": 3,
+                      "position": 13,
+                      "index": 37
+                    }
+                  },
+                  "nodeType": 14
+                },
+                "dInfo": {
+                  "position": {
+                    "line": 3,
+                    "position": 9,
+                    "index": 33
+                  }
+                },
+                "name": "a",
+                "type": {
+                  "primitive": 1,
+                  "type": 3,
+                  "constancy": false,
+                  "dInfo": {
+                    "position": {
+                      "line": 3,
+                      "position": 20,
+                      "index": 44
+                    }
+                  },
+                  "nodeType": 20
+                },
+                "nodeType": 2
+              },
+              {
+                "value": {
+                  "value": false,
+                  "constantType": 3,
+                  "dInfo": {
+                    "position": {
+                      "line": 4,
+                      "position": 13,
+                      "index": 62
+                    }
+                  },
+                  "nodeType": 14
+                },
+                "dInfo": {
+                  "position": {
+                    "line": 4,
+                    "position": 9,
+                    "index": 58
+                  }
+                },
+                "name": "b",
+                "type": {
+                  "primitive": 1,
+                  "type": 3,
+                  "constancy": false,
+                  "dInfo": {
+                    "position": {
+                      "line": 4,
+                      "position": 21,
+                      "index": 70
+                    }
+                  },
+                  "nodeType": 20
+                },
+                "nodeType": 2
+              },
+              {
+                "dInfo": {
+                  "position": {
+                    "line": 5,
+                    "position": 9,
+                    "index": 84
+                  }
+                },
+                "name": "c",
+                "type": {
+                  "primitive": 0,
+                  "type": 3,
+                  "constancy": false,
+                  "dInfo": {
+                    "position": {
+                      "line": 5,
+                      "position": 13,
+                      "index": 88
+                    }
+                  },
+                  "nodeType": 20
+                },
+                "nodeType": 2
+              },
+              {
+                "dInfo": {
+                  "position": {
+                    "line": 6,
+                    "position": 9,
+                    "index": 101
+                  }
+                },
+                "name": "d",
+                "type": {
+                  "length": {
+                    "value": 5,
+                    "constantType": 0,
+                    "dInfo": {
+                      "position": {
+                        "line": 6,
+                        "position": 14,
+                        "index": 106
+                      }
+                    },
+                    "nodeType": 14
+                  },
+                  "element": {
+                    "length": {
+                      "value": 5,
+                      "constantType": 0,
+                      "dInfo": {
+                        "position": {
+                          "line": 6,
+                          "position": 17,
+                          "index": 109
+                        }
+                      },
+                      "nodeType": 14
+                    },
+                    "element": {
+                      "length": {
+                        "value": 6,
+                        "constantType": 0,
+                        "dInfo": {
+                          "position": {
+                            "line": 6,
+                            "position": 20,
+                            "index": 112
+                          }
+                        },
+                        "nodeType": 14
+                      },
+                      "element": {
+                        "primitive": 0,
+                        "type": 3,
+                        "constancy": false,
+                        "dInfo": {
+                          "position": {
+                            "line": 6,
+                            "position": 23,
+                            "index": 115
+                          }
+                        },
+                        "nodeType": 20
+                      },
+                      "type": 0,
+                      "constancy": false,
+                      "dInfo": {
+                        "position": {
+                          "line": 6,
+                          "position": 19,
+                          "index": 111
+                        }
+                      },
+                      "nodeType": 20
+                    },
+                    "type": 0,
+                    "constancy": false,
+                    "dInfo": {
+                      "position": {
+                        "line": 6,
+                        "position": 16,
+                        "index": 108
+                      }
+                    },
+                    "nodeType": 20
+                  },
+                  "type": 0,
+                  "constancy": false,
+                  "dInfo": {
+                    "position": {
+                      "line": 6,
+                      "position": 13,
+                      "index": 105
+                    }
+                  },
+                  "nodeType": 20
+                },
+                "nodeType": 2
+              }
+            ],
+            "nodeType": 26
+          },
+          {
+            "expression": {
+              "name": "c",
+              "dInfo": {
+                "position": {
+                  "line": 9,
+                  "position": 12,
+                  "index": 139
+                }
+              },
+              "nodeType": 13
+            },
+            "cases": {
+              "children": [
+                {
+                  "expression": {
+                    "value": 1,
+                    "constantType": 0,
+                    "dInfo": {
+                      "position": {
+                        "line": 10,
+                        "position": 10,
+                        "index": 153
+                      }
+                    },
+                    "nodeType": 14
+                  },
+                  "block": {
+                    "children": [
+                      {
+                        "returnExpr": {
+                          "value": 1,
+                          "constantType": 0,
+                          "dInfo": {
+                            "position": {
+                              "line": 11,
+                              "position": 16,
+                              "index": 171
+                            }
+                          },
+                          "nodeType": 14
+                        },
+                        "dInfo": {
+                          "position": {
+                            "line": 11,
+                            "position": 9,
+                            "index": 164
+                          }
+                        },
+                        "nodeType": 23
+                      },
+                      {
+                        "dInfo": {
+                          "position": {
+                            "line": 12,
+                            "position": 5,
+                            "index": 178
+                          }
+                        },
+                        "nodeType": 22
+                      }
+                    ],
+                    "nodeType": 12
+                  },
+                  "dInfo": {
+                    "position": {
+                      "line": 10,
+                      "position": 5,
+                      "index": 148
+                    }
+                  },
+                  "nodeType": 9
+                },
+                {
+                  "expression": {
+                    "value": 2,
+                    "constantType": 0,
+                    "dInfo": {
+                      "position": {
+                        "line": 13,
+                        "position": 10,
+                        "index": 194
+                      }
+                    },
+                    "nodeType": 14
+                  },
+                  "block": {
+                    "children": [
+                      {
+                        "returnExpr": {
+                          "value": 2,
+                          "constantType": 0,
+                          "dInfo": {
+                            "position": {
+                              "line": 14,
+                              "position": 16,
+                              "index": 212
+                            }
+                          },
+                          "nodeType": 14
+                        },
+                        "dInfo": {
+                          "position": {
+                            "line": 14,
+                            "position": 9,
+                            "index": 205
+                          }
+                        },
+                        "nodeType": 23
+                      }
+                    ],
+                    "nodeType": 12
+                  },
+                  "dInfo": {
+                    "position": {
+                      "line": 13,
+                      "position": 5,
+                      "index": 189
+                    }
+                  },
+                  "nodeType": 9
+                }
+              ],
+              "nodeType": 12
+            },
+            "defaultNode": {
+              "block": {
+                "children": [
+                  {
+                    "returnExpr": {
+                      "value": 3,
+                      "constantType": 0,
+                      "dInfo": {
+                        "position": {
+                          "line": 16,
+                          "position": 16,
+                          "index": 243
+                        }
+                      },
+                      "nodeType": 14
+                    },
+                    "dInfo": {
+                      "position": {
+                        "line": 16,
+                        "position": 9,
+                        "index": 236
+                      }
+                    },
+                    "nodeType": 23
+                  }
+                ],
+                "nodeType": 12
+              },
+              "dInfo": {
+                "position": {
+                  "line": 15,
+                  "position": 5,
+                  "index": 219
+                }
+              },
+              "nodeType": 4
+            },
+            "dInfo": {
+              "position": {
+                "line": 9,
+                "position": 5,
+                "index": 132
+              }
+            },
+            "nodeType": 8
+          },
+          {
+            "initialization": {
+              "children": [
+                {
+                  "value": {
+                    "value": 0,
+                    "constantType": 0,
+                    "dInfo": {
+                      "position": {
+                        "line": 20,
+                        "position": 17,
+                        "index": 270
+                      }
+                    },
+                    "nodeType": 14
+                  },
+                  "dInfo": {
+                    "position": {
+                      "line": 20,
+                      "position": 13,
+                      "index": 266
+                    }
+                  },
+                  "name": "i",
+                  "type": {
+                    "primitive": 0,
+                    "type": 3,
+                    "constancy": false,
+                    "dInfo": {
+                      "position": {
+                        "line": 20,
+                        "position": 21,
+                        "index": 274
+                      }
+                    },
+                    "nodeType": 20
+                  },
+                  "nodeType": 2
+                }
+              ],
+              "nodeType": 26
+            },
+            "step": {
+              "children": [
+                {
+                  "node": {
+                    "name": "i",
+                    "dInfo": {
+                      "position": {
+                        "line": 20,
+                        "position": 37,
+                        "index": 290
+                      }
+                    },
+                    "nodeType": 13
+                  },
+                  "operation": 7,
+                  "dInfo": {
+                    "position": {
+                      "line": 20,
+                      "position": 35,
+                      "index": 288
+                    }
+                  },
+                  "nodeType": 1
+                }
+              ],
+              "nodeType": 12
+            },
+            "expression": {
+              "left": {
+                "name": "i",
+                "dInfo": {
+                  "position": {
+                    "line": 20,
+                    "position": 26,
+                    "index": 279
+                  }
+                },
+                "nodeType": 13
+              },
+              "right": {
+                "value": 10,
+                "constantType": 0,
+                "dInfo": {
+                  "position": {
+                    "line": 20,
+                    "position": 31,
+                    "index": 284
+                  }
+                },
+                "nodeType": 14
+              },
+              "operation": 11,
+              "dInfo": {
+                "position": {
+                  "line": 20,
+                  "position": 28,
+                  "index": 281
+                }
+              },
+              "nodeType": 0
+            },
+            "block": {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "value": {
+                        "value": 10.0,
+                        "constantType": 2,
+                        "dInfo": {
+                          "position": {
+                            "line": 21,
+                            "position": 17,
+                            "index": 311
+                          }
+                        },
+                        "nodeType": 14
+                      },
+                      "dInfo": {
+                        "position": {
+                          "line": 21,
+                          "position": 13,
+                          "index": 307
+                        }
+                      },
+                      "name": "l",
+                      "type": {
+                        "primitive": 3,
+                        "type": 3,
+                        "constancy": false,
+                        "dInfo": {
+                          "position": {
+                            "line": 21,
+                            "position": 24,
+                            "index": 318
+                          }
+                        },
+                        "nodeType": 20
+                      },
+                      "nodeType": 2
+                    }
+                  ],
+                  "nodeType": 26
+                },
+                {
+                  "condition": {
+                    "name": "a",
+                    "dInfo": {
+                      "position": {
+                        "line": 23,
+                        "position": 12,
+                        "index": 338
+                      }
+                    },
+                    "nodeType": 13
+                  },
+                  "block": {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "dInfo": {
+                              "position": {
+                                "line": 24,
+                                "position": 17,
+                                "index": 359
+                              }
+                            },
+                            "name": "k",
+                            "type": {
+                              "primitive": 6,
+                              "type": 3,
+                              "constancy": false,
+                              "dInfo": {
+                                "position": {
+                                  "line": 24,
+                                  "position": 21,
+                                  "index": 363
+                                }
+                              },
+                              "nodeType": 20
+                            },
+                            "nodeType": 2
+                          }
+                        ],
+                        "nodeType": 26
+                      }
+                    ],
+                    "nodeType": 12
+                  },
+                  "dInfo": {
+                    "position": {
+                      "line": 23,
+                      "position": 9,
+                      "index": 335
+                    }
+                  },
+                  "nodeType": 7
+                },
+                {
+                  "children": [
+                    {
+                      "dInfo": {
+                        "position": {
+                          "line": 27,
+                          "position": 13,
+                          "index": 392
+                        }
+                      },
+                      "name": "m",
+                      "type": {
+                        "primitive": 4,
+                        "type": 3,
+                        "constancy": false,
+                        "dInfo": {
+                          "position": {
+                            "line": 27,
+                            "position": 17,
+                            "index": 396
+                          }
+                        },
+                        "nodeType": 20
+                      },
+                      "nodeType": 2
+                    }
+                  ],
+                  "nodeType": 26
+                }
+              ],
+              "nodeType": 12
+            },
+            "dInfo": {
+              "position": {
+                "line": 20,
+                "position": 5,
+                "index": 258
+              }
+            },
+            "nodeType": 6
+          },
+          {
+            "left": {
+              "left": {
+                "left": {
+                  "left": {
+                    "name": "d",
+                    "dInfo": {
+                      "position": {
+                        "line": 30,
+                        "position": 5,
+                        "index": 413
+                      }
+                    },
+                    "nodeType": 13
+                  },
+                  "right": {
+                    "value": 0,
+                    "constantType": 0,
+                    "dInfo": {
+                      "position": {
+                        "line": 30,
+                        "position": 7,
+                        "index": 415
+                      }
+                    },
+                    "nodeType": 14
+                  },
+                  "operation": 30,
+                  "dInfo": {
+                    "position": {
+                      "line": 30,
+                      "position": 7,
+                      "index": 415
+                    }
+                  },
+                  "nodeType": 0
+                },
+                "right": {
+                  "value": 1,
+                  "constantType": 0,
+                  "dInfo": {
+                    "position": {
+                      "line": 30,
+                      "position": 10,
+                      "index": 418
+                    }
+                  },
+                  "nodeType": 14
+                },
+                "operation": 30,
+                "dInfo": {
+                  "position": {
+                    "line": 30,
+                    "position": 10,
+                    "index": 418
+                  }
+                },
+                "nodeType": 0
+              },
+              "right": {
+                "value": 2,
+                "constantType": 0,
+                "dInfo": {
+                  "position": {
+                    "line": 30,
+                    "position": 13,
+                    "index": 421
+                  }
+                },
+                "nodeType": 14
+              },
+              "operation": 30,
+              "dInfo": {
+                "position": {
+                  "line": 30,
+                  "position": 13,
+                  "index": 421
+                }
+              },
+              "nodeType": 0
+            },
+            "right": {
+              "value": 5,
+              "constantType": 0,
+              "dInfo": {
+                "position": {
+                  "line": 30,
+                  "position": 18,
+                  "index": 426
+                }
+              },
+              "nodeType": 14
+            },
+            "operation": 0,
+            "dInfo": {
+              "position": {
+                "line": 30,
+                "position": 16,
+                "index": 424
+              }
+            },
+            "nodeType": 0
+          },
+          {
+            "children": [
+              {
+                "dInfo": {
+                  "position": {
+                    "line": 32,
+                    "position": 9,
+                    "index": 438
+                  }
+                },
+                "name": "t",
+                "type": {
+                  "name": "abc",
+                  "type": 1,
+                  "constancy": false,
+                  "dInfo": {
+                    "position": {
+                      "line": 32,
+                      "position": 13,
+                      "index": 442
+                    }
+                  },
+                  "nodeType": 20
+                },
+                "nodeType": 2
+              }
+            ],
+            "nodeType": 26
+          },
+          {
+            "left": {
+              "left": {
+                "name": "t",
+                "dInfo": {
+                  "position": {
+                    "line": 34,
+                    "position": 5,
+                    "index": 459
+                  }
+                },
+                "nodeType": 13
+              },
+              "right": {
+                "name": "a",
+                "dInfo": {
+                  "position": {
+                    "line": 34,
+                    "position": 7,
+                    "index": 461
+                  }
+                },
+                "nodeType": 13
+              },
+              "operation": 29,
+              "dInfo": {
+                "position": {
+                  "line": 34,
+                  "position": 6,
+                  "index": 460
+                }
+              },
+              "nodeType": 0
+            },
+            "right": {
+              "value": 5,
+              "constantType": 0,
+              "dInfo": {
+                "position": {
+                  "line": 34,
+                  "position": 11,
+                  "index": 465
+                }
+              },
+              "nodeType": 14
+            },
+            "operation": 0,
+            "dInfo": {
+              "position": {
+                "line": 34,
+                "position": 9,
+                "index": 463
+              }
+            },
+            "nodeType": 0
+          },
+          {
+            "left": {
+              "left": {
+                "name": "t",
+                "dInfo": {
+                  "position": {
+                    "line": 35,
+                    "position": 5,
+                    "index": 472
+                  }
+                },
+                "nodeType": 13
+              },
+              "right": {
+                "name": "b",
+                "dInfo": {
+                  "position": {
+                    "line": 35,
+                    "position": 7,
+                    "index": 474
+                  }
+                },
+                "nodeType": 13
+              },
+              "operation": 29,
+              "dInfo": {
+                "position": {
+                  "line": 35,
+                  "position": 6,
+                  "index": 473
+                }
+              },
+              "nodeType": 0
+            },
+            "right": {
+              "value": 10,
+              "constantType": 0,
+              "dInfo": {
+                "position": {
+                  "line": 35,
+                  "position": 11,
+                  "index": 478
+                }
+              },
+              "nodeType": 14
+            },
+            "operation": 0,
+            "dInfo": {
+              "position": {
+                "line": 35,
+                "position": 9,
+                "index": 476
+              }
+            },
+            "nodeType": 0
+          },
+          {
+            "left": {
+              "left": {
+                "name": "t",
+                "dInfo": {
+                  "position": {
+                    "line": 36,
+                    "position": 5,
+                    "index": 486
+                  }
+                },
+                "nodeType": 13
+              },
+              "right": {
+                "name": "c",
+                "dInfo": {
+                  "position": {
+                    "line": 36,
+                    "position": 7,
+                    "index": 488
+                  }
+                },
+                "nodeType": 13
+              },
+              "operation": 29,
+              "dInfo": {
+                "position": {
+                  "line": 36,
+                  "position": 6,
+                  "index": 487
+                }
+              },
+              "nodeType": 0
+            },
+            "right": {
+              "value": 1.2,
+              "constantType": 2,
+              "dInfo": {
+                "position": {
+                  "line": 36,
+                  "position": 11,
+                  "index": 492
+                }
+              },
+              "nodeType": 14
+            },
+            "operation": 0,
+            "dInfo": {
+              "position": {
+                "line": 36,
+                "position": 9,
+                "index": 490
+              }
+            },
+            "nodeType": 0
+          },
+          {
+            "left": {
+              "left": {
+                "name": "t",
+                "dInfo": {
+                  "position": {
+                    "line": 37,
+                    "position": 5,
+                    "index": 501
+                  }
+                },
+                "nodeType": 13
+              },
+              "right": {
+                "name": "d",
+                "dInfo": {
+                  "position": {
+                    "line": 37,
+                    "position": 7,
+                    "index": 503
+                  }
+                },
+                "nodeType": 13
+              },
+              "operation": 29,
+              "dInfo": {
+                "position": {
+                  "line": 37,
+                  "position": 6,
+                  "index": 502
+                }
+              },
+              "nodeType": 0
+            },
+            "right": {
+              "node": {
+                "name": "foo",
+                "dInfo": {
+                  "position": {
+                    "line": 37,
+                    "position": 12,
+                    "index": 508
+                  }
+                },
+                "nodeType": 13
+              },
+              "operation": 4,
+              "dInfo": {
+                "position": {
+                  "line": 37,
+                  "position": 11,
+                  "index": 507
+                }
+              },
+              "nodeType": 1
+            },
+            "operation": 0,
+            "dInfo": {
+              "position": {
+                "line": 37,
+                "position": 9,
+                "index": 505
+              }
+            },
+            "nodeType": 0
+          },
+          {
+            "left": {
+              "left": {
+                "left": {
+                  "left": {
+                    "name": "t",
+                    "dInfo": {
+                      "position": {
+                        "line": 39,
+                        "position": 5,
+                        "index": 518
+                      }
+                    },
+                    "nodeType": 13
+                  },
+                  "right": {
+                    "name": "e",
+                    "dInfo": {
+                      "position": {
+                        "line": 39,
+                        "position": 7,
+                        "index": 520
+                      }
+                    },
+                    "nodeType": 13
+                  },
+                  "operation": 29,
+                  "dInfo": {
+                    "position": {
+                      "line": 39,
+                      "position": 6,
+                      "index": 519
+                    }
+                  },
+                  "nodeType": 0
+                },
+                "right": {
+                  "name": "b",
+                  "dInfo": {
+                    "position": {
+                      "line": 39,
+                      "position": 9,
+                      "index": 522
+                    }
+                  },
+                  "nodeType": 13
+                },
+                "operation": 29,
+                "dInfo": {
+                  "position": {
+                    "line": 39,
+                    "position": 8,
+                    "index": 521
+                  }
+                },
+                "nodeType": 0
+              },
+              "right": {
+                "name": "a",
+                "dInfo": {
+                  "position": {
+                    "line": 39,
+                    "position": 11,
+                    "index": 524
+                  }
+                },
+                "nodeType": 13
+              },
+              "operation": 29,
+              "dInfo": {
+                "position": {
+                  "line": 39,
+                  "position": 10,
+                  "index": 523
+                }
+              },
+              "nodeType": 0
+            },
+            "right": {
+              "value": 5,
+              "constantType": 0,
+              "dInfo": {
+                "position": {
+                  "line": 39,
+                  "position": 15,
+                  "index": 528
+                }
+              },
+              "nodeType": 14
+            },
+            "operation": 0,
+            "dInfo": {
+              "position": {
+                "line": 39,
+                "position": 13,
+                "index": 526
+              }
+            },
+            "nodeType": 0
+          },
+          {
+            "condition": {
+              "left": {
+                "name": "a",
+                "dInfo": {
+                  "position": {
+                    "line": 41,
+                    "position": 8,
+                    "index": 539
+                  }
+                },
+                "nodeType": 13
+              },
+              "right": {
+                "name": "b",
+                "dInfo": {
+                  "position": {
+                    "line": 41,
+                    "position": 13,
+                    "index": 544
+                  }
+                },
+                "nodeType": 13
+              },
+              "operation": 17,
+              "dInfo": {
+                "position": {
+                  "line": 41,
+                  "position": 10,
+                  "index": 541
+                }
+              },
+              "nodeType": 0
+            },
+            "elseNode": {
+              "block": {
+                "children": [
+                  {
+                    "condition": {
+                      "left": {
+                        "name": "a",
+                        "dInfo": {
+                          "position": {
+                            "line": 43,
+                            "position": 15,
+                            "index": 584
+                          }
+                        },
+                        "nodeType": 13
+                      },
+                      "right": {
+                        "name": "b",
+                        "dInfo": {
+                          "position": {
+                            "line": 43,
+                            "position": 20,
+                            "index": 589
+                          }
+                        },
+                        "nodeType": 13
+                      },
+                      "operation": 18,
+                      "dInfo": {
+                        "position": {
+                          "line": 43,
+                          "position": 17,
+                          "index": 586
+                        }
+                      },
+                      "nodeType": 0
+                    },
+                    "block": {
+                      "children": [
+                        {
+                          "children": [
+                            {
+                              "dInfo": {
+                                "position": {
+                                  "line": 44,
+                                  "position": 13,
+                                  "index": 606
+                                }
+                              },
+                              "name": "c",
+                              "type": {
+                                "primitive": 3,
+                                "type": 3,
+                                "constancy": false,
+                                "dInfo": {
+                                  "position": {
+                                    "line": 44,
+                                    "position": 17,
+                                    "index": 610
+                                  }
+                                },
+                                "nodeType": 20
+                              },
+                              "nodeType": 2
+                            }
+                          ],
+                          "nodeType": 26
+                        }
+                      ],
+                      "nodeType": 12
+                    },
+                    "dInfo": {
+                      "position": {
+                        "line": 43,
+                        "position": 12,
+                        "index": 581
+                      }
+                    },
+                    "nodeType": 7
+                  }
+                ],
+                "nodeType": 12
+              },
+              "dInfo": {
+                "position": {
+                  "line": 43,
+                  "position": 7,
+                  "index": 576
+                }
+              },
+              "nodeType": 3
+            },
+            "block": {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "dInfo": {
+                        "position": {
+                          "line": 42,
+                          "position": 13,
+                          "index": 561
+                        }
+                      },
+                      "name": "e",
+                      "type": {
+                        "primitive": 0,
+                        "type": 3,
+                        "constancy": false,
+                        "dInfo": {
+                          "position": {
+                            "line": 42,
+                            "position": 17,
+                            "index": 565
+                          }
+                        },
+                        "nodeType": 20
+                      },
+                      "nodeType": 2
+                    }
+                  ],
+                  "nodeType": 26
+                }
+              ],
+              "nodeType": 12
+            },
+            "dInfo": {
+              "position": {
+                "line": 41,
+                "position": 5,
+                "index": 536
+              }
+            },
+            "nodeType": 7
+          }
+        ],
+        "nodeType": 12
+      },
+      "dInfo": {
+        "position": {
+          "line": 1,
+          "position": 6,
+          "index": 5
+        }
+      },
+      "name": "q",
+      "type": {
+        "arguments": {
+          "children": [],
+          "nodeType": 26
+        },
+        "returnValue": {
+          "primitive": 0,
+          "type": 3,
+          "constancy": false,
+          "dInfo": {
+            "position": {
+              "line": 1,
+              "position": 10,
+              "index": 9
+            }
+          },
+          "nodeType": 20
+        },
+        "type": 2,
+        "constancy": false,
+        "dInfo": {
+          "position": {
+            "line": 1,
+            "position": 7,
+            "index": 6
+          }
+        },
+        "nodeType": 20
+      },
+      "nodeType": 15
+    },
+    {
+      "children": [
+        {
+          "dInfo": {
+            "position": {
+              "line": 49,
+              "position": 5,
+              "index": 645
+            }
+          },
+          "name": "bar",
+          "type": {
+            "name": "abc",
+            "type": 1,
+            "constancy": true,
+            "dInfo": {
+              "position": {
+                "line": 49,
+                "position": 17,
+                "index": 657
+              }
+            },
+            "nodeType": 20
+          },
+          "nodeType": 2
+        }
+      ],
+      "nodeType": 26
+    },
+    {
       "declarations": {
         "children": [
           {
             "dInfo": {
               "position": {
-                "line": 53,
+                "line": 52,
                 "position": 5,
-                "index": 675
+                "index": 692
               }
             },
             "name": "a",
@@ -18,9 +1337,9 @@
               "constancy": false,
               "dInfo": {
                 "position": {
-                  "line": 53,
+                  "line": 52,
                   "position": 7,
-                  "index": 677
+                  "index": 694
                 }
               },
               "nodeType": 20
@@ -30,9 +1349,9 @@
           {
             "dInfo": {
               "position": {
-                "line": 54,
+                "line": 53,
                 "position": 5,
-                "index": 686
+                "index": 703
               }
             },
             "name": "b",
@@ -44,9 +1363,9 @@
                   "constancy": false,
                   "dInfo": {
                     "position": {
-                      "line": 54,
+                      "line": 53,
                       "position": 9,
-                      "index": 690
+                      "index": 707
                     }
                   },
                   "nodeType": 20
@@ -56,9 +1375,9 @@
                 "constancy": false,
                 "dInfo": {
                   "position": {
-                    "line": 54,
+                    "line": 53,
                     "position": 8,
-                    "index": 689
+                    "index": 706
                   }
                 },
                 "nodeType": 20
@@ -68,9 +1387,9 @@
               "constancy": false,
               "dInfo": {
                 "position": {
-                  "line": 54,
+                  "line": 53,
                   "position": 7,
-                  "index": 688
+                  "index": 705
                 }
               },
               "nodeType": 20
@@ -82,9 +1401,9 @@
       },
       "dInfo": {
         "position": {
-          "line": 52,
+          "line": 51,
           "position": 1,
-          "index": 658
+          "index": 675
         }
       },
       "name": "def",
@@ -94,9 +1413,9 @@
         "constancy": false,
         "dInfo": {
           "position": {
-            "line": 52,
+            "line": 51,
             "position": 1,
-            "index": 658
+            "index": 675
           }
         },
         "nodeType": 20
@@ -109,9 +1428,9 @@
           {
             "dInfo": {
               "position": {
-                "line": 57,
+                "line": 56,
                 "position": 5,
-                "index": 722
+                "index": 739
               }
             },
             "name": "a",
@@ -121,9 +1440,33 @@
               "constancy": false,
               "dInfo": {
                 "position": {
-                  "line": 57,
+                  "line": 56,
                   "position": 11,
-                  "index": 728
+                  "index": 745
+                }
+              },
+              "nodeType": 20
+            },
+            "nodeType": 2
+          },
+          {
+            "dInfo": {
+              "position": {
+                "line": 56,
+                "position": 8,
+                "index": 742
+              }
+            },
+            "name": "b",
+            "type": {
+              "primitive": 0,
+              "type": 3,
+              "constancy": false,
+              "dInfo": {
+                "position": {
+                  "line": 56,
+                  "position": 11,
+                  "index": 745
                 }
               },
               "nodeType": 20
@@ -134,20 +1477,20 @@
             "dInfo": {
               "position": {
                 "line": 57,
-                "position": 8,
-                "index": 725
+                "position": 5,
+                "index": 754
               }
             },
-            "name": "b",
+            "name": "c",
             "type": {
-              "primitive": 0,
+              "primitive": 3,
               "type": 3,
               "constancy": false,
               "dInfo": {
                 "position": {
                   "line": 57,
-                  "position": 11,
-                  "index": 728
+                  "position": 7,
+                  "index": 756
                 }
               },
               "nodeType": 20
@@ -159,31 +1502,7 @@
               "position": {
                 "line": 58,
                 "position": 5,
-                "index": 737
-              }
-            },
-            "name": "c",
-            "type": {
-              "primitive": 3,
-              "type": 3,
-              "constancy": false,
-              "dInfo": {
-                "position": {
-                  "line": 58,
-                  "position": 7,
-                  "index": 739
-                }
-              },
-              "nodeType": 20
-            },
-            "nodeType": 2
-          },
-          {
-            "dInfo": {
-              "position": {
-                "line": 59,
-                "position": 5,
-                "index": 751
+                "index": 768
               }
             },
             "name": "d",
@@ -194,9 +1513,9 @@
                     {
                       "dInfo": {
                         "position": {
-                          "line": 59,
+                          "line": 58,
                           "position": 12,
-                          "index": 758
+                          "index": 775
                         }
                       },
                       "name": "q",
@@ -206,9 +1525,9 @@
                         "constancy": false,
                         "dInfo": {
                           "position": {
-                            "line": 59,
+                            "line": 58,
                             "position": 17,
-                            "index": 763
+                            "index": 780
                           }
                         },
                         "nodeType": 20
@@ -218,9 +1537,9 @@
                     {
                       "dInfo": {
                         "position": {
-                          "line": 59,
+                          "line": 58,
                           "position": 15,
-                          "index": 761
+                          "index": 778
                         }
                       },
                       "name": "w",
@@ -230,9 +1549,9 @@
                         "constancy": false,
                         "dInfo": {
                           "position": {
-                            "line": 59,
+                            "line": 58,
                             "position": 17,
-                            "index": 763
+                            "index": 780
                           }
                         },
                         "nodeType": 20
@@ -242,9 +1561,9 @@
                     {
                       "dInfo": {
                         "position": {
-                          "line": 59,
+                          "line": 58,
                           "position": 22,
-                          "index": 768
+                          "index": 785
                         }
                       },
                       "name": "e",
@@ -254,9 +1573,9 @@
                         "constancy": false,
                         "dInfo": {
                           "position": {
-                            "line": 59,
+                            "line": 58,
                             "position": 27,
-                            "index": 773
+                            "index": 790
                           }
                         },
                         "nodeType": 20
@@ -266,9 +1585,9 @@
                     {
                       "dInfo": {
                         "position": {
-                          "line": 59,
+                          "line": 58,
                           "position": 25,
-                          "index": 771
+                          "index": 788
                         }
                       },
                       "name": "r",
@@ -278,9 +1597,9 @@
                         "constancy": false,
                         "dInfo": {
                           "position": {
-                            "line": 59,
+                            "line": 58,
                             "position": 27,
-                            "index": 773
+                            "index": 790
                           }
                         },
                         "nodeType": 20
@@ -296,9 +1615,9 @@
                   "constancy": false,
                   "dInfo": {
                     "position": {
-                      "line": 59,
+                      "line": 58,
                       "position": 34,
-                      "index": 780
+                      "index": 797
                     }
                   },
                   "nodeType": 20
@@ -307,9 +1626,46 @@
                 "constancy": false,
                 "dInfo": {
                   "position": {
-                    "line": 59,
+                    "line": 58,
                     "position": 11,
-                    "index": 757
+                    "index": 774
+                  }
+                },
+                "nodeType": 20
+              },
+              "primitive": 7,
+              "type": 3,
+              "constancy": false,
+              "dInfo": {
+                "position": {
+                  "line": 58,
+                  "position": 7,
+                  "index": 770
+                }
+              },
+              "nodeType": 20
+            },
+            "nodeType": 2
+          },
+          {
+            "dInfo": {
+              "position": {
+                "line": 59,
+                "position": 5,
+                "index": 806
+              }
+            },
+            "name": "e",
+            "type": {
+              "pointerType": {
+                "name": "def",
+                "type": 1,
+                "constancy": false,
+                "dInfo": {
+                  "position": {
+                    "line": 59,
+                    "position": 8,
+                    "index": 809
                   }
                 },
                 "nodeType": 20
@@ -321,44 +1677,7 @@
                 "position": {
                   "line": 59,
                   "position": 7,
-                  "index": 753
-                }
-              },
-              "nodeType": 20
-            },
-            "nodeType": 2
-          },
-          {
-            "dInfo": {
-              "position": {
-                "line": 60,
-                "position": 5,
-                "index": 789
-              }
-            },
-            "name": "e",
-            "type": {
-              "pointerType": {
-                "name": "def",
-                "type": 1,
-                "constancy": false,
-                "dInfo": {
-                  "position": {
-                    "line": 60,
-                    "position": 8,
-                    "index": 792
-                  }
-                },
-                "nodeType": 20
-              },
-              "primitive": 7,
-              "type": 3,
-              "constancy": false,
-              "dInfo": {
-                "position": {
-                  "line": 60,
-                  "position": 7,
-                  "index": 791
+                  "index": 808
                 }
               },
               "nodeType": 20
@@ -370,9 +1689,9 @@
       },
       "dInfo": {
         "position": {
-          "line": 56,
+          "line": 55,
           "position": 1,
-          "index": 705
+          "index": 722
         }
       },
       "name": "abc",
@@ -382,9 +1701,9 @@
         "constancy": false,
         "dInfo": {
           "position": {
-            "line": 56,
+            "line": 55,
             "position": 1,
-            "index": 705
+            "index": 722
           }
         },
         "nodeType": 20
@@ -399,9 +1718,9 @@
               {
                 "dInfo": {
                   "position": {
-                    "line": 64,
+                    "line": 63,
                     "position": 9,
-                    "index": 860
+                    "index": 877
                   }
                 },
                 "name": "bar",
@@ -411,9 +1730,9 @@
                   "constancy": true,
                   "dInfo": {
                     "position": {
-                      "line": 64,
+                      "line": 63,
                       "position": 21,
-                      "index": 872
+                      "index": 889
                     }
                   },
                   "nodeType": 20
@@ -426,9 +1745,9 @@
           {
             "dInfo": {
               "position": {
-                "line": 65,
+                "line": 64,
                 "position": 5,
-                "index": 888
+                "index": 905
               }
             },
             "nodeType": 23
@@ -438,9 +1757,9 @@
       },
       "dInfo": {
         "position": {
-          "line": 63,
+          "line": 62,
           "position": 6,
-          "index": 813
+          "index": 830
         }
       },
       "name": "foo",
@@ -450,9 +1769,9 @@
             {
               "dInfo": {
                 "position": {
-                  "line": 63,
+                  "line": 62,
                   "position": 10,
-                  "index": 817
+                  "index": 834
                 }
               },
               "name": "q",
@@ -462,9 +1781,9 @@
                 "constancy": true,
                 "dInfo": {
                   "position": {
-                    "line": 63,
+                    "line": 62,
                     "position": 21,
-                    "index": 828
+                    "index": 845
                   }
                 },
                 "nodeType": 20
@@ -474,9 +1793,9 @@
             {
               "dInfo": {
                 "position": {
-                  "line": 63,
+                  "line": 62,
                   "position": 13,
-                  "index": 820
+                  "index": 837
                 }
               },
               "name": "w",
@@ -486,9 +1805,9 @@
                 "constancy": true,
                 "dInfo": {
                   "position": {
-                    "line": 63,
+                    "line": 62,
                     "position": 21,
-                    "index": 828
+                    "index": 845
                   }
                 },
                 "nodeType": 20
@@ -498,9 +1817,9 @@
             {
               "dInfo": {
                 "position": {
-                  "line": 63,
+                  "line": 62,
                   "position": 26,
-                  "index": 833
+                  "index": 850
                 }
               },
               "name": "e",
@@ -510,9 +1829,9 @@
                 "constancy": false,
                 "dInfo": {
                   "position": {
-                    "line": 63,
+                    "line": 62,
                     "position": 31,
-                    "index": 838
+                    "index": 855
                   }
                 },
                 "nodeType": 20
@@ -522,9 +1841,9 @@
             {
               "dInfo": {
                 "position": {
-                  "line": 63,
+                  "line": 62,
                   "position": 29,
-                  "index": 836
+                  "index": 853
                 }
               },
               "name": "r",
@@ -534,9 +1853,9 @@
                 "constancy": false,
                 "dInfo": {
                   "position": {
-                    "line": 63,
+                    "line": 62,
                     "position": 31,
-                    "index": 838
+                    "index": 855
                   }
                 },
                 "nodeType": 20
@@ -552,9 +1871,9 @@
           "constancy": false,
           "dInfo": {
             "position": {
-              "line": 63,
+              "line": 62,
               "position": 38,
-              "index": 845
+              "index": 862
             }
           },
           "nodeType": 20
@@ -563,9 +1882,9 @@
         "constancy": false,
         "dInfo": {
           "position": {
-            "line": 63,
+            "line": 62,
             "position": 9,
-            "index": 816
+            "index": 833
           }
         },
         "nodeType": 20
@@ -580,18 +1899,18 @@
             "constantType": 0,
             "dInfo": {
               "position": {
-                "line": 69,
+                "line": 68,
                 "position": 9,
-                "index": 913
+                "index": 930
               }
             },
             "nodeType": 14
           },
           "dInfo": {
             "position": {
-              "line": 69,
+              "line": 68,
               "position": 5,
-              "index": 909
+              "index": 926
             }
           },
           "name": "q",
@@ -601,9 +1920,9 @@
             "constancy": true,
             "dInfo": {
               "position": {
-                "line": 69,
+                "line": 68,
                 "position": 19,
-                "index": 923
+                "index": 940
               }
             },
             "nodeType": 20
@@ -616,18 +1935,18 @@
             "constantType": 2,
             "dInfo": {
               "position": {
-                "line": 70,
+                "line": 69,
                 "position": 9,
-                "index": 936
+                "index": 953
               }
             },
             "nodeType": 14
           },
           "dInfo": {
             "position": {
-              "line": 70,
+              "line": 69,
               "position": 5,
-              "index": 932
+              "index": 949
             }
           },
           "name": "w",
@@ -637,9 +1956,9 @@
             "constancy": false,
             "dInfo": {
               "position": {
-                "line": 70,
+                "line": 69,
                 "position": 27,
-                "index": 954
+                "index": 971
               }
             },
             "nodeType": 20
@@ -652,18 +1971,18 @@
             "constantType": 2,
             "dInfo": {
               "position": {
-                "line": 70,
+                "line": 69,
                 "position": 21,
-                "index": 948
+                "index": 965
               }
             },
             "nodeType": 14
           },
           "dInfo": {
             "position": {
-              "line": 70,
+              "line": 69,
               "position": 17,
-              "index": 944
+              "index": 961
             }
           },
           "name": "e",
@@ -673,9 +1992,9 @@
             "constancy": false,
             "dInfo": {
               "position": {
-                "line": 70,
+                "line": 69,
                 "position": 27,
-                "index": 954
+                "index": 971
               }
             },
             "nodeType": 20
@@ -696,18 +2015,18 @@
                   "constantType": 0,
                   "dInfo": {
                     "position": {
-                      "line": 76,
+                      "line": 75,
                       "position": 13,
-                      "index": 1053
+                      "index": 1070
                     }
                   },
                   "nodeType": 14
                 },
                 "dInfo": {
                   "position": {
-                    "line": 76,
+                    "line": 75,
                     "position": 9,
-                    "index": 1049
+                    "index": 1066
                   }
                 },
                 "name": "a",
@@ -717,9 +2036,9 @@
                   "constancy": false,
                   "dInfo": {
                     "position": {
-                      "line": 76,
+                      "line": 75,
                       "position": 17,
-                      "index": 1057
+                      "index": 1074
                     }
                   },
                   "nodeType": 20
@@ -732,18 +2051,18 @@
                   "constantType": 0,
                   "dInfo": {
                     "position": {
-                      "line": 77,
+                      "line": 76,
                       "position": 13,
-                      "index": 1074
+                      "index": 1091
                     }
                   },
                   "nodeType": 14
                 },
                 "dInfo": {
                   "position": {
-                    "line": 77,
+                    "line": 76,
                     "position": 9,
-                    "index": 1070
+                    "index": 1087
                   }
                 },
                 "name": "b",
@@ -753,9 +2072,81 @@
                   "constancy": true,
                   "dInfo": {
                     "position": {
-                      "line": 77,
+                      "line": 76,
                       "position": 24,
-                      "index": 1085
+                      "index": 1102
+                    }
+                  },
+                  "nodeType": 20
+                },
+                "nodeType": 2
+              },
+              {
+                "dInfo": {
+                  "position": {
+                    "line": 77,
+                    "position": 9,
+                    "index": 1115
+                  }
+                },
+                "name": "l",
+                "type": {
+                  "length": {
+                    "value": 10,
+                    "constantType": 0,
+                    "dInfo": {
+                      "position": {
+                        "line": 77,
+                        "position": 14,
+                        "index": 1120
+                      }
+                    },
+                    "nodeType": 14
+                  },
+                  "element": {
+                    "length": {
+                      "value": 5,
+                      "constantType": 0,
+                      "dInfo": {
+                        "position": {
+                          "line": 77,
+                          "position": 18,
+                          "index": 1124
+                        }
+                      },
+                      "nodeType": 14
+                    },
+                    "element": {
+                      "primitive": 0,
+                      "type": 3,
+                      "constancy": false,
+                      "dInfo": {
+                        "position": {
+                          "line": 77,
+                          "position": 21,
+                          "index": 1127
+                        }
+                      },
+                      "nodeType": 20
+                    },
+                    "type": 0,
+                    "constancy": false,
+                    "dInfo": {
+                      "position": {
+                        "line": 77,
+                        "position": 17,
+                        "index": 1123
+                      }
+                    },
+                    "nodeType": 20
+                  },
+                  "type": 0,
+                  "constancy": false,
+                  "dInfo": {
+                    "position": {
+                      "line": 77,
+                      "position": 13,
+                      "index": 1119
                     }
                   },
                   "nodeType": 20
@@ -767,67 +2158,19 @@
                   "position": {
                     "line": 78,
                     "position": 9,
-                    "index": 1098
+                    "index": 1140
                   }
                 },
-                "name": "l",
+                "name": "m",
                 "type": {
-                  "length": {
-                    "value": 10,
-                    "constantType": 0,
-                    "dInfo": {
-                      "position": {
-                        "line": 78,
-                        "position": 14,
-                        "index": 1103
-                      }
-                    },
-                    "nodeType": 14
-                  },
-                  "element": {
-                    "length": {
-                      "value": 5,
-                      "constantType": 0,
-                      "dInfo": {
-                        "position": {
-                          "line": 78,
-                          "position": 18,
-                          "index": 1107
-                        }
-                      },
-                      "nodeType": 14
-                    },
-                    "element": {
-                      "primitive": 0,
-                      "type": 3,
-                      "constancy": false,
-                      "dInfo": {
-                        "position": {
-                          "line": 78,
-                          "position": 21,
-                          "index": 1110
-                        }
-                      },
-                      "nodeType": 20
-                    },
-                    "type": 0,
-                    "constancy": false,
-                    "dInfo": {
-                      "position": {
-                        "line": 78,
-                        "position": 17,
-                        "index": 1106
-                      }
-                    },
-                    "nodeType": 20
-                  },
-                  "type": 0,
+                  "name": "abc",
+                  "type": 1,
                   "constancy": false,
                   "dInfo": {
                     "position": {
                       "line": 78,
                       "position": 13,
-                      "index": 1102
+                      "index": 1144
                     }
                   },
                   "nodeType": 20
@@ -839,31 +2182,7 @@
                   "position": {
                     "line": 79,
                     "position": 9,
-                    "index": 1123
-                  }
-                },
-                "name": "m",
-                "type": {
-                  "name": "abc",
-                  "type": 1,
-                  "constancy": false,
-                  "dInfo": {
-                    "position": {
-                      "line": 79,
-                      "position": 13,
-                      "index": 1127
-                    }
-                  },
-                  "nodeType": 20
-                },
-                "nodeType": 2
-              },
-              {
-                "dInfo": {
-                  "position": {
-                    "line": 80,
-                    "position": 9,
-                    "index": 1147
+                    "index": 1164
                   }
                 },
                 "name": "g",
@@ -873,9 +2192,9 @@
                   "constancy": false,
                   "dInfo": {
                     "position": {
-                      "line": 80,
+                      "line": 79,
                       "position": 13,
-                      "index": 1151
+                      "index": 1168
                     }
                   },
                   "nodeType": 20
@@ -891,9 +2210,9 @@
                 "name": "m",
                 "dInfo": {
                   "position": {
-                    "line": 88,
+                    "line": 87,
                     "position": 5,
-                    "index": 1237
+                    "index": 1254
                   }
                 },
                 "nodeType": 13
@@ -902,9 +2221,9 @@
                 "name": "d",
                 "dInfo": {
                   "position": {
-                    "line": 88,
+                    "line": 87,
                     "position": 7,
-                    "index": 1239
+                    "index": 1256
                   }
                 },
                 "nodeType": 13
@@ -912,9 +2231,9 @@
               "operation": 29,
               "dInfo": {
                 "position": {
-                  "line": 88,
+                  "line": 87,
                   "position": 6,
-                  "index": 1238
+                  "index": 1255
                 }
               },
               "nodeType": 0
@@ -924,9 +2243,9 @@
                 "name": "main",
                 "dInfo": {
                   "position": {
-                    "line": 88,
+                    "line": 87,
                     "position": 12,
-                    "index": 1244
+                    "index": 1261
                   }
                 },
                 "nodeType": 13
@@ -934,9 +2253,9 @@
               "operation": 4,
               "dInfo": {
                 "position": {
-                  "line": 88,
+                  "line": 87,
                   "position": 11,
-                  "index": 1243
+                  "index": 1260
                 }
               },
               "nodeType": 1
@@ -944,9 +2263,9 @@
             "operation": 0,
             "dInfo": {
               "position": {
-                "line": 88,
+                "line": 87,
                 "position": 9,
-                "index": 1241
+                "index": 1258
               }
             },
             "nodeType": 0
@@ -956,9 +2275,9 @@
               "name": "a",
               "dInfo": {
                 "position": {
-                  "line": 89,
+                  "line": 88,
                   "position": 5,
-                  "index": 1254
+                  "index": 1271
                 }
               },
               "nodeType": 13
@@ -970,9 +2289,9 @@
                     "name": "m",
                     "dInfo": {
                       "position": {
-                        "line": 89,
+                        "line": 88,
                         "position": 11,
-                        "index": 1260
+                        "index": 1277
                       }
                     },
                     "nodeType": 13
@@ -981,9 +2300,9 @@
                     "name": "d",
                     "dInfo": {
                       "position": {
-                        "line": 89,
+                        "line": 88,
                         "position": 13,
-                        "index": 1262
+                        "index": 1279
                       }
                     },
                     "nodeType": 13
@@ -991,9 +2310,9 @@
                   "operation": 29,
                   "dInfo": {
                     "position": {
-                      "line": 89,
+                      "line": 88,
                       "position": 12,
-                      "index": 1261
+                      "index": 1278
                     }
                   },
                   "nodeType": 0
@@ -1001,9 +2320,9 @@
                 "operation": 5,
                 "dInfo": {
                   "position": {
-                    "line": 89,
+                    "line": 88,
                     "position": 10,
-                    "index": 1259
+                    "index": 1276
                   }
                 },
                 "nodeType": 1
@@ -1014,9 +2333,9 @@
                     "name": "args",
                     "dInfo": {
                       "position": {
-                        "line": 89,
+                        "line": 88,
                         "position": 16,
-                        "index": 1265
+                        "index": 1282
                       }
                     },
                     "nodeType": 13
@@ -1026,9 +2345,9 @@
               },
               "dInfo": {
                 "position": {
-                  "line": 89,
+                  "line": 88,
                   "position": 15,
-                  "index": 1264
+                  "index": 1281
                 }
               },
               "nodeType": 18
@@ -1036,9 +2355,9 @@
             "operation": 0,
             "dInfo": {
               "position": {
-                "line": 89,
+                "line": 88,
                 "position": 7,
-                "index": 1256
+                "index": 1273
               }
             },
             "nodeType": 0
@@ -1048,9 +2367,9 @@
               "name": "g",
               "dInfo": {
                 "position": {
-                  "line": 91,
+                  "line": 90,
                   "position": 5,
-                  "index": 1277
+                  "index": 1294
                 }
               },
               "nodeType": 13
@@ -1062,9 +2381,9 @@
                 "constancy": false,
                 "dInfo": {
                   "position": {
-                    "line": 91,
+                    "line": 90,
                     "position": 10,
-                    "index": 1282
+                    "index": 1299
                   }
                 },
                 "nodeType": 20
@@ -1073,9 +2392,9 @@
                 "name": "a",
                 "dInfo": {
                   "position": {
-                    "line": 91,
+                    "line": 90,
                     "position": 15,
-                    "index": 1287
+                    "index": 1304
                   }
                 },
                 "nodeType": 13
@@ -1083,9 +2402,9 @@
               "operation": 8,
               "dInfo": {
                 "position": {
-                  "line": 91,
+                  "line": 90,
                   "position": 15,
-                  "index": 1287
+                  "index": 1304
                 }
               },
               "nodeType": 1
@@ -1093,9 +2412,9 @@
             "operation": 0,
             "dInfo": {
               "position": {
-                "line": 91,
+                "line": 90,
                 "position": 7,
-                "index": 1279
+                "index": 1296
               }
             },
             "nodeType": 0
@@ -1107,9 +2426,9 @@
                   "name": "l",
                   "dInfo": {
                     "position": {
-                      "line": 93,
+                      "line": 92,
                       "position": 5,
-                      "index": 1295
+                      "index": 1312
                     }
                   },
                   "nodeType": 13
@@ -1119,9 +2438,9 @@
                   "constantType": 0,
                   "dInfo": {
                     "position": {
-                      "line": 93,
+                      "line": 92,
                       "position": 7,
-                      "index": 1297
+                      "index": 1314
                     }
                   },
                   "nodeType": 14
@@ -1129,9 +2448,9 @@
                 "operation": 30,
                 "dInfo": {
                   "position": {
-                    "line": 93,
+                    "line": 92,
                     "position": 7,
-                    "index": 1297
+                    "index": 1314
                   }
                 },
                 "nodeType": 0
@@ -1141,9 +2460,9 @@
                 "constantType": 0,
                 "dInfo": {
                   "position": {
-                    "line": 93,
+                    "line": 92,
                     "position": 10,
-                    "index": 1300
+                    "index": 1317
                   }
                 },
                 "nodeType": 14
@@ -1151,9 +2470,9 @@
               "operation": 30,
               "dInfo": {
                 "position": {
-                  "line": 93,
+                  "line": 92,
                   "position": 10,
-                  "index": 1300
+                  "index": 1317
                 }
               },
               "nodeType": 0
@@ -1162,9 +2481,9 @@
               "name": "a",
               "dInfo": {
                 "position": {
-                  "line": 93,
+                  "line": 92,
                   "position": 15,
-                  "index": 1305
+                  "index": 1322
                 }
               },
               "nodeType": 13
@@ -1172,9 +2491,9 @@
             "operation": 0,
             "dInfo": {
               "position": {
-                "line": 93,
+                "line": 92,
                 "position": 13,
-                "index": 1303
+                "index": 1320
               }
             },
             "nodeType": 0
@@ -1187,18 +2506,18 @@
                   "constantType": 1,
                   "dInfo": {
                     "position": {
-                      "line": 95,
+                      "line": 94,
                       "position": 13,
-                      "index": 1321
+                      "index": 1338
                     }
                   },
                   "nodeType": 14
                 },
                 "dInfo": {
                   "position": {
-                    "line": 95,
+                    "line": 94,
                     "position": 9,
-                    "index": 1317
+                    "index": 1334
                   }
                 },
                 "name": "c",
@@ -1208,9 +2527,9 @@
                   "constancy": false,
                   "dInfo": {
                     "position": {
-                      "line": 95,
+                      "line": 94,
                       "position": 19,
-                      "index": 1327
+                      "index": 1344
                     }
                   },
                   "nodeType": 20
@@ -1228,9 +2547,9 @@
                     "name": "c",
                     "dInfo": {
                       "position": {
-                        "line": 96,
+                        "line": 95,
                         "position": 14,
-                        "index": 1346
+                        "index": 1363
                       }
                     },
                     "nodeType": 13
@@ -1238,18 +2557,18 @@
                   "operation": 4,
                   "dInfo": {
                     "position": {
-                      "line": 96,
+                      "line": 95,
                       "position": 13,
-                      "index": 1345
+                      "index": 1362
                     }
                   },
                   "nodeType": 1
                 },
                 "dInfo": {
                   "position": {
-                    "line": 96,
+                    "line": 95,
                     "position": 9,
-                    "index": 1341
+                    "index": 1358
                   }
                 },
                 "name": "q",
@@ -1260,9 +2579,9 @@
                     "constancy": false,
                     "dInfo": {
                       "position": {
-                        "line": 96,
+                        "line": 95,
                         "position": 19,
-                        "index": 1351
+                        "index": 1368
                       }
                     },
                     "nodeType": 20
@@ -1272,9 +2591,9 @@
                   "constancy": false,
                   "dInfo": {
                     "position": {
-                      "line": 96,
+                      "line": 95,
                       "position": 18,
-                      "index": 1350
+                      "index": 1367
                     }
                   },
                   "nodeType": 20
@@ -1289,9 +2608,9 @@
               "name": "args",
               "dInfo": {
                 "position": {
-                  "line": 97,
+                  "line": 96,
                   "position": 5,
-                  "index": 1361
+                  "index": 1378
                 }
               },
               "nodeType": 13
@@ -1301,9 +2620,9 @@
                 "name": "q",
                 "dInfo": {
                   "position": {
-                    "line": 97,
+                    "line": 96,
                     "position": 13,
-                    "index": 1369
+                    "index": 1386
                   }
                 },
                 "nodeType": 13
@@ -1311,9 +2630,9 @@
               "operation": 4,
               "dInfo": {
                 "position": {
-                  "line": 97,
+                  "line": 96,
                   "position": 12,
-                  "index": 1368
+                  "index": 1385
                 }
               },
               "nodeType": 1
@@ -1321,9 +2640,9 @@
             "operation": 0,
             "dInfo": {
               "position": {
-                "line": 97,
+                "line": 96,
                 "position": 10,
-                "index": 1366
+                "index": 1383
               }
             },
             "nodeType": 0
@@ -1334,9 +2653,9 @@
                 "name": "c",
                 "dInfo": {
                   "position": {
-                    "line": 100,
+                    "line": 99,
                     "position": 8,
-                    "index": 1395
+                    "index": 1412
                   }
                 },
                 "nodeType": 13
@@ -1346,9 +2665,9 @@
                 "constantType": 1,
                 "dInfo": {
                   "position": {
-                    "line": 100,
+                    "line": 99,
                     "position": 13,
-                    "index": 1400
+                    "index": 1417
                   }
                 },
                 "nodeType": 14
@@ -1356,9 +2675,9 @@
               "operation": 13,
               "dInfo": {
                 "position": {
-                  "line": 100,
+                  "line": 99,
                   "position": 10,
-                  "index": 1397
+                  "index": 1414
                 }
               },
               "nodeType": 0
@@ -1370,9 +2689,9 @@
               },
               "dInfo": {
                 "position": {
-                  "line": 102,
+                  "line": 101,
                   "position": 7,
-                  "index": 1431
+                  "index": 1448
                 }
               },
               "nodeType": 3
@@ -1385,18 +2704,18 @@
                     "constantType": 0,
                     "dInfo": {
                       "position": {
-                        "line": 101,
+                        "line": 100,
                         "position": 16,
-                        "index": 1422
+                        "index": 1439
                       }
                     },
                     "nodeType": 14
                   },
                   "dInfo": {
                     "position": {
-                      "line": 101,
+                      "line": 100,
                       "position": 9,
-                      "index": 1415
+                      "index": 1432
                     }
                   },
                   "nodeType": 23
@@ -1406,9 +2725,9 @@
             },
             "dInfo": {
               "position": {
-                "line": 100,
+                "line": 99,
                 "position": 5,
-                "index": 1392
+                "index": 1409
               }
             },
             "nodeType": 7
@@ -1418,9 +2737,9 @@
               "name": "a",
               "dInfo": {
                 "position": {
-                  "line": 106,
+                  "line": 105,
                   "position": 12,
-                  "index": 1476
+                  "index": 1493
                 }
               },
               "nodeType": 13
@@ -1433,9 +2752,9 @@
                     "constantType": 0,
                     "dInfo": {
                       "position": {
-                        "line": 107,
+                        "line": 106,
                         "position": 14,
-                        "index": 1494
+                        "index": 1511
                       }
                     },
                     "nodeType": 14
@@ -1448,18 +2767,18 @@
                           "constantType": 0,
                           "dInfo": {
                             "position": {
-                              "line": 108,
+                              "line": 107,
                               "position": 20,
-                              "index": 1516
+                              "index": 1533
                             }
                           },
                           "nodeType": 14
                         },
                         "dInfo": {
                           "position": {
-                            "line": 108,
+                            "line": 107,
                             "position": 13,
-                            "index": 1509
+                            "index": 1526
                           }
                         },
                         "nodeType": 23
@@ -1467,9 +2786,9 @@
                       {
                         "dInfo": {
                           "position": {
-                            "line": 109,
+                            "line": 108,
                             "position": 9,
-                            "index": 1527
+                            "index": 1544
                           }
                         },
                         "nodeType": 22
@@ -1479,9 +2798,9 @@
                   },
                   "dInfo": {
                     "position": {
-                      "line": 107,
+                      "line": 106,
                       "position": 9,
-                      "index": 1489
+                      "index": 1506
                     }
                   },
                   "nodeType": 9
@@ -1492,9 +2811,9 @@
                     "constantType": 0,
                     "dInfo": {
                       "position": {
-                        "line": 110,
+                        "line": 109,
                         "position": 14,
-                        "index": 1547
+                        "index": 1564
                       }
                     },
                     "nodeType": 14
@@ -1507,18 +2826,18 @@
                           "constantType": 0,
                           "dInfo": {
                             "position": {
-                              "line": 111,
+                              "line": 110,
                               "position": 20,
-                              "index": 1569
+                              "index": 1586
                             }
                           },
                           "nodeType": 14
                         },
                         "dInfo": {
                           "position": {
-                            "line": 111,
+                            "line": 110,
                             "position": 13,
-                            "index": 1562
+                            "index": 1579
                           }
                         },
                         "nodeType": 23
@@ -1528,9 +2847,9 @@
                   },
                   "dInfo": {
                     "position": {
-                      "line": 110,
+                      "line": 109,
                       "position": 9,
-                      "index": 1542
+                      "index": 1559
                     }
                   },
                   "nodeType": 9
@@ -1547,18 +2866,18 @@
                       "constantType": 0,
                       "dInfo": {
                         "position": {
-                          "line": 113,
+                          "line": 112,
                           "position": 20,
-                          "index": 1608
+                          "index": 1625
                         }
                       },
                       "nodeType": 14
                     },
                     "dInfo": {
                       "position": {
-                        "line": 113,
+                        "line": 112,
                         "position": 13,
-                        "index": 1601
+                        "index": 1618
                       }
                     },
                     "nodeType": 23
@@ -1568,18 +2887,18 @@
               },
               "dInfo": {
                 "position": {
-                  "line": 112,
+                  "line": 111,
                   "position": 9,
-                  "index": 1580
+                  "index": 1597
                 }
               },
               "nodeType": 4
             },
             "dInfo": {
               "position": {
-                "line": 106,
+                "line": 105,
                 "position": 5,
-                "index": 1469
+                "index": 1486
               }
             },
             "nodeType": 8
@@ -1590,9 +2909,9 @@
                 "name": "a",
                 "dInfo": {
                   "position": {
-                    "line": 118,
+                    "line": 117,
                     "position": 13,
-                    "index": 1657
+                    "index": 1674
                   }
                 },
                 "nodeType": 13
@@ -1601,9 +2920,9 @@
                 "name": "b",
                 "dInfo": {
                   "position": {
-                    "line": 118,
+                    "line": 117,
                     "position": 18,
-                    "index": 1662
+                    "index": 1679
                   }
                 },
                 "nodeType": 13
@@ -1611,9 +2930,9 @@
               "operation": 11,
               "dInfo": {
                 "position": {
-                  "line": 118,
+                  "line": 117,
                   "position": 15,
-                  "index": 1659
+                  "index": 1676
                 }
               },
               "nodeType": 0
@@ -1626,18 +2945,18 @@
                     "constantType": 0,
                     "dInfo": {
                       "position": {
-                        "line": 117,
+                        "line": 116,
                         "position": 16,
-                        "index": 1642
+                        "index": 1659
                       }
                     },
                     "nodeType": 14
                   },
                   "dInfo": {
                     "position": {
-                      "line": 117,
+                      "line": 116,
                       "position": 9,
-                      "index": 1635
+                      "index": 1652
                     }
                   },
                   "nodeType": 23
@@ -1647,9 +2966,9 @@
             },
             "dInfo": {
               "position": {
-                "line": 116,
+                "line": 115,
                 "position": 5,
-                "index": 1622
+                "index": 1639
               }
             },
             "nodeType": 11
@@ -1660,9 +2979,9 @@
                 "name": "a",
                 "dInfo": {
                   "position": {
-                    "line": 120,
+                    "line": 119,
                     "position": 8,
-                    "index": 1674
+                    "index": 1691
                   }
                 },
                 "nodeType": 13
@@ -1671,9 +2990,9 @@
                 "name": "b",
                 "dInfo": {
                   "position": {
-                    "line": 120,
+                    "line": 119,
                     "position": 12,
-                    "index": 1678
+                    "index": 1695
                   }
                 },
                 "nodeType": 13
@@ -1681,9 +3000,9 @@
               "operation": 8,
               "dInfo": {
                 "position": {
-                  "line": 120,
+                  "line": 119,
                   "position": 10,
-                  "index": 1676
+                  "index": 1693
                 }
               },
               "nodeType": 0
@@ -1697,9 +3016,9 @@
                       "constantType": 0,
                       "dInfo": {
                         "position": {
-                          "line": 121,
+                          "line": 120,
                           "position": 17,
-                          "index": 1699
+                          "index": 1716
                         }
                       },
                       "nodeType": 14
@@ -1707,18 +3026,18 @@
                     "operation": 2,
                     "dInfo": {
                       "position": {
-                        "line": 121,
+                        "line": 120,
                         "position": 16,
-                        "index": 1698
+                        "index": 1715
                       }
                     },
                     "nodeType": 1
                   },
                   "dInfo": {
                     "position": {
-                      "line": 121,
+                      "line": 120,
                       "position": 9,
-                      "index": 1691
+                      "index": 1708
                     }
                   },
                   "nodeType": 23
@@ -1728,9 +3047,9 @@
             },
             "dInfo": {
               "position": {
-                "line": 120,
+                "line": 119,
                 "position": 5,
-                "index": 1671
+                "index": 1688
               }
             },
             "nodeType": 7
@@ -1744,18 +3063,18 @@
                     "constantType": 0,
                     "dInfo": {
                       "position": {
-                        "line": 124,
+                        "line": 123,
                         "position": 17,
-                        "index": 1725
+                        "index": 1742
                       }
                     },
                     "nodeType": 14
                   },
                   "dInfo": {
                     "position": {
-                      "line": 124,
+                      "line": 123,
                       "position": 13,
-                      "index": 1721
+                      "index": 1738
                     }
                   },
                   "name": "i",
@@ -1765,9 +3084,9 @@
                     "constancy": false,
                     "dInfo": {
                       "position": {
-                        "line": 124,
+                        "line": 123,
                         "position": 21,
-                        "index": 1729
+                        "index": 1746
                       }
                     },
                     "nodeType": 20
@@ -1784,9 +3103,9 @@
                     "name": "i",
                     "dInfo": {
                       "position": {
-                        "line": 124,
+                        "line": 123,
                         "position": 37,
-                        "index": 1745
+                        "index": 1762
                       }
                     },
                     "nodeType": 13
@@ -1794,9 +3113,9 @@
                   "operation": 7,
                   "dInfo": {
                     "position": {
-                      "line": 124,
+                      "line": 123,
                       "position": 35,
-                      "index": 1743
+                      "index": 1760
                     }
                   },
                   "nodeType": 1
@@ -1809,9 +3128,9 @@
                 "name": "i",
                 "dInfo": {
                   "position": {
-                    "line": 124,
+                    "line": 123,
                     "position": 26,
-                    "index": 1734
+                    "index": 1751
                   }
                 },
                 "nodeType": 13
@@ -1821,9 +3140,9 @@
                 "constantType": 0,
                 "dInfo": {
                   "position": {
-                    "line": 124,
+                    "line": 123,
                     "position": 31,
-                    "index": 1739
+                    "index": 1756
                   }
                 },
                 "nodeType": 14
@@ -1831,9 +3150,9 @@
               "operation": 11,
               "dInfo": {
                 "position": {
-                  "line": 124,
+                  "line": 123,
                   "position": 28,
-                  "index": 1736
+                  "index": 1753
                 }
               },
               "nodeType": 0
@@ -1846,9 +3165,9 @@
                       "name": "i",
                       "dInfo": {
                         "position": {
-                          "line": 125,
+                          "line": 124,
                           "position": 12,
-                          "index": 1761
+                          "index": 1778
                         }
                       },
                       "nodeType": 13
@@ -1858,9 +3177,9 @@
                       "constantType": 0,
                       "dInfo": {
                         "position": {
-                          "line": 125,
+                          "line": 124,
                           "position": 16,
-                          "index": 1765
+                          "index": 1782
                         }
                       },
                       "nodeType": 14
@@ -1868,9 +3187,9 @@
                     "operation": 8,
                     "dInfo": {
                       "position": {
-                        "line": 125,
+                        "line": 124,
                         "position": 14,
-                        "index": 1763
+                        "index": 1780
                       }
                     },
                     "nodeType": 0
@@ -1883,9 +3202,9 @@
                             "name": "b",
                             "dInfo": {
                               "position": {
-                                "line": 128,
+                                "line": 127,
                                 "position": 15,
-                                "index": 1818
+                                "index": 1835
                               }
                             },
                             "nodeType": 13
@@ -1893,9 +3212,9 @@
                           "operation": 6,
                           "dInfo": {
                             "position": {
-                              "line": 128,
+                              "line": 127,
                               "position": 13,
-                              "index": 1816
+                              "index": 1833
                             }
                           },
                           "nodeType": 1
@@ -1905,9 +3224,9 @@
                     },
                     "dInfo": {
                       "position": {
-                        "line": 127,
+                        "line": 126,
                         "position": 11,
-                        "index": 1797
+                        "index": 1814
                       }
                     },
                     "nodeType": 3
@@ -1919,9 +3238,9 @@
                           "name": "a",
                           "dInfo": {
                             "position": {
-                              "line": 126,
+                              "line": 125,
                               "position": 13,
-                              "index": 1782
+                              "index": 1799
                             }
                           },
                           "nodeType": 13
@@ -1929,9 +3248,9 @@
                         "operation": 0,
                         "dInfo": {
                           "position": {
-                            "line": 126,
+                            "line": 125,
                             "position": 14,
-                            "index": 1783
+                            "index": 1800
                           }
                         },
                         "nodeType": 1
@@ -1941,9 +3260,9 @@
                   },
                   "dInfo": {
                     "position": {
-                      "line": 125,
+                      "line": 124,
                       "position": 9,
-                      "index": 1758
+                      "index": 1775
                     }
                   },
                   "nodeType": 7
@@ -1953,9 +3272,9 @@
             },
             "dInfo": {
               "position": {
-                "line": 124,
+                "line": 123,
                 "position": 5,
-                "index": 1713
+                "index": 1730
               }
             },
             "nodeType": 6
@@ -1965,9 +3284,9 @@
       },
       "dInfo": {
         "position": {
-          "line": 73,
+          "line": 72,
           "position": 6,
-          "index": 971
+          "index": 988
         }
       },
       "name": "main",
@@ -1977,9 +3296,9 @@
             {
               "dInfo": {
                 "position": {
-                  "line": 73,
+                  "line": 72,
                   "position": 11,
-                  "index": 976
+                  "index": 993
                 }
               },
               "name": "args",
@@ -1991,9 +3310,9 @@
                     "constancy": false,
                     "dInfo": {
                       "position": {
-                        "line": 73,
+                        "line": 72,
                         "position": 32,
-                        "index": 997
+                        "index": 1014
                       }
                     },
                     "nodeType": 20
@@ -2003,9 +3322,9 @@
                   "constancy": true,
                   "dInfo": {
                     "position": {
-                      "line": 73,
+                      "line": 72,
                       "position": 30,
-                      "index": 995
+                      "index": 1012
                     }
                   },
                   "nodeType": 20
@@ -2015,9 +3334,9 @@
                 "constancy": true,
                 "dInfo": {
                   "position": {
-                    "line": 73,
+                    "line": 72,
                     "position": 22,
-                    "index": 987
+                    "index": 1004
                   }
                 },
                 "nodeType": 20
@@ -2033,9 +3352,9 @@
           "constancy": false,
           "dInfo": {
             "position": {
-              "line": 73,
+              "line": 72,
               "position": 38,
-              "index": 1003
+              "index": 1020
             }
           },
           "nodeType": 20
@@ -2044,9 +3363,9 @@
         "constancy": false,
         "dInfo": {
           "position": {
-            "line": 73,
+            "line": 72,
             "position": 10,
-            "index": 975
+            "index": 992
           }
         },
         "nodeType": 20

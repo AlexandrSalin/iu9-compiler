@@ -43,7 +43,7 @@ public class IRGenerator {
             
             BlockNode<BaseNode> tree = gson.fromJson(reader, BlockNode.class);
             SemanticAnalyser analyser = new SemanticAnalyser(tree);
-            analyser.Analyse();
+            analyser.analyse();
             
             IRGenerator generator = new IRGenerator(analyser.tree());
             generator.generate();

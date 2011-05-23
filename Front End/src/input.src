@@ -1,10 +1,9 @@
-/*
 func q() int {
     var (
-        a = true bool;
-        b = false bool;
-        c int;
-//        d [5][5][6] int;
+        a = true : bool;
+        b = false : bool;
+        c : int;
+        d : [5][5][6] int;
     );
 
     switch(c) {
@@ -18,19 +17,19 @@ func q() int {
     }
 
 
-    for(var i = 0 int; i <= 10; ++i) {
-        var l = 10.0 double;
+    for(var i = 0 : int; i <= 10; ++i) {
+        var l = 10.0 : double;
 
         if(a) {
-            var k long;
+            var k : long;
         }
 
-        var m char;
+        var m : char;
     }
 
     d[0][1][2] = 5;
 
-    var t struct abc;
+    var t : struct abc;
 
     t.a = 5;
     t.b = 10;
@@ -40,15 +39,15 @@ func q() int {
     t.e.b.a = 5;
 
     if(a && b) {
-        var b int;
+        var e : int;
     } else if(a || b) {
-        var c double;
+        var f : double;
     }
 //    return;
 }
 
-var bar const struct abc;
-     */
+var bar : const struct abc;
+     
 struct def {
     a int;
     b **struct abc;

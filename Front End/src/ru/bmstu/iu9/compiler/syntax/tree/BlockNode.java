@@ -61,6 +61,10 @@ public class BlockNode<T>
         return this;
     }
     
+    public boolean removeNode(T node) {
+        return children.remove(node);
+    }
+    
     private final List<T> children;
     
     

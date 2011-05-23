@@ -160,11 +160,9 @@ public class Parser {
     
     public static void main(String[] args) {
         
-        Parser parser = new Parser("C:\\Users\\maggot\\Documents\\" + 
-                "NetBeansProjects\\ru.bmstu.iu9.compiler\\Front End\\src\\output.json");
+        Parser parser = new Parser("C:\\Users\\Bobukh\\Documents\\NetBeansProjects\\Front End\\src\\output.json");
         parser.process();
-        parser.toJson("C:\\Users\\maggot\\Documents\\NetBeansProjects\\" +
-                "ru.bmstu.iu9.compiler\\Front End\\src\\parse_tree.json");
+        parser.toJson("C:\\Users\\Bobukh\\Documents\\NetBeansProjects\\Front End\\src\\parse_tree.json");
     }
     
     /**

@@ -25,8 +25,7 @@ public abstract class CompilerException extends Exception {
     public CompilerException Log(String module) {
         Logger.getLogger(module).log(
             Level.WARNING,
-            "",
-            this
+            this.getMessage()
         );
         return this;
     }
