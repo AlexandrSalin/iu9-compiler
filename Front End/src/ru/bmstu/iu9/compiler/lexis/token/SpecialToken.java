@@ -14,4 +14,9 @@ public final class SpecialToken extends Token {
     public SpecialToken(Position starting, Position ending, Type type) {
         super(new Fragment(starting, ending), type);
     }
+    
+    @Override
+    public String toString() {
+        return type().name();
+    }
 }

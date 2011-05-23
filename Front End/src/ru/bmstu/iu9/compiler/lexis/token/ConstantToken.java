@@ -4,10 +4,18 @@ import ru.bmstu.iu9.compiler.Fragment;
 
 /**
  *
- * @author maggot
+ * @author anton.bobukh
  */
-public abstract class ConstantToken extends Token {
-    protected ConstantToken(Fragment coordinates, Type type) {
+public abstract class ConstantToken<T> extends Token {
+    protected ConstantToken(Fragment coordinates, T value, Type type) {
         super(coordinates, type);
+        this.value = value;
     }
+    
+    @Override
+    public String toString() {
+        return value.toString();
+    }
+    
+    public final T value;
 }

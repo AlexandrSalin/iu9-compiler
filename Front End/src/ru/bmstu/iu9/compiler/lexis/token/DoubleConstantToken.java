@@ -7,19 +7,11 @@ import ru.bmstu.iu9.compiler.Position;
  *
  * @author maggot
  */
-public final class DoubleConstantToken extends ConstantToken {
+public final class DoubleConstantToken extends ConstantToken<Double> {
     public DoubleConstantToken(Fragment coordinates, double value) {
-        super(coordinates, Type.CONST_DOUBLE);
-        this.value = value;
+        super(coordinates, value, Type.CONST_DOUBLE);
     }
     public DoubleConstantToken(Position starting, Position ending, double value) {
-        super(new Fragment(starting, ending), Type.CONST_DOUBLE);
-        this.value = value;
+        super(new Fragment(starting, ending), value, Type.CONST_DOUBLE);
     }
-    
-    public Double value() { 
-        return this.value;
-    }
-    
-    private double value;
 }

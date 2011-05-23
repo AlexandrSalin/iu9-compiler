@@ -7,19 +7,11 @@ import ru.bmstu.iu9.compiler.Position;
  *
  * @author maggot
  */
-public final class CharConstantToken extends ConstantToken {
+public final class CharConstantToken extends ConstantToken<Integer> {
     public CharConstantToken(Fragment coordinates, int value) {
-        super(coordinates, Type.CONST_CHAR);
-        this.value = value;
+        super(coordinates, value, Type.CONST_CHAR);
     }
     public CharConstantToken(Position starting, Position ending, int value) {
-        super(new Fragment(starting, ending), Type.CONST_CHAR);
-        this.value = value;
+        super(new Fragment(starting, ending), value, Type.CONST_CHAR);
     }
-    
-    public Integer value() { 
-        return this.value; 
-    }
-    
-    private int value;
 }

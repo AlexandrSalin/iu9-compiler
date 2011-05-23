@@ -9,9 +9,6 @@ import ru.bmstu.iu9.compiler.ir.type.*;
 import ru.bmstu.iu9.compiler.syntax.tree.*;
 
 /**
- * @todo Добавить проверку lhv и rhv
- * @todo Проверка переопределения переменных
- * @todo Проверка правильности расстановки break и continue
  * 
  * @author maggot
  */

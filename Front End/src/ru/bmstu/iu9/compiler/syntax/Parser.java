@@ -528,7 +528,7 @@ public class Parser {
     
     private String Identifier() throws SyntaxException {
         if (checkTokens(iterator.current(), Token.Type.IDENTIFIER)) {
-            String identifier = ((IdentifierToken)iterator.current()).value();
+            String identifier = ((IdentifierToken)iterator.current()).value;
             nextToken();
             return identifier;
         } else {
@@ -1550,21 +1550,21 @@ public class Parser {
             case CONST_CHAR:
                 node = 
                     new CharConstantLeaf(
-                        ((CharConstantToken)iterator.current()).value(), 
+                        ((CharConstantToken)iterator.current()).value, 
                         pos
                     );
                 break;
             case CONST_DOUBLE:
                 node = 
                     new DoubleConstantLeaf(
-                        ((DoubleConstantToken)iterator.current()).value(), 
+                        ((DoubleConstantToken)iterator.current()).value, 
                         pos
                     );
                 break;
             case CONST_INT:
                 node = 
                     new IntegerConstantLeaf(
-                        ((IntegerConstantToken)iterator.current()).value(), 
+                        ((IntegerConstantToken)iterator.current()).value, 
                         pos
                     );
                 break;

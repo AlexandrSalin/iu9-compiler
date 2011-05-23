@@ -16,6 +16,15 @@ public class LexisException extends CompilerException {
     }
 }
 
+class InvalidLexemeException extends  LexisException {
+    public InvalidLexemeException(String lexeme) {
+        super("Invalid lexeme \"" + lexeme + "\"");
+        this.lexeme = lexeme;
+    }
+    
+    public final String lexeme;
+}
+
 class InvalidCodePointException extends LexisException {
     public InvalidCodePointException(CodePoint codePoint) {
         super(
