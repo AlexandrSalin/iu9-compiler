@@ -4,7 +4,8 @@ iu9-compiler
 bmstu iu9 compiler
 
 чтобы закачать пиши:
-в первый раз - git remote add origin https://github.com/iu9/iu9-compiler.git, и дальше
+в первый раз - git remote add origin https://github.com/iu9/iu9-compiler.git, и дальше.
+
 потом только это
 
 git add -A
