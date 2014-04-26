@@ -11,20 +11,11 @@ import ru.bmstu.iu9.compiler.Position;
  *
  * @author maggot
  */
-public class DoubleConstantLeaf extends ConstantLeaf {
+public class DoubleConstantLeaf extends ConstantLeaf<Double> {
     public DoubleConstantLeaf(double value, Position position) {
-        super(ConstantType.DOUBLE, position);
-        this.value = value;
+        super(ConstantType.DOUBLE, value, position);
     }
     public DoubleConstantLeaf(double value, DebugInfo dInfo) {
-        super(ConstantType.DOUBLE, dInfo);
-        this.value = value;
+        super(ConstantType.DOUBLE, value, dInfo);
     }
-    
-    @Override
-    public String toString() {
-        return Double.toString(this.value);
-    }
-    
-    public final double value;
 }

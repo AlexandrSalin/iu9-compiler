@@ -8,7 +8,9 @@ import java.util.ListIterator;
  *
  * @author maggot
  */
-class Code implements Iterable<Statement> {
+public class Code implements Iterable<Statement>, Cloneable {
+    CFG controlFlowGraph;
+
     public Code() {
         statements = new LinkedList<Statement>();
     }
@@ -18,10 +20,6 @@ class Code implements Iterable<Statement> {
         System.out.println(
                 currentIndex() + " :\t" + statement.toString()
             );
-    }
-    
-    public Statement[] statements() { 
-        return this.statements.toArray(new Statement[0]); 
     }
     
     public int nextIndex() {
@@ -42,11 +40,31 @@ class Code implements Iterable<Statement> {
     
     private List<Statement> statements;
 
+
     public void print() {
         for(int i = 0; i < statements.size(); ++i) {
             System.out.println(
                 i + " :\t" + statements.get(i).toString()
             );
         }
+    }
+
+    public Code clone() {
+        Code clone = new Code();
+        for (Statement st : statements) {
+            clone.addStatement(st);
+        }
+        return clone;
+    }
+
+    public void buildCFG(){
+        controlFlowGraph = new CFG(statements).build();
+    }
+
+    public CFG getCFG(){
+        if (controlFlowGraph != null){
+            return controlFlowGraph;
+        }
+        throw new RuntimeException("CFG is null for current code");
     }
 }

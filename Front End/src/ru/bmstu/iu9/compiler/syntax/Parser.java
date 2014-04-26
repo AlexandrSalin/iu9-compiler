@@ -20,7 +20,7 @@ import ru.bmstu.iu9.compiler.syntax.tree.*;
  * lexer.run();
  * lexer.toJson("tokens.json");
  * 
- * Parser parser = new Parser("tokens.src");
+ * Parser parser = new Parser("tokens.json");
  * parser.process();
  * parser.toJson("parser_tree.json");
  * </pre>
@@ -160,11 +160,9 @@ public class Parser {
     
     public static void main(String[] args) {
         
-        Parser parser = new Parser("C:\\Users\\maggot\\Documents\\" + 
-                "NetBeansProjects\\ru.bmstu.iu9.compiler\\Front End\\src\\output.json");
+        Parser parser = new Parser("src/output.json");
         parser.process();
-        parser.toJson("C:\\Users\\maggot\\Documents\\NetBeansProjects\\" +
-                "ru.bmstu.iu9.compiler\\Front End\\src\\parse_tree.json");
+        parser.toJson("src/parse_tree.json");
     }
     
     /**
@@ -1552,21 +1550,21 @@ public class Parser {
             case CONST_CHAR:
                 node = 
                     new CharConstantLeaf(
-                        ((CharConstantToken)iterator.current()).value(), 
+                        ((CharConstantToken)iterator.current()).value, 
                         pos
                     );
                 break;
             case CONST_DOUBLE:
                 node = 
                     new DoubleConstantLeaf(
-                        ((DoubleConstantToken)iterator.current()).value(), 
+                        ((DoubleConstantToken)iterator.current()).value, 
                         pos
                     );
                 break;
             case CONST_INT:
                 node = 
                     new IntegerConstantLeaf(
-                        ((IntegerConstantToken)iterator.current()).value(), 
+                        ((IntegerConstantToken)iterator.current()).value, 
                         pos
                     );
                 break;

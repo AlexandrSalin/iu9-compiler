@@ -2,7 +2,7 @@ package ru.bmstu.iu9.compiler.ir.type;
 
 /**
  *
- * @author maggot
+ * @author anton.bobukh
  */
 final public class InvalidType extends BaseType {
     public InvalidType() {

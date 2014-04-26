@@ -2,7 +2,7 @@ package ru.bmstu.iu9.compiler.ir.type;
 
 /**
  *
- * @author maggot
+ * @author anton.bobukh
  */
 public class PrimitiveType extends BaseType {
     public enum Type { 

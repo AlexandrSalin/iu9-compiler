@@ -4,25 +4,34 @@
  */
 package ru.bmstu.iu9.compiler.ir;
 
-import com.google.gson.*;
-import java.io.*;
-import java.util.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import ru.bmstu.iu9.compiler.Position;
 import ru.bmstu.iu9.compiler.ir.type.*;
-import ru.bmstu.iu9.compiler.semantics.*;
+import ru.bmstu.iu9.compiler.semantics.SemanticAnalyser;
 import ru.bmstu.iu9.compiler.syntax.tree.*;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Stack;
 
 /**
  *
+ * @todo RunStatement & IndirectRunStatement
  * @author anton.bobukh
  */
+
+
+//LinkedList<Statement> statements
 public class IRGenerator {
     public IRGenerator(BlockNode<BaseNode> parseTree) {
         this.parseTree = parseTree;
         this.codes = new LinkedList<Code>();
         this.varTable = new VariablesTable();
     }
-    
+
     public static void main(String[] args) {
         BufferedReader reader = null;
         
@@ -38,17 +47,18 @@ public class IRGenerator {
                         create();
             
             reader = new BufferedReader(
-                        new FileReader("C:\\Users\\maggot\\Documents" +
-                                       "\\NetBeansProjects\\ru.bmstu.iu9.compiler\\Front End\\src\\parse_tree.json"));
+                        new FileReader("src/parse_tree.json"));
             
             BlockNode<BaseNode> tree = gson.fromJson(reader, BlockNode.class);
             SemanticAnalyser analyser = new SemanticAnalyser(tree);
-            analyser.Analyse();
+            analyser.analyse();
             
             IRGenerator generator = new IRGenerator(analyser.tree());
             generator.generate();
-            
-            return;
+
+
+            System.out.println("Goodbye");
+
         } catch(java.io.IOException ex) {
 //            ex.printStackTrace();
         } finally {
@@ -68,7 +78,14 @@ public class IRGenerator {
                 continue;
             }
         }
-        return;
+
+        //for CFG
+        int i = 0;
+        for(Code code: codes) {
+            code.buildCFG();
+            CFG gr = code.getCFG();
+            System.out.println("\n\nCFG " + (i++) + ": " + gr.toString());
+        }
     }
     
     
@@ -1136,7 +1153,10 @@ public class IRGenerator {
 
     private Label returnLabel;
     private TmpVariableOperand returnValue;
-    
+
+    public Code Code() {
+        return code.clone();
+    }
 
     private class Scopes {
         public void addVariable(NamedVariable variable) {

@@ -1,17 +1,23 @@
 package ru.bmstu.iu9.compiler.semantics;
 
-import com.google.gson.*;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.util.*;
-
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import ru.bmstu.iu9.compiler.ir.type.*;
 import ru.bmstu.iu9.compiler.syntax.tree.*;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Stack;
+
 /**
+ * @todo что будет, если рекурсивно объявлены структуры, но используются не
+ * указатели, а объекты?
  * @todo Добавить проверку lhv и rhv
  * @todo Проверка переопределения переменных
  * @todo Проверка правильности расстановки break и continue
+ * @todo проверка присваивания const
  * 
  * @author maggot
  */
@@ -47,7 +53,7 @@ public class SemanticAnalyser {
         }
     }
     
-    public void Analyse() {
+    public void analyse() {
         resolveNames(parseTree);
         resolveTypes(parseTree);
         processNode(parseTree);
@@ -55,9 +61,8 @@ public class SemanticAnalyser {
     
     public static void main(String[] args) {
         SemanticAnalyser analyser = 
-            new SemanticAnalyser("C:\\Users\\maggot\\Documents\\NetBeansProjects" +
-                "\\ru.bmstu.iu9.compiler\\Front End\\src\\parse_tree.json");
-        analyser.Analyse();
+            new SemanticAnalyser("src/parse_tree.json");
+        analyser.analyse();
 
         return;
     }

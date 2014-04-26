@@ -1,13 +1,20 @@
 package ru.bmstu.iu9.compiler.lexis;
 
-import ru.bmstu.iu9.compiler.lexis.token.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import ru.bmstu.iu9.compiler.Fragment;
-import com.google.gson.*;
-import java.io.*;
-import java.lang.reflect.Array;
-import java.util.*;
-import java.util.regex.*;
 import ru.bmstu.iu9.compiler.lexis.Program.CodePointIterator;
+import ru.bmstu.iu9.compiler.lexis.token.*;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.PrintWriter;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Класс Lexer осуществляет лексический анализ текста программы и генерирует
@@ -94,11 +101,9 @@ public class Lexer {
     }
     
     public static void main(String[] args) {
-        Lexer lex = new Lexer("C:\\Users\\maggot\\Documents\\NetBeansProjects" +
-                "\\ru.bmstu.iu9.compiler\\Front End\\src\\input.src");
+        Lexer lex = new Lexer("src/input.src");
         lex.run();
-        lex.toJson("C:\\Users\\maggot\\Documents\\NetBeansProjects" + 
-                "\\ru.bmstu.iu9.compiler\\Front End\\src\\output.json");
+        lex.toJson("src/output.json");
     }
     
     /**

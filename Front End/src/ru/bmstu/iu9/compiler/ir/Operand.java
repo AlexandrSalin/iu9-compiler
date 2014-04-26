@@ -12,7 +12,7 @@ interface Operand extends Cloneable {
 }
 
 /**
- * Абстрактный базовый класс для операндов типа переменная. Связан с 
+ * Абстрактный базовый класс для операндов-переменных. Связан с 
  * {@link ru.bmstu.iu9.compiler.ir.Variable переменной} через таблицу, в которой
  * она расположена, и ключ в этой таблице.
  * 
@@ -23,12 +23,12 @@ abstract class VariableOperand implements Operand {
         this.table = table;
         this.number = number;
     }
-
-    /**
+       /**
      * Открывает доступ к типу переменной, с которой связан операнд.
      * 
      * @return Тип переменной
      */
+    @Override
     public
     BaseType type() {
         return this.table.get(number).type; 
@@ -184,4 +184,33 @@ class ConstantOperand<T> implements Operand {
      */
     public final T value;
     private final BaseType type;
+}
+
+class SsaName extends VariableOperand
+{
+    public SsaName(VariablesTable table, long number, int ver)
+    {
+        super(table, number);
+        this.version = ver;
+    }
+
+    public BaseType type() {
+        return this.type;
+    }
+
+    public Statement GetDefStmt(){
+        return this.baseStatement;
+    };
+
+    public VariableOperand GetVar(){
+        return this.baseVariableOperand;
+    };
+    public int GetVersion(){
+        return this.version;
+    };
+
+    protected VariableOperand baseVariableOperand;
+    protected Statement baseStatement; //?
+    protected int version;
+    protected BaseType type;
 }

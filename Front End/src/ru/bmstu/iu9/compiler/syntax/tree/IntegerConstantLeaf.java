@@ -7,20 +7,11 @@ import ru.bmstu.iu9.compiler.Position;
  *
  * @author maggot
  */
-final public class IntegerConstantLeaf extends ConstantLeaf {
+final public class IntegerConstantLeaf extends ConstantLeaf<Integer> {
     public IntegerConstantLeaf(int value, Position position) {
-        super(ConstantType.INT, position);
-        this.value = value;
+        super(ConstantType.INT, value, position);
     }
     public IntegerConstantLeaf(int value, DebugInfo dInfo) {
-        super(ConstantType.INT, dInfo);
-        this.value = value;
+        super(ConstantType.INT, value, dInfo);
     }
-    
-    @Override
-    public String toString() {
-        return Integer.toString(this.value);
-    }
-    
-    public final int value;
 }

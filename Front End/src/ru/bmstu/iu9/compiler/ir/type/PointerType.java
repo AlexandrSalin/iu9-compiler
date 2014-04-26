@@ -2,7 +2,7 @@ package ru.bmstu.iu9.compiler.ir.type;
 
 /**
  *
- * @author maggot
+ * @author anton.bobukh
  */
 public final class PointerType extends PrimitiveType {
     public PointerType(BaseType type, boolean constancy) {

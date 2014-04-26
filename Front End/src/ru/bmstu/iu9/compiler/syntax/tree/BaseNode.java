@@ -16,7 +16,7 @@ public class BaseNode {
         FOR, IF, SWITCH, CASE, WHILE, DO_WHILE, BLOCK, VARIABLE,
         CONSTANT, FUNCTION_DECL, STRUCT_DECL, INVALID, CALL, LOCK,
         TYPE, ARGUMENT, BREAK, RETURN, CONTINUE, BARRIER, BLOCK_DECL
-    };
+    }
     
     protected BaseNode(NodeType nodeType) {
         this.nodeType = nodeType.ordinal();

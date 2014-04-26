@@ -1,0 +1,62 @@
+0 :	a = 0
+1 :	b = 10
+2 :	tmp17 = m PLUS 12
+3 :	tmp18 = REF main
+4 :	*tmp17 = tmp18
+5 :	tmp19 = DEREF tmp17
+6 :	tmp20 = m PLUS 12
+7 :	tmp21 = DEREF tmp20
+8 :	param args
+9 :	tmp22 = call tmp21 : 1
+10 :	a = tmp22
+11 :	tmp23 = CAST a
+12 :	g = tmp23
+13 :	tmp24 = 2 MUL 20
+14 :	tmp25 = l PLUS tmp24
+15 :	tmp26 = 3 MUL 4
+16 :	tmp27 = tmp25 PLUS tmp26
+17 :	*tmp27 = a
+18 :	tmp28 = DEREF tmp27
+19 :	c = 97
+20 :	tmp31 = REF c
+21 :	q = tmp31
+22 :	tmp32 = REF q
+23 :	args = tmp32
+24 :	tmp33 = c EQUAL 98
+25 :	if tmp33 ? 26 : 29
+26 :	tmp34 = 1
+27 :	goto 61
+28 :	goto 29
+29 :	tmp35 = a EQUAL 1
+30 :	if tmp35 ? 31 : 40
+31 :	tmp34 = 1
+32 :	goto 61
+33 :	goto 42
+34 :	goto 40
+35 :	tmp36 = a EQUAL 2
+36 :	if tmp36 ? 37 : 40
+37 :	tmp34 = 2
+38 :	goto 61
+39 :	goto 40
+40 :	tmp34 = 3
+41 :	goto 61
+42 :	tmp37 = a LESS_OR_EUQAL b
+43 :	tmp34 = 2
+44 :	goto 61
+45 :	if tmp37 ? 43 : 46
+46 :	tmp38 = a GREATER b
+47 :	if tmp38 ? 48 : 51
+48 :	tmp39 = MINUS 1
+49 :	tmp34 = tmp39
+50 :	goto 61
+51 :	i = 0
+52 :	tmp41 = i LESS_OR_EUQAL 10
+53 :	if tmp41 ? 54 : 61
+54 :	tmp42 = i GREATER 0
+55 :	if tmp42 ? 56 : 58
+56 :	tmp43 = POST_INC a
+57 :	goto 59
+58 :	tmp44 = PRE_DEC b
+59 :	tmp45 = PRE_INC i
+60 :	goto 
+61 :	return tmp34

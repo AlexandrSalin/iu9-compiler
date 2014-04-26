@@ -31,8 +31,9 @@ class VariablesTable {
     public Long get(String name) {
         for(Map.Entry<Long, Variable> var : vars.entrySet()) {
             if (var.getValue() instanceof NamedVariable && 
-                ((NamedVariable)var.getValue()).name.equals(name))
+                ((NamedVariable)var.getValue()).name.equals(name)) {
                 return var.getKey();
+            }
         }
         return null;
     }

@@ -6,9 +6,9 @@ import java.util.List;
 
 /**
  *
- * @author maggot
+ * @author anton.bobukh
  */
-abstract public class BaseType {
+public abstract class BaseType {
     public enum Type { 
         ARRAY, STRUCT, FUNCTION, PRIMITIVE_TYPE, INVALID;
         
@@ -21,8 +21,9 @@ abstract public class BaseType {
         }
         private boolean is(Type[] types) {
             for (int i = 0; i < types.length; ++i) {
-                if ((this.value & types[i].value) != 0)
+                if ((this.value & types[i].value) != 0) {
                     return true;
+                }
             }
             return false;
         }
@@ -62,11 +63,6 @@ abstract public class BaseType {
         return this.getClass().equals(obj.getClass()) && 
                 (this.type == (((BaseType)obj).type));
     }
-   /* @Override
-    public String toString() {
-        return ((constancy) ? "CONST " : "") + 
-                Type.values()[this.type].toString();
-    }*/
     
     public long size() {
         return this.size;

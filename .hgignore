@@ -1,0 +1,13 @@
+\.orig$
+\.orig\..*$
+\.chg\..*$
+\.rej$
+\.conflict\~$
+syntax: glob
+Front End/src/.idea/*
+*.class
+*.rs
+Front End/nbproject/*
+Front End/build*
+Front End/manifest.mf
+.hgignore

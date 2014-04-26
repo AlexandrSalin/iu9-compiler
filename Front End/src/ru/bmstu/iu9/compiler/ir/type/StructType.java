@@ -5,7 +5,7 @@ import java.util.List;
 
 /**
  *
- * @author maggot
+ * @author anton.bobukh
  */
 public final class StructType extends BaseType {
     public static class Field {

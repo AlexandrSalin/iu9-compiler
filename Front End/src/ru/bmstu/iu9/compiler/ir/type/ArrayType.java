@@ -2,7 +2,7 @@ package ru.bmstu.iu9.compiler.ir.type;
 
 /**
  *
- * @author maggot
+ * @author anton.bobukh
  */
 public final class ArrayType extends BaseType {
     public ArrayType(BaseType element, int length, boolean constancy) {

@@ -10,17 +10,20 @@ import ru.bmstu.iu9.compiler.Position;
 
 /**
  *
+ * @param <T> 
  * @author maggot
  */
-abstract public class ConstantLeaf extends Leaf {
+abstract public class ConstantLeaf<T> extends Leaf {
     public enum ConstantType { INT, CHAR, DOUBLE, BOOL };
     
-    protected ConstantLeaf(ConstantType type, Position position) {
+    protected ConstantLeaf(ConstantType type, T value, Position position) {
         super(BaseNode.NodeType.CONSTANT, position);
+        this.value = value;
         this.constantType = type.ordinal();
     }
-    protected ConstantLeaf(ConstantType type, DebugInfo dInfo) {
+    protected ConstantLeaf(ConstantType type, T value, DebugInfo dInfo) {
         super(BaseNode.NodeType.CONSTANT, dInfo);
+        this.value = value;
         this.constantType = type.ordinal();
     }
     
@@ -28,5 +31,11 @@ abstract public class ConstantLeaf extends Leaf {
         return ConstantType.values()[this.constantType];
     }
     
+    @Override
+    public String toString() {
+        return value.toString();
+    }
+    
     public final int constantType;
+    public final T value;
 }

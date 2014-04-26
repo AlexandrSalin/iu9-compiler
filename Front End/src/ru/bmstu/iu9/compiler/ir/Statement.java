@@ -1,10 +1,11 @@
 package ru.bmstu.iu9.compiler.ir;
 
-import java.util.*;
-
+import ru.bmstu.iu9.compiler.cfg.BasicBlock;
 import ru.bmstu.iu9.compiler.ir.type.PrimitiveType;
 import ru.bmstu.iu9.compiler.syntax.tree.BinaryOperationNode;
 import ru.bmstu.iu9.compiler.syntax.tree.UnaryOperationNode;
+
+import java.util.*;
 
 /**
  *
@@ -14,14 +15,75 @@ abstract class Statement {
     public enum Operation { 
         PARAM, CALL, RETURN, GOTO, IF_GOTO, RUN, BARRIER, BINATY_OPERATION, 
         UNARY_OPERATION, ASSIGN, INDIRECT_ASSIGN, MEMBER_SELECT, INDEX,
-        START_LOCK, END_LOCK
+        START_LOCK, END_LOCK, INDIRECT_RUN, INDIRECT_CALL, PHI_FUNCTION
     };
     
     protected Statement(Operation operation) {
         this.baseOperation = operation;
     }
-    
+
     protected final Operation baseOperation;
+    protected boolean ssaExists;
+    protected List<SsaName> ssaList;
+
+    public void SetSsa(SsaName ssa){
+        ssaList.add(ssa);
+        ssaExists = true;
+    }
+
+    public ListIterator<SsaName> GetDefSsaNames(){
+        return this.ssaList.listIterator();
+    };
+    public int GetDefSsaNamesCount(){
+        this.ssaList.size();
+    };
+   /* public SsaName GetDefSsaName(){
+        return
+    };*/
+    public ListIterator<SsaName> GetUseSsaNames(){};
+}
+
+final class IndirectRunStatement extends Statement {
+    public IndirectRunStatement(VariableOperand function, int argsNumber) {
+        super(Operation.INDIRECT_RUN);
+        this.function = function;
+        this.argsNumber = 
+            new ConstantOperand(
+                new PrimitiveType(PrimitiveType.Type.INT),
+                argsNumber
+            );
+    }
+    
+    @Override
+    public String toString() {
+        return "run " + function + " : " + argsNumber; 
+    }
+    
+    public final VariableOperand function;
+    public final ConstantOperand argsNumber;
+
+
+
+}
+
+final class RunStatement extends Statement {
+    public RunStatement(VariableOperand function, int argsNumber) {
+        super(Operation.RUN);
+        this.function = function;
+        this.argsNumber = 
+            new ConstantOperand(
+                new PrimitiveType(PrimitiveType.Type.INT),
+                argsNumber
+            );
+    }
+    
+    @Override
+    public String toString() {
+        return "run " + function + " : " + argsNumber; 
+    }
+    
+    public final VariableOperand function;
+    public final ConstantOperand argsNumber;
 }
 
 final class ReturnStatement extends Statement {
@@ -86,6 +148,12 @@ final class AssignmentStatement extends Statement {
     public String toString() {
         return lhv + " = " + rhv;
     }
+
+    public VariableOperand GetDefSsaName(){
+        if (this.ssaExists)
+            return lhv;
+        else return null;
+    };
     
     public final Operand rhv;
     public final VariableOperand lhv;
@@ -111,7 +179,7 @@ final class IndirectAssignmentStatement extends Statement {
 
 final class BinaryOperationStatement extends Statement {
     public enum Operation {
-        MUL, MINUS, PLUS, ARRAY_ELEMENT, DIV, MOD, BITWISE_SHIFT_RIGHT, 
+        MUL, MINUS, PLUS, ARRAY_ELEMENT, DIV, MOD, BITWISE_SHIFT_RIGHT,
         BITWISE_SHIFT_LEFT, GREATER, GREATER_OR_EQUAL, LESS, LESS_OR_EUQAL, 
         NOT_EQUAL, EQUAL, BITWISE_AND, BITWISE_XOR, BITWISE_OR, BOOL_AND, 
         BOOL_OR
@@ -175,7 +243,9 @@ final class BinaryOperationStatement extends Statement {
 
 
 class Label {
-    public Label() { }
+    public Label() {
+            this.index = (long)-1;
+    }
     
     public void setIndex(long index) {
         this.index = index;
@@ -267,7 +337,7 @@ final class IndirectCallStatement extends Statement {
             int argsNumber,
             VariableOperand lhv) {
 
-        super(Operation.CALL);
+        super(Operation.INDIRECT_CALL);
         this.functionPointer = functionPointer;
         this.argsNumber =
             new ConstantOperand(
@@ -398,3 +468,25 @@ final class MemberSelectStatement extends Statement {
     public final VariableOperand lhv;
 }
 */
+
+class PhiFunction extends Statement
+{
+    public PhiFunction()
+    {
+        super(Operation.PHI_FUNCTION);
+    }
+
+    public SsaName GetArgByEdge(Edge e)
+    {
+
+    };
+    public Edge GetEdgeByArg(Iterator<SsaName> it){};
+    public Edge GetEdgeByArg(SsaName ssaName){};
+    public void DeleteEdgeByArg(Iterator<SsaName> it){};
+    public void DeleteEdgeByArg(SsaName ssaName){};
+    public void SetArgByEdge(Edge e, SsaName ssaName){};
+
+    protected SsaName ssaNameLHS;
+    protected SsaName ssaNamesRHS[]; // должно быть соответствие между входящими дугами и аргументами PHI
+    protected BasicBlock bb;
+}

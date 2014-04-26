@@ -7,20 +7,11 @@ import ru.bmstu.iu9.compiler.Position;
  *
  * @author maggot
  */
-final public class BoolConstantLeaf extends ConstantLeaf {
+final public class BoolConstantLeaf extends ConstantLeaf<Boolean> {
     public BoolConstantLeaf(boolean value, Position position) {
-        super(ConstantType.BOOL, position);
-        this.value = value;
+        super(ConstantType.BOOL, value, position);
     }
     public BoolConstantLeaf(boolean value, DebugInfo dInfo) {
-        super(ConstantType.BOOL, dInfo);
-        this.value = value;
+        super(ConstantType.BOOL, value, dInfo);
     }
-    
-    @Override
-    public String toString() {
-        return value ? "true" : "false";
-    }
-    
-    public final boolean value;
 }
