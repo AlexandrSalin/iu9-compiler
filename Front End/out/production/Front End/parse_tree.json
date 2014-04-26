@@ -1,0 +1,1900 @@
+{
+  "children": [
+    {
+      "declarations": {
+        "children": [
+          {
+            "dInfo": {
+              "position": {
+                "line": 53,
+                "position": 5,
+                "index": 675
+              }
+            },
+            "name": "a",
+            "type": {
+              "primitive": 0,
+              "type": 3,
+              "constancy": false,
+              "dInfo": {
+                "position": {
+                  "line": 53,
+                  "position": 7,
+                  "index": 677
+                }
+              },
+              "nodeType": 20
+            },
+            "nodeType": 2
+          },
+          {
+            "dInfo": {
+              "position": {
+                "line": 54,
+                "position": 5,
+                "index": 686
+              }
+            },
+            "name": "b",
+            "type": {
+              "pointerType": {
+                "pointerType": {
+                  "name": "abc",
+                  "type": 1,
+                  "constancy": false,
+                  "dInfo": {
+                    "position": {
+                      "line": 54,
+                      "position": 9,
+                      "index": 690
+                    }
+                  },
+                  "nodeType": 20
+                },
+                "primitive": 7,
+                "type": 3,
+                "constancy": false,
+                "dInfo": {
+                  "position": {
+                    "line": 54,
+                    "position": 8,
+                    "index": 689
+                  }
+                },
+                "nodeType": 20
+              },
+              "primitive": 7,
+              "type": 3,
+              "constancy": false,
+              "dInfo": {
+                "position": {
+                  "line": 54,
+                  "position": 7,
+                  "index": 688
+                }
+              },
+              "nodeType": 20
+            },
+            "nodeType": 2
+          }
+        ],
+        "nodeType": 26
+      },
+      "dInfo": {
+        "position": {
+          "line": 52,
+          "position": 1,
+          "index": 658
+        }
+      },
+      "name": "def",
+      "type": {
+        "name": "def",
+        "type": 1,
+        "constancy": false,
+        "dInfo": {
+          "position": {
+            "line": 52,
+            "position": 1,
+            "index": 658
+          }
+        },
+        "nodeType": 20
+      },
+      "nodeType": 16
+    },
+    {
+      "declarations": {
+        "children": [
+          {
+            "dInfo": {
+              "position": {
+                "line": 57,
+                "position": 5,
+                "index": 722
+              }
+            },
+            "name": "a",
+            "type": {
+              "primitive": 0,
+              "type": 3,
+              "constancy": false,
+              "dInfo": {
+                "position": {
+                  "line": 57,
+                  "position": 11,
+                  "index": 728
+                }
+              },
+              "nodeType": 20
+            },
+            "nodeType": 2
+          },
+          {
+            "dInfo": {
+              "position": {
+                "line": 57,
+                "position": 8,
+                "index": 725
+              }
+            },
+            "name": "b",
+            "type": {
+              "primitive": 0,
+              "type": 3,
+              "constancy": false,
+              "dInfo": {
+                "position": {
+                  "line": 57,
+                  "position": 11,
+                  "index": 728
+                }
+              },
+              "nodeType": 20
+            },
+            "nodeType": 2
+          },
+          {
+            "dInfo": {
+              "position": {
+                "line": 58,
+                "position": 5,
+                "index": 737
+              }
+            },
+            "name": "c",
+            "type": {
+              "primitive": 3,
+              "type": 3,
+              "constancy": false,
+              "dInfo": {
+                "position": {
+                  "line": 58,
+                  "position": 7,
+                  "index": 739
+                }
+              },
+              "nodeType": 20
+            },
+            "nodeType": 2
+          },
+          {
+            "dInfo": {
+              "position": {
+                "line": 59,
+                "position": 5,
+                "index": 751
+              }
+            },
+            "name": "d",
+            "type": {
+              "pointerType": {
+                "arguments": {
+                  "children": [
+                    {
+                      "dInfo": {
+                        "position": {
+                          "line": 59,
+                          "position": 12,
+                          "index": 758
+                        }
+                      },
+                      "name": "q",
+                      "type": {
+                        "primitive": 0,
+                        "type": 3,
+                        "constancy": false,
+                        "dInfo": {
+                          "position": {
+                            "line": 59,
+                            "position": 17,
+                            "index": 763
+                          }
+                        },
+                        "nodeType": 20
+                      },
+                      "nodeType": 21
+                    },
+                    {
+                      "dInfo": {
+                        "position": {
+                          "line": 59,
+                          "position": 15,
+                          "index": 761
+                        }
+                      },
+                      "name": "w",
+                      "type": {
+                        "primitive": 0,
+                        "type": 3,
+                        "constancy": false,
+                        "dInfo": {
+                          "position": {
+                            "line": 59,
+                            "position": 17,
+                            "index": 763
+                          }
+                        },
+                        "nodeType": 20
+                      },
+                      "nodeType": 21
+                    },
+                    {
+                      "dInfo": {
+                        "position": {
+                          "line": 59,
+                          "position": 22,
+                          "index": 768
+                        }
+                      },
+                      "name": "e",
+                      "type": {
+                        "primitive": 2,
+                        "type": 3,
+                        "constancy": false,
+                        "dInfo": {
+                          "position": {
+                            "line": 59,
+                            "position": 27,
+                            "index": 773
+                          }
+                        },
+                        "nodeType": 20
+                      },
+                      "nodeType": 21
+                    },
+                    {
+                      "dInfo": {
+                        "position": {
+                          "line": 59,
+                          "position": 25,
+                          "index": 771
+                        }
+                      },
+                      "name": "r",
+                      "type": {
+                        "primitive": 2,
+                        "type": 3,
+                        "constancy": false,
+                        "dInfo": {
+                          "position": {
+                            "line": 59,
+                            "position": 27,
+                            "index": 773
+                          }
+                        },
+                        "nodeType": 20
+                      },
+                      "nodeType": 21
+                    }
+                  ],
+                  "nodeType": 26
+                },
+                "returnValue": {
+                  "primitive": 0,
+                  "type": 3,
+                  "constancy": false,
+                  "dInfo": {
+                    "position": {
+                      "line": 59,
+                      "position": 34,
+                      "index": 780
+                    }
+                  },
+                  "nodeType": 20
+                },
+                "type": 2,
+                "constancy": false,
+                "dInfo": {
+                  "position": {
+                    "line": 59,
+                    "position": 11,
+                    "index": 757
+                  }
+                },
+                "nodeType": 20
+              },
+              "primitive": 7,
+              "type": 3,
+              "constancy": false,
+              "dInfo": {
+                "position": {
+                  "line": 59,
+                  "position": 7,
+                  "index": 753
+                }
+              },
+              "nodeType": 20
+            },
+            "nodeType": 2
+          },
+          {
+            "dInfo": {
+              "position": {
+                "line": 60,
+                "position": 5,
+                "index": 789
+              }
+            },
+            "name": "e",
+            "type": {
+              "pointerType": {
+                "name": "def",
+                "type": 1,
+                "constancy": false,
+                "dInfo": {
+                  "position": {
+                    "line": 60,
+                    "position": 8,
+                    "index": 792
+                  }
+                },
+                "nodeType": 20
+              },
+              "primitive": 7,
+              "type": 3,
+              "constancy": false,
+              "dInfo": {
+                "position": {
+                  "line": 60,
+                  "position": 7,
+                  "index": 791
+                }
+              },
+              "nodeType": 20
+            },
+            "nodeType": 2
+          }
+        ],
+        "nodeType": 26
+      },
+      "dInfo": {
+        "position": {
+          "line": 56,
+          "position": 1,
+          "index": 705
+        }
+      },
+      "name": "abc",
+      "type": {
+        "name": "abc",
+        "type": 1,
+        "constancy": false,
+        "dInfo": {
+          "position": {
+            "line": 56,
+            "position": 1,
+            "index": 705
+          }
+        },
+        "nodeType": 20
+      },
+      "nodeType": 16
+    },
+    {
+      "block": {
+        "children": [
+          {
+            "children": [
+              {
+                "dInfo": {
+                  "position": {
+                    "line": 64,
+                    "position": 9,
+                    "index": 860
+                  }
+                },
+                "name": "bar",
+                "type": {
+                  "name": "abc",
+                  "type": 1,
+                  "constancy": true,
+                  "dInfo": {
+                    "position": {
+                      "line": 64,
+                      "position": 21,
+                      "index": 872
+                    }
+                  },
+                  "nodeType": 20
+                },
+                "nodeType": 2
+              }
+            ],
+            "nodeType": 26
+          },
+          {
+            "dInfo": {
+              "position": {
+                "line": 65,
+                "position": 5,
+                "index": 888
+              }
+            },
+            "nodeType": 23
+          }
+        ],
+        "nodeType": 12
+      },
+      "dInfo": {
+        "position": {
+          "line": 63,
+          "position": 6,
+          "index": 813
+        }
+      },
+      "name": "foo",
+      "type": {
+        "arguments": {
+          "children": [
+            {
+              "dInfo": {
+                "position": {
+                  "line": 63,
+                  "position": 10,
+                  "index": 817
+                }
+              },
+              "name": "q",
+              "type": {
+                "primitive": 0,
+                "type": 3,
+                "constancy": true,
+                "dInfo": {
+                  "position": {
+                    "line": 63,
+                    "position": 21,
+                    "index": 828
+                  }
+                },
+                "nodeType": 20
+              },
+              "nodeType": 21
+            },
+            {
+              "dInfo": {
+                "position": {
+                  "line": 63,
+                  "position": 13,
+                  "index": 820
+                }
+              },
+              "name": "w",
+              "type": {
+                "primitive": 0,
+                "type": 3,
+                "constancy": true,
+                "dInfo": {
+                  "position": {
+                    "line": 63,
+                    "position": 21,
+                    "index": 828
+                  }
+                },
+                "nodeType": 20
+              },
+              "nodeType": 21
+            },
+            {
+              "dInfo": {
+                "position": {
+                  "line": 63,
+                  "position": 26,
+                  "index": 833
+                }
+              },
+              "name": "e",
+              "type": {
+                "primitive": 2,
+                "type": 3,
+                "constancy": false,
+                "dInfo": {
+                  "position": {
+                    "line": 63,
+                    "position": 31,
+                    "index": 838
+                  }
+                },
+                "nodeType": 20
+              },
+              "nodeType": 21
+            },
+            {
+              "dInfo": {
+                "position": {
+                  "line": 63,
+                  "position": 29,
+                  "index": 836
+                }
+              },
+              "name": "r",
+              "type": {
+                "primitive": 2,
+                "type": 3,
+                "constancy": false,
+                "dInfo": {
+                  "position": {
+                    "line": 63,
+                    "position": 31,
+                    "index": 838
+                  }
+                },
+                "nodeType": 20
+              },
+              "nodeType": 21
+            }
+          ],
+          "nodeType": 26
+        },
+        "returnValue": {
+          "primitive": 5,
+          "type": 3,
+          "constancy": false,
+          "dInfo": {
+            "position": {
+              "line": 63,
+              "position": 38,
+              "index": 845
+            }
+          },
+          "nodeType": 20
+        },
+        "type": 2,
+        "constancy": false,
+        "dInfo": {
+          "position": {
+            "line": 63,
+            "position": 9,
+            "index": 816
+          }
+        },
+        "nodeType": 20
+      },
+      "nodeType": 15
+    },
+    {
+      "children": [
+        {
+          "value": {
+            "constantType": 0,
+            "value": 5,
+            "dInfo": {
+              "position": {
+                "line": 69,
+                "position": 9,
+                "index": 913
+              }
+            },
+            "nodeType": 14
+          },
+          "dInfo": {
+            "position": {
+              "line": 69,
+              "position": 5,
+              "index": 909
+            }
+          },
+          "name": "q",
+          "type": {
+            "primitive": 0,
+            "type": 3,
+            "constancy": true,
+            "dInfo": {
+              "position": {
+                "line": 69,
+                "position": 19,
+                "index": 923
+              }
+            },
+            "nodeType": 20
+          },
+          "nodeType": 2
+        },
+        {
+          "value": {
+            "constantType": 2,
+            "value": 9.9E-5,
+            "dInfo": {
+              "position": {
+                "line": 70,
+                "position": 9,
+                "index": 936
+              }
+            },
+            "nodeType": 14
+          },
+          "dInfo": {
+            "position": {
+              "line": 70,
+              "position": 5,
+              "index": 932
+            }
+          },
+          "name": "w",
+          "type": {
+            "primitive": 3,
+            "type": 3,
+            "constancy": false,
+            "dInfo": {
+              "position": {
+                "line": 70,
+                "position": 27,
+                "index": 954
+              }
+            },
+            "nodeType": 20
+          },
+          "nodeType": 2
+        },
+        {
+          "value": {
+            "constantType": 2,
+            "value": 5.0,
+            "dInfo": {
+              "position": {
+                "line": 70,
+                "position": 21,
+                "index": 948
+              }
+            },
+            "nodeType": 14
+          },
+          "dInfo": {
+            "position": {
+              "line": 70,
+              "position": 17,
+              "index": 944
+            }
+          },
+          "name": "e",
+          "type": {
+            "primitive": 3,
+            "type": 3,
+            "constancy": false,
+            "dInfo": {
+              "position": {
+                "line": 70,
+                "position": 27,
+                "index": 954
+              }
+            },
+            "nodeType": 20
+          },
+          "nodeType": 2
+        }
+      ],
+      "nodeType": 26
+    },
+    {
+      "block": {
+        "children": [
+          {
+            "children": [
+              {
+                "value": {
+                  "constantType": 0,
+                  "value": 0,
+                  "dInfo": {
+                    "position": {
+                      "line": 76,
+                      "position": 13,
+                      "index": 1053
+                    }
+                  },
+                  "nodeType": 14
+                },
+                "dInfo": {
+                  "position": {
+                    "line": 76,
+                    "position": 9,
+                    "index": 1049
+                  }
+                },
+                "name": "a",
+                "type": {
+                  "primitive": 0,
+                  "type": 3,
+                  "constancy": false,
+                  "dInfo": {
+                    "position": {
+                      "line": 76,
+                      "position": 17,
+                      "index": 1057
+                    }
+                  },
+                  "nodeType": 20
+                },
+                "nodeType": 2
+              },
+              {
+                "value": {
+                  "constantType": 0,
+                  "value": 10,
+                  "dInfo": {
+                    "position": {
+                      "line": 77,
+                      "position": 13,
+                      "index": 1074
+                    }
+                  },
+                  "nodeType": 14
+                },
+                "dInfo": {
+                  "position": {
+                    "line": 77,
+                    "position": 9,
+                    "index": 1070
+                  }
+                },
+                "name": "b",
+                "type": {
+                  "primitive": 0,
+                  "type": 3,
+                  "constancy": true,
+                  "dInfo": {
+                    "position": {
+                      "line": 77,
+                      "position": 24,
+                      "index": 1085
+                    }
+                  },
+                  "nodeType": 20
+                },
+                "nodeType": 2
+              },
+              {
+                "dInfo": {
+                  "position": {
+                    "line": 78,
+                    "position": 9,
+                    "index": 1098
+                  }
+                },
+                "name": "l",
+                "type": {
+                  "length": {
+                    "constantType": 0,
+                    "value": 10,
+                    "dInfo": {
+                      "position": {
+                        "line": 78,
+                        "position": 14,
+                        "index": 1103
+                      }
+                    },
+                    "nodeType": 14
+                  },
+                  "element": {
+                    "length": {
+                      "constantType": 0,
+                      "value": 5,
+                      "dInfo": {
+                        "position": {
+                          "line": 78,
+                          "position": 18,
+                          "index": 1107
+                        }
+                      },
+                      "nodeType": 14
+                    },
+                    "element": {
+                      "primitive": 0,
+                      "type": 3,
+                      "constancy": false,
+                      "dInfo": {
+                        "position": {
+                          "line": 78,
+                          "position": 21,
+                          "index": 1110
+                        }
+                      },
+                      "nodeType": 20
+                    },
+                    "type": 0,
+                    "constancy": false,
+                    "dInfo": {
+                      "position": {
+                        "line": 78,
+                        "position": 17,
+                        "index": 1106
+                      }
+                    },
+                    "nodeType": 20
+                  },
+                  "type": 0,
+                  "constancy": false,
+                  "dInfo": {
+                    "position": {
+                      "line": 78,
+                      "position": 13,
+                      "index": 1102
+                    }
+                  },
+                  "nodeType": 20
+                },
+                "nodeType": 2
+              },
+              {
+                "dInfo": {
+                  "position": {
+                    "line": 79,
+                    "position": 9,
+                    "index": 1123
+                  }
+                },
+                "name": "m",
+                "type": {
+                  "name": "abc",
+                  "type": 1,
+                  "constancy": false,
+                  "dInfo": {
+                    "position": {
+                      "line": 79,
+                      "position": 13,
+                      "index": 1127
+                    }
+                  },
+                  "nodeType": 20
+                },
+                "nodeType": 2
+              },
+              {
+                "dInfo": {
+                  "position": {
+                    "line": 80,
+                    "position": 9,
+                    "index": 1147
+                  }
+                },
+                "name": "g",
+                "type": {
+                  "primitive": 6,
+                  "type": 3,
+                  "constancy": false,
+                  "dInfo": {
+                    "position": {
+                      "line": 80,
+                      "position": 13,
+                      "index": 1151
+                    }
+                  },
+                  "nodeType": 20
+                },
+                "nodeType": 2
+              }
+            ],
+            "nodeType": 26
+          },
+          {
+            "left": {
+              "name": "g",
+              "dInfo": {
+                "position": {
+                  "line": 89,
+                  "position": 5,
+                  "index": 1238
+                }
+              },
+              "nodeType": 13
+            },
+            "right": {
+              "castingType": {
+                "primitive": 6,
+                "type": 3,
+                "constancy": false,
+                "dInfo": {
+                  "position": {
+                    "line": 89,
+                    "position": 10,
+                    "index": 1243
+                  }
+                },
+                "nodeType": 20
+              },
+              "node": {
+                "name": "a",
+                "dInfo": {
+                  "position": {
+                    "line": 89,
+                    "position": 15,
+                    "index": 1248
+                  }
+                },
+                "nodeType": 13
+              },
+              "operation": 8,
+              "dInfo": {
+                "position": {
+                  "line": 89,
+                  "position": 15,
+                  "index": 1248
+                }
+              },
+              "nodeType": 1
+            },
+            "operation": 0,
+            "dInfo": {
+              "position": {
+                "line": 89,
+                "position": 7,
+                "index": 1240
+              }
+            },
+            "nodeType": 0
+          },
+          {
+            "left": {
+              "left": {
+                "left": {
+                  "name": "l",
+                  "dInfo": {
+                    "position": {
+                      "line": 91,
+                      "position": 5,
+                      "index": 1256
+                    }
+                  },
+                  "nodeType": 13
+                },
+                "right": {
+                  "constantType": 0,
+                  "value": 2,
+                  "dInfo": {
+                    "position": {
+                      "line": 91,
+                      "position": 7,
+                      "index": 1258
+                    }
+                  },
+                  "nodeType": 14
+                },
+                "operation": 30,
+                "dInfo": {
+                  "position": {
+                    "line": 91,
+                    "position": 7,
+                    "index": 1258
+                  }
+                },
+                "nodeType": 0
+              },
+              "right": {
+                "constantType": 0,
+                "value": 3,
+                "dInfo": {
+                  "position": {
+                    "line": 91,
+                    "position": 10,
+                    "index": 1261
+                  }
+                },
+                "nodeType": 14
+              },
+              "operation": 30,
+              "dInfo": {
+                "position": {
+                  "line": 91,
+                  "position": 10,
+                  "index": 1261
+                }
+              },
+              "nodeType": 0
+            },
+            "right": {
+              "name": "a",
+              "dInfo": {
+                "position": {
+                  "line": 91,
+                  "position": 15,
+                  "index": 1266
+                }
+              },
+              "nodeType": 13
+            },
+            "operation": 0,
+            "dInfo": {
+              "position": {
+                "line": 91,
+                "position": 13,
+                "index": 1264
+              }
+            },
+            "nodeType": 0
+          },
+          {
+            "children": [
+              {
+                "value": {
+                  "constantType": 1,
+                  "value": 97,
+                  "dInfo": {
+                    "position": {
+                      "line": 93,
+                      "position": 13,
+                      "index": 1282
+                    }
+                  },
+                  "nodeType": 14
+                },
+                "dInfo": {
+                  "position": {
+                    "line": 93,
+                    "position": 9,
+                    "index": 1278
+                  }
+                },
+                "name": "c",
+                "type": {
+                  "primitive": 4,
+                  "type": 3,
+                  "constancy": false,
+                  "dInfo": {
+                    "position": {
+                      "line": 93,
+                      "position": 19,
+                      "index": 1288
+                    }
+                  },
+                  "nodeType": 20
+                },
+                "nodeType": 2
+              }
+            ],
+            "nodeType": 26
+          },
+          {
+            "children": [
+              {
+                "value": {
+                  "node": {
+                    "name": "c",
+                    "dInfo": {
+                      "position": {
+                        "line": 94,
+                        "position": 14,
+                        "index": 1307
+                      }
+                    },
+                    "nodeType": 13
+                  },
+                  "operation": 4,
+                  "dInfo": {
+                    "position": {
+                      "line": 94,
+                      "position": 13,
+                      "index": 1306
+                    }
+                  },
+                  "nodeType": 1
+                },
+                "dInfo": {
+                  "position": {
+                    "line": 94,
+                    "position": 9,
+                    "index": 1302
+                  }
+                },
+                "name": "q",
+                "type": {
+                  "pointerType": {
+                    "primitive": 4,
+                    "type": 3,
+                    "constancy": false,
+                    "dInfo": {
+                      "position": {
+                        "line": 94,
+                        "position": 19,
+                        "index": 1312
+                      }
+                    },
+                    "nodeType": 20
+                  },
+                  "primitive": 7,
+                  "type": 3,
+                  "constancy": false,
+                  "dInfo": {
+                    "position": {
+                      "line": 94,
+                      "position": 18,
+                      "index": 1311
+                    }
+                  },
+                  "nodeType": 20
+                },
+                "nodeType": 2
+              }
+            ],
+            "nodeType": 26
+          },
+          {
+            "left": {
+              "name": "args",
+              "dInfo": {
+                "position": {
+                  "line": 95,
+                  "position": 5,
+                  "index": 1322
+                }
+              },
+              "nodeType": 13
+            },
+            "right": {
+              "node": {
+                "name": "q",
+                "dInfo": {
+                  "position": {
+                    "line": 95,
+                    "position": 13,
+                    "index": 1330
+                  }
+                },
+                "nodeType": 13
+              },
+              "operation": 4,
+              "dInfo": {
+                "position": {
+                  "line": 95,
+                  "position": 12,
+                  "index": 1329
+                }
+              },
+              "nodeType": 1
+            },
+            "operation": 0,
+            "dInfo": {
+              "position": {
+                "line": 95,
+                "position": 10,
+                "index": 1327
+              }
+            },
+            "nodeType": 0
+          },
+          {
+            "condition": {
+              "left": {
+                "name": "c",
+                "dInfo": {
+                  "position": {
+                    "line": 98,
+                    "position": 8,
+                    "index": 1356
+                  }
+                },
+                "nodeType": 13
+              },
+              "right": {
+                "constantType": 1,
+                "value": 98,
+                "dInfo": {
+                  "position": {
+                    "line": 98,
+                    "position": 13,
+                    "index": 1361
+                  }
+                },
+                "nodeType": 14
+              },
+              "operation": 13,
+              "dInfo": {
+                "position": {
+                  "line": 98,
+                  "position": 10,
+                  "index": 1358
+                }
+              },
+              "nodeType": 0
+            },
+            "elseNode": {
+              "block": {
+                "children": [],
+                "nodeType": 12
+              },
+              "dInfo": {
+                "position": {
+                  "line": 100,
+                  "position": 7,
+                  "index": 1392
+                }
+              },
+              "nodeType": 3
+            },
+            "block": {
+              "children": [
+                {
+                  "returnExpr": {
+                    "constantType": 0,
+                    "value": 1,
+                    "dInfo": {
+                      "position": {
+                        "line": 99,
+                        "position": 16,
+                        "index": 1383
+                      }
+                    },
+                    "nodeType": 14
+                  },
+                  "dInfo": {
+                    "position": {
+                      "line": 99,
+                      "position": 9,
+                      "index": 1376
+                    }
+                  },
+                  "nodeType": 23
+                }
+              ],
+              "nodeType": 12
+            },
+            "dInfo": {
+              "position": {
+                "line": 98,
+                "position": 5,
+                "index": 1353
+              }
+            },
+            "nodeType": 7
+          },
+          {
+            "expression": {
+              "name": "a",
+              "dInfo": {
+                "position": {
+                  "line": 104,
+                  "position": 12,
+                  "index": 1437
+                }
+              },
+              "nodeType": 13
+            },
+            "cases": {
+              "children": [
+                {
+                  "expression": {
+                    "constantType": 0,
+                    "value": 1,
+                    "dInfo": {
+                      "position": {
+                        "line": 105,
+                        "position": 14,
+                        "index": 1455
+                      }
+                    },
+                    "nodeType": 14
+                  },
+                  "block": {
+                    "children": [
+                      {
+                        "returnExpr": {
+                          "constantType": 0,
+                          "value": 1,
+                          "dInfo": {
+                            "position": {
+                              "line": 106,
+                              "position": 20,
+                              "index": 1477
+                            }
+                          },
+                          "nodeType": 14
+                        },
+                        "dInfo": {
+                          "position": {
+                            "line": 106,
+                            "position": 13,
+                            "index": 1470
+                          }
+                        },
+                        "nodeType": 23
+                      },
+                      {
+                        "dInfo": {
+                          "position": {
+                            "line": 107,
+                            "position": 9,
+                            "index": 1488
+                          }
+                        },
+                        "nodeType": 22
+                      }
+                    ],
+                    "nodeType": 12
+                  },
+                  "dInfo": {
+                    "position": {
+                      "line": 105,
+                      "position": 9,
+                      "index": 1450
+                    }
+                  },
+                  "nodeType": 9
+                },
+                {
+                  "expression": {
+                    "constantType": 0,
+                    "value": 2,
+                    "dInfo": {
+                      "position": {
+                        "line": 108,
+                        "position": 14,
+                        "index": 1508
+                      }
+                    },
+                    "nodeType": 14
+                  },
+                  "block": {
+                    "children": [
+                      {
+                        "returnExpr": {
+                          "constantType": 0,
+                          "value": 2,
+                          "dInfo": {
+                            "position": {
+                              "line": 109,
+                              "position": 20,
+                              "index": 1530
+                            }
+                          },
+                          "nodeType": 14
+                        },
+                        "dInfo": {
+                          "position": {
+                            "line": 109,
+                            "position": 13,
+                            "index": 1523
+                          }
+                        },
+                        "nodeType": 23
+                      }
+                    ],
+                    "nodeType": 12
+                  },
+                  "dInfo": {
+                    "position": {
+                      "line": 108,
+                      "position": 9,
+                      "index": 1503
+                    }
+                  },
+                  "nodeType": 9
+                }
+              ],
+              "nodeType": 12
+            },
+            "defaultNode": {
+              "block": {
+                "children": [
+                  {
+                    "returnExpr": {
+                      "constantType": 0,
+                      "value": 3,
+                      "dInfo": {
+                        "position": {
+                          "line": 111,
+                          "position": 20,
+                          "index": 1569
+                        }
+                      },
+                      "nodeType": 14
+                    },
+                    "dInfo": {
+                      "position": {
+                        "line": 111,
+                        "position": 13,
+                        "index": 1562
+                      }
+                    },
+                    "nodeType": 23
+                  }
+                ],
+                "nodeType": 12
+              },
+              "dInfo": {
+                "position": {
+                  "line": 110,
+                  "position": 9,
+                  "index": 1541
+                }
+              },
+              "nodeType": 4
+            },
+            "dInfo": {
+              "position": {
+                "line": 104,
+                "position": 5,
+                "index": 1430
+              }
+            },
+            "nodeType": 8
+          },
+          {
+            "expression": {
+              "left": {
+                "name": "a",
+                "dInfo": {
+                  "position": {
+                    "line": 116,
+                    "position": 13,
+                    "index": 1618
+                  }
+                },
+                "nodeType": 13
+              },
+              "right": {
+                "name": "b",
+                "dInfo": {
+                  "position": {
+                    "line": 116,
+                    "position": 18,
+                    "index": 1623
+                  }
+                },
+                "nodeType": 13
+              },
+              "operation": 11,
+              "dInfo": {
+                "position": {
+                  "line": 116,
+                  "position": 15,
+                  "index": 1620
+                }
+              },
+              "nodeType": 0
+            },
+            "block": {
+              "children": [
+                {
+                  "returnExpr": {
+                    "constantType": 0,
+                    "value": 2,
+                    "dInfo": {
+                      "position": {
+                        "line": 115,
+                        "position": 16,
+                        "index": 1603
+                      }
+                    },
+                    "nodeType": 14
+                  },
+                  "dInfo": {
+                    "position": {
+                      "line": 115,
+                      "position": 9,
+                      "index": 1596
+                    }
+                  },
+                  "nodeType": 23
+                }
+              ],
+              "nodeType": 12
+            },
+            "dInfo": {
+              "position": {
+                "line": 114,
+                "position": 5,
+                "index": 1583
+              }
+            },
+            "nodeType": 11
+          },
+          {
+            "condition": {
+              "left": {
+                "name": "a",
+                "dInfo": {
+                  "position": {
+                    "line": 118,
+                    "position": 8,
+                    "index": 1635
+                  }
+                },
+                "nodeType": 13
+              },
+              "right": {
+                "name": "b",
+                "dInfo": {
+                  "position": {
+                    "line": 118,
+                    "position": 12,
+                    "index": 1639
+                  }
+                },
+                "nodeType": 13
+              },
+              "operation": 8,
+              "dInfo": {
+                "position": {
+                  "line": 118,
+                  "position": 10,
+                  "index": 1637
+                }
+              },
+              "nodeType": 0
+            },
+            "block": {
+              "children": [
+                {
+                  "returnExpr": {
+                    "node": {
+                      "constantType": 0,
+                      "value": 1,
+                      "dInfo": {
+                        "position": {
+                          "line": 119,
+                          "position": 17,
+                          "index": 1660
+                        }
+                      },
+                      "nodeType": 14
+                    },
+                    "operation": 2,
+                    "dInfo": {
+                      "position": {
+                        "line": 119,
+                        "position": 16,
+                        "index": 1659
+                      }
+                    },
+                    "nodeType": 1
+                  },
+                  "dInfo": {
+                    "position": {
+                      "line": 119,
+                      "position": 9,
+                      "index": 1652
+                    }
+                  },
+                  "nodeType": 23
+                }
+              ],
+              "nodeType": 12
+            },
+            "dInfo": {
+              "position": {
+                "line": 118,
+                "position": 5,
+                "index": 1632
+              }
+            },
+            "nodeType": 7
+          },
+          {
+            "initialization": {
+              "children": [
+                {
+                  "value": {
+                    "constantType": 0,
+                    "value": 0,
+                    "dInfo": {
+                      "position": {
+                        "line": 122,
+                        "position": 17,
+                        "index": 1686
+                      }
+                    },
+                    "nodeType": 14
+                  },
+                  "dInfo": {
+                    "position": {
+                      "line": 122,
+                      "position": 13,
+                      "index": 1682
+                    }
+                  },
+                  "name": "i",
+                  "type": {
+                    "primitive": 0,
+                    "type": 3,
+                    "constancy": false,
+                    "dInfo": {
+                      "position": {
+                        "line": 122,
+                        "position": 21,
+                        "index": 1690
+                      }
+                    },
+                    "nodeType": 20
+                  },
+                  "nodeType": 2
+                }
+              ],
+              "nodeType": 26
+            },
+            "step": {
+              "children": [
+                {
+                  "node": {
+                    "name": "i",
+                    "dInfo": {
+                      "position": {
+                        "line": 122,
+                        "position": 35,
+                        "index": 1704
+                      }
+                    },
+                    "nodeType": 13
+                  },
+                  "operation": 0,
+                  "dInfo": {
+                    "position": {
+                      "line": 122,
+                      "position": 36,
+                      "index": 1705
+                    }
+                  },
+                  "nodeType": 1
+                }
+              ],
+              "nodeType": 12
+            },
+            "expression": {
+              "left": {
+                "name": "i",
+                "dInfo": {
+                  "position": {
+                    "line": 122,
+                    "position": 26,
+                    "index": 1695
+                  }
+                },
+                "nodeType": 13
+              },
+              "right": {
+                "constantType": 0,
+                "value": 10,
+                "dInfo": {
+                  "position": {
+                    "line": 122,
+                    "position": 31,
+                    "index": 1700
+                  }
+                },
+                "nodeType": 14
+              },
+              "operation": 11,
+              "dInfo": {
+                "position": {
+                  "line": 122,
+                  "position": 28,
+                  "index": 1697
+                }
+              },
+              "nodeType": 0
+            },
+            "block": {
+              "children": [
+                {
+                  "condition": {
+                    "left": {
+                      "name": "i",
+                      "dInfo": {
+                        "position": {
+                          "line": 123,
+                          "position": 12,
+                          "index": 1722
+                        }
+                      },
+                      "nodeType": 13
+                    },
+                    "right": {
+                      "constantType": 0,
+                      "value": 0,
+                      "dInfo": {
+                        "position": {
+                          "line": 123,
+                          "position": 16,
+                          "index": 1726
+                        }
+                      },
+                      "nodeType": 14
+                    },
+                    "operation": 8,
+                    "dInfo": {
+                      "position": {
+                        "line": 123,
+                        "position": 14,
+                        "index": 1724
+                      }
+                    },
+                    "nodeType": 0
+                  },
+                  "elseNode": {
+                    "block": {
+                      "children": [
+                        {
+                          "node": {
+                            "name": "b",
+                            "dInfo": {
+                              "position": {
+                                "line": 126,
+                                "position": 15,
+                                "index": 1779
+                              }
+                            },
+                            "nodeType": 13
+                          },
+                          "operation": 6,
+                          "dInfo": {
+                            "position": {
+                              "line": 126,
+                              "position": 13,
+                              "index": 1777
+                            }
+                          },
+                          "nodeType": 1
+                        }
+                      ],
+                      "nodeType": 12
+                    },
+                    "dInfo": {
+                      "position": {
+                        "line": 125,
+                        "position": 11,
+                        "index": 1758
+                      }
+                    },
+                    "nodeType": 3
+                  },
+                  "block": {
+                    "children": [
+                      {
+                        "node": {
+                          "name": "a",
+                          "dInfo": {
+                            "position": {
+                              "line": 124,
+                              "position": 13,
+                              "index": 1743
+                            }
+                          },
+                          "nodeType": 13
+                        },
+                        "operation": 0,
+                        "dInfo": {
+                          "position": {
+                            "line": 124,
+                            "position": 14,
+                            "index": 1744
+                          }
+                        },
+                        "nodeType": 1
+                      }
+                    ],
+                    "nodeType": 12
+                  },
+                  "dInfo": {
+                    "position": {
+                      "line": 123,
+                      "position": 9,
+                      "index": 1719
+                    }
+                  },
+                  "nodeType": 7
+                }
+              ],
+              "nodeType": 12
+            },
+            "dInfo": {
+              "position": {
+                "line": 122,
+                "position": 5,
+                "index": 1674
+              }
+            },
+            "nodeType": 6
+          }
+        ],
+        "nodeType": 12
+      },
+      "dInfo": {
+        "position": {
+          "line": 73,
+          "position": 6,
+          "index": 971
+        }
+      },
+      "name": "main",
+      "type": {
+        "arguments": {
+          "children": [
+            {
+              "dInfo": {
+                "position": {
+                  "line": 73,
+                  "position": 11,
+                  "index": 976
+                }
+              },
+              "name": "args",
+              "type": {
+                "pointerType": {
+                  "pointerType": {
+                    "primitive": 4,
+                    "type": 3,
+                    "constancy": false,
+                    "dInfo": {
+                      "position": {
+                        "line": 73,
+                        "position": 32,
+                        "index": 997
+                      }
+                    },
+                    "nodeType": 20
+                  },
+                  "primitive": 7,
+                  "type": 3,
+                  "constancy": true,
+                  "dInfo": {
+                    "position": {
+                      "line": 73,
+                      "position": 30,
+                      "index": 995
+                    }
+                  },
+                  "nodeType": 20
+                },
+                "primitive": 7,
+                "type": 3,
+                "constancy": true,
+                "dInfo": {
+                  "position": {
+                    "line": 73,
+                    "position": 22,
+                    "index": 987
+                  }
+                },
+                "nodeType": 20
+              },
+              "nodeType": 21
+            }
+          ],
+          "nodeType": 26
+        },
+        "returnValue": {
+          "primitive": 0,
+          "type": 3,
+          "constancy": false,
+          "dInfo": {
+            "position": {
+              "line": 73,
+              "position": 38,
+              "index": 1003
+            }
+          },
+          "nodeType": 20
+        },
+        "type": 2,
+        "constancy": false,
+        "dInfo": {
+          "position": {
+            "line": 73,
+            "position": 10,
+            "index": 975
+          }
+        },
+        "nodeType": 20
+      },
+      "nodeType": 15
+    }
+  ],
+  "nodeType": 12
+}

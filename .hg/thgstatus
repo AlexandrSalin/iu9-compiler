@@ -1,0 +1,6 @@
+mFront End/src/ru/bmstu/iu9/compiler/ir
+mFront End/src/ru/bmstu/iu9/compiler/ir/type
+mFront End/src/ru/bmstu/iu9/compiler/lexis/token
+mFront End/src/ru/bmstu/iu9/compiler/semantics
+mFront End/src/ru/bmstu/iu9/compiler/syntax
+mFront End/src/ru/bmstu/iu9/compiler/syntax/tree

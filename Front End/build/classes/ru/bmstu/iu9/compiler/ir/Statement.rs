@@ -1,0 +1,14 @@
+ru.bmstu.iu9.compiler.ir.MemberSelectStatement
+ru.bmstu.iu9.compiler.ir.BinaryOperationStatement$Operation
+ru.bmstu.iu9.compiler.ir.GoToStatement
+ru.bmstu.iu9.compiler.ir.ArrayIndexStatement
+ru.bmstu.iu9.compiler.ir.AssignmentStatement
+ru.bmstu.iu9.compiler.ir.IndirectAssignmentStatement
+ru.bmstu.iu9.compiler.ir.Statement
+ru.bmstu.iu9.compiler.ir.IfStatement
+ru.bmstu.iu9.compiler.ir.UnaryOperationStatement
+ru.bmstu.iu9.compiler.ir.Label
+ru.bmstu.iu9.compiler.ir.ReturnStatement
+ru.bmstu.iu9.compiler.ir.BinaryOperationStatement
+ru.bmstu.iu9.compiler.ir.CallStatement
+ru.bmstu.iu9.compiler.ir.UnaryOperationStatement$Operation

@@ -1,0 +1,108 @@
+Const         ::= Number | "'" UnicodeChar "'" | "true" | "false" 
+Number        ::= DecimalLit | OctalLit | HexLit | FloatLit 
+
+
+Type          ::= TypeName | TypeLit | "(" Type ")"
+TypeName      ::= "int" | "bool" | "double" | "float" | "void"
+TypeLit       ::= ArrayType | StructType | PointerType | FunctionType
+
+ArrayType     ::= "[" DecimalLit "]" Type
+
+StructType    ::= "struct" Identifier
+
+PointerType   ::= "*" Type
+
+FunctionType  ::= "func" Signature
+Signature     ::= Parameters Type
+Parameters    ::= "(" [ ParameterList [ "," ] ] ")"
+ParameterList ::= ParameterDecl { "," ParameterDecl }
+ParameterDecl ::= [ IdentifierList ] Type
+
+
+
+Identifier    ::= Letter { Letter | UnicodeDigit } 
+Letter        ::= UnicodeLetter | "_" 
+DecimalDigit  ::= "0" ... "9"           
+OctalDigit    ::= "0" ... "7" 
+HexDigit      ::= "0" ... "9" | "A" ... "F" | "a" ... "f" 
+
+IntLit        ::= DecimalLit | OctalLit | HexLit 
+DecimalLit    ::= ( "1" ... "9" ) { DecimalDigit } 
+OctalLit      ::= "0" { OctalDigit } 
+HexLit        ::= "0" ( "x" | "X" ) HexDigit { HexDigit } 
+FloatLit      ::= Decimals "." [ Decimals ] [ Exponent ] | 
+                  Decimals Exponent | 
+                  "." Decimals [ Exponent ] 
+Decimals      ::= DecimalDigit { DecimalDigit } 
+Exponent      ::= ( "e" | "E" ) [ "+" | "-" ] Decimals 
+
+MemberSelect  ::= "."
+IncDec        ::= "++" | "--"
+BitwiseNot    ::= "~" 
+BoolNot       ::= "!" 
+PlusMinus     ::= "+" | "-"
+Asterisk      ::= "*"
+TypeConv      ::= "(" Type ")" 
+Mul           ::= "/" | "%"
+BitwiseShift  ::= ">>" | "<<" 
+OrderRelation ::= ">=" | "<=" | ">" | "<" 
+Equal         ::= "==" | "!=" 
+Ampersand     ::= "&" 
+BitwiseXor    ::= "^" 
+BitwiseOr     ::= "|" 
+BoolAnd       ::= "&&" 
+BoolOr        ::= "||" 
+Assign        ::= "=" | "+=" | "-=" | "*=" | "/=" | "%=" | ">>=" | "<<=" | "&=" | "^=" | "|=" 
+Sequencing    ::= "," 
+
+
+Program       ::= { FunctionDef | VariableDef ";" | StructDef ";" }
+
+FunctionDecl  ::= "func" Identifier Signature Block
+
+VariableDef   ::= "var" Variable { "," Variable } ":" Type
+Variable      ::= Identifier [ "=" Expression ]
+
+StructDef ::= "struct" Identifier "{" { VariableDef ";" } "}"
+
+Code ::= "{" Block "}"
+Block ::= { VariableDef ";" | Expression ";" | For | If | While | DoWhile ";" | NewThread ";" | 
+            Switch | Return ";" | Break ";" | Continue ";" | "lock" Code | Barrier ";" } 
+
+Expression ::= BoolExpression { Assign BoolExpression }
+BoolExpression ::= ABoolExpression { BoolOr ABoolExpression } 
+ABoolExpression ::= BBoolExpression { BoolAnd BBoolExpression } 
+BBoolExpression ::= GExpression { BitwiseOr GExpression } 
+GExpression ::= HExpression { BitwiseXor HExpression } 
+HExpression ::= IExpression { Ampersand IExpression } 
+IExpression ::= CBoolExpression { Equal CBoolExpression } 
+CBoolExpression ::= DboolExpression { OrderRelation DboolExpression } 
+DboolExpression ::= AExpression { BitwiseShift AExpression } 
+AExpression ::= BExpression { PlusMinus BExpression } 
+BExpression ::= CExpression { ( Div | Asterisk | Mod ) CExpression } 
+CExpression ::= [ "<" Type ">" ] DExpression
+DExpression ::= ([ PlusMinus ] | { Ampersand | Asterisk } | [ IncDec ]) EExpression 
+EExpression ::= FExpression [ IncDec ] 
+FExpression ::= JExpression { ArrayElement | MemberSelect Identifier | FuncArgs }
+JExpression ::= "(" Expression ")" | Const | Identifier 
+
+ArrayElement::= "[" Expression "]"
+FuncArgs    ::= "(" [ Expression { "," Expression }] ")" 
+
+For         ::= "for" "(" 
+                [ VariableDef | Expression ] ";" 
+                [ Expression ] ";" 
+                [ Expression { Sequencing Expression }] ")" Code 
+If          ::= "if" "(" Expression ")" Code [ "else" ( If | Code )] 
+While       ::= "while" "(" Expression ")" Code 
+DoWhile     ::= "do" Code "while" "(" Expression ")" 
+Switch      ::= "switch" "(" Expression ")" "{" Case { Case } [ Default ] "}" 
+Case        ::= "case" Expression ":" Block 
+Default     ::= "default" ":" Block 
+
+Return      ::= "return" [ Expression ]
+Break       ::= "break"
+Continue    ::= "continue"
+
+NewThread   ::= "run" Expression
+Barrier     ::= "barrier"

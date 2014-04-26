@@ -1,0 +1,129 @@
+/*
+func q() int {
+    var (
+        a = true bool;
+        b = false bool;
+        c int;
+//        d [5][5][6] int;
+    );
+
+    switch(c) {
+    case 1:
+        return 1;
+    break;
+    case 2:
+        return 2;
+    default:
+        return 3;
+    }
+
+
+    for(var i = 0 int; i <= 10; ++i) {
+        var l = 10.0 double;
+
+        if(a) {
+            var k long;
+        }
+
+        var m char;
+    }
+
+    d[0][1][2] = 5;
+
+    var t struct abc;
+
+    t.a = 5;
+    t.b = 10;
+    t.c = 1.2;
+    t.d = &foo;
+
+    t.e.b.a = 5;
+
+    if(a && b) {
+        var b int;
+    } else if(a || b) {
+        var c double;
+    }
+//    return;
+}
+
+var bar const struct abc;
+     */
+struct def {
+    a int;
+    b **struct abc;
+};
+struct abc {
+    a, b  int;
+    c double;
+    d func(q, w int, e, r float) int;
+    e *struct def;
+};
+
+func foo(q, w const int, e, r float) void {
+    var bar : const struct abc;
+    return;
+}
+
+var (
+    q = 5 : const int;
+    w = 9.9e-5, e = 5.0 : double;
+);
+
+func main(args const * const * char) int {
+    // comment 1 2 3 
+    var (
+        a = 0 : int;
+        b = 10 : const int;
+        l : [10][5] int;
+        m : struct abc;
+        g : long;
+        );
+
+    /*
+        test 
+        multiline 
+        comment 
+    */
+
+    g = <long>a;
+
+    l[2][3] = a;
+
+    var c = 'a' : char;
+    var q = &c : *char;
+    args = &q;
+//    bar = 0;
+
+    if(c == 'b') {
+        return 1;
+    } else {
+//        return 0;
+    }
+
+    switch(a) {
+        case 1:
+            return 1;
+        break;
+        case 2:
+            return 2;
+        default:
+            return 3;
+    }
+
+    do {
+        return 2;
+    } while(a <= b);
+
+    if(a > b) {
+        return -1;
+    }
+
+    for(var i = 0 : int; i <= 10; i++) {
+        if(i > 0) {
+            a++;
+        } else {
+            --b;
+        }
+    }
+}
