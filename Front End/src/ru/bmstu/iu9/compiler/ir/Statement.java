@@ -35,12 +35,14 @@ abstract class Statement {
         return this.ssaList.listIterator();
     };
     public int GetDefSsaNamesCount(){
-        this.ssaList.size();
+        return this.ssaList.size();
     };
-   /* public SsaName GetDefSsaName(){
-        return
-    };*/
-    public ListIterator<SsaName> GetUseSsaNames(){};
+    // ПРОСТО ПОСТАВЬ РЕТУРН, ЧТОБЫ БЫЛА ЗАГЛУШКА
+    // public SsaName GetDefSsaName(){
+    //    return
+    //};
+    // ПРОСТО ПОСТАВЬ РЕТУРН, ЧТОБЫ БЫЛА ЗАГЛУШКА
+    //public ListIterator<SsaName> GetUseSsaNames();
 }
 
 final class IndirectRunStatement extends Statement {
@@ -476,12 +478,15 @@ class PhiFunction extends Statement
         super(Operation.PHI_FUNCTION);
     }
 
-    public SsaName GetArgByEdge(Edge e)
-    {
-
-    };
-    public Edge GetEdgeByArg(Iterator<SsaName> it){};
-    public Edge GetEdgeByArg(SsaName ssaName){};
+    // ПРОСТО ПОСТАВЬ РЕТУРН, ЧТОБЫ БЫЛА ЗАГЛУШКА
+    //public SsaName GetArgByEdge(Edge e)
+    //{
+    //
+    //};
+    // ПРОСТО ПОСТАВЬ РЕТУРН, ЧТОБЫ БЫЛА ЗАГЛУШКА
+    //public Edge GetEdgeByArg(Iterator<SsaName> it){};
+    // ПРОСТО ПОСТАВЬ РЕТУРН, ЧТОБЫ БЫЛА ЗАГЛУШКА
+    //public Edge GetEdgeByArg(SsaName ssaName){};
     public void DeleteEdgeByArg(Iterator<SsaName> it){};
     public void DeleteEdgeByArg(SsaName ssaName){};
     public void SetArgByEdge(Edge e, SsaName ssaName){};
